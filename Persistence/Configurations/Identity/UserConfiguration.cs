@@ -14,6 +14,11 @@ namespace Persistence.Configurations.Identity
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.HasMany(u => u.RefreshTokens)
+                .WithOne(t => t.User)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasData(
                   new User
                   {

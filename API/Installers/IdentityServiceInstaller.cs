@@ -33,7 +33,9 @@ namespace API.Installers
                             ValidateIssuerSigningKey = true,
                             IssuerSigningKey = key,
                             ValidateIssuer = false,
-                            ValidateAudience = false
+                            ValidateAudience = false,
+                            ValidateLifetime = true,
+                            ClockSkew = TimeSpan.Zero
                         };
                     });
             }
