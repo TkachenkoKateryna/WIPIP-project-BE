@@ -16,7 +16,10 @@ namespace API.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJWTTokenService _jwtService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, IJWTTokenService jwtService)
+        public AccountController(UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            IJWTTokenService jwtService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -36,7 +39,6 @@ namespace API.Controllers
 
             if (result.Succeeded)
             {
-                await SetRefreshToken(user);
                 return CreateUserObject(user);
             }
 
@@ -62,7 +64,6 @@ namespace API.Controllers
                 Email = registeDto.Email,
             };
 
-
             var passGen = await _userManager.CreateAsync(user, registeDto.Password);
 
             if (passGen.Succeeded)
@@ -70,14 +71,12 @@ namespace API.Controllers
                 if (registeDto.isLead)
                 {
                     await _userManager.AddToRoleAsync(user, "Lead");
-
                 }
                 else
                 {
                     await _userManager.AddToRoleAsync(user, "Manager");
                 }
 
-                await SetRefreshToken(user);
                 return CreateUserObject(user);
             }
 
@@ -93,37 +92,26 @@ namespace API.Controllers
             return CreateUserObject(user);
         }
 
-        [Authorize]
-        [HttpPost("refeshToken")]
-        public async Task<ActionResult<UserDto>> RefreshToken()
+        [AllowAnonymous]
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePassword)
         {
-            var refreshToken = Request.Cookies["refreshToken"];
-            var user = await _userManager.Users.Include(r => r.RefreshTokens)
-                .FirstOrDefaultAsync(x => x.UserName == User.FindFirstValue(ClaimTypes.Name));
+            User user = await _userManager.FindByEmailAsync(changePassword.Email);
 
-            if (user == null) return Unauthorized();
+            if (user is null) return BadRequest("User not found");
 
-            var oldToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
+            IdentityResult result =
+                    await _userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
 
-            if (oldToken != null && !oldToken.IsActive) return Unauthorized();
-
-            return CreateUserObject(user);
-        }
-
-        private async Task SetRefreshToken(User user)
-        {
-            var refreshToken = _jwtService.GenerateRefreshToken();
-
-            user.RefreshTokens.Add(refreshToken);
-            await _userManager.UpdateAsync(user);
-
-            var cookieOptions = new CookieOptions
+            if (result.Succeeded)
             {
-                HttpOnly = true,
-                Expires = DateTime.UtcNow.AddDays(7),
-            };
-
-            Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
+                User updatedUser = await _userManager.FindByEmailAsync(changePassword.Email);
+                return Ok(CreateUserObject(updatedUser));
+            }
+            else
+            {
+                return BadRequest("Error while changing the password");
+            }
         }
 
         private UserDto CreateUserObject(User user)
@@ -137,6 +125,5 @@ namespace API.Controllers
                 Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()
             };
         }
-
     }
 }
