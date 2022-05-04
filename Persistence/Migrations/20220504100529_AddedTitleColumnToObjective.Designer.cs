@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.EF;
 
@@ -11,9 +12,10 @@ using Persistence.EF;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220504100529_AddedTitleColumnToObjective")]
+    partial class AddedTitleColumnToObjective
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,23 +200,12 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            Description = "Planmykids project that helps parents with building itineraries for kids to different camps.",
-                            IsDeleted = false
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
@@ -481,15 +472,15 @@ namespace Persistence.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "700bfcb2-a703-43dc-a95a-38eb7aadd4ed",
+                            ConcurrencyStamp = "54aa4d36-81eb-420e-b38b-71d4593cfb3c",
                             Email = "bob@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "BOB@TEXT.COM",
                             NormalizedUserName = "BOB",
-                            PasswordHash = "AQAAAAEAACcQAAAAECOfjezfQ4+U0KmRKNWPyVBKcbxDmlPDGISZbM5Efpck7A7HDTTQ3vV21aGn1bZyWQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEJShRqkr8BtPy/6oCxkAtUDi2LTwbYb3PYo/7er19g7MfshReRP+ZYS+5mjeOAOa5Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cdd3ea40-2152-4156-aefd-702f0477de67",
+                            SecurityStamp = "e82133eb-da58-413e-99fb-d763e4baad77",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         },
@@ -497,15 +488,15 @@ namespace Persistence.Migrations
                         {
                             Id = "4f555f12-9168-49b1-9f17-b87904564904",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "062077ef-8c27-4343-a218-11c6b6f2d6b2",
+                            ConcurrencyStamp = "833d756a-0a57-467b-b5c6-3c443711a2cd",
                             Email = "jane@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANE@TEXT.COM",
                             NormalizedUserName = "JANE",
-                            PasswordHash = "AQAAAAEAACcQAAAAEN17ADOkRsK3h3bC23nPcJwjxyqf6JQPic4cu6wKWWxoVUk3WN7rKm9kTxt/y9Dlqw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKAELEX3mXzZOvMrWKx9WlSQE0Q1kPWrtXxbJB7RBJSdZa2cpulXY9Ncf4MuHajIww==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eb90c08a-6d5a-48ae-b62e-a27e880ce775",
+                            SecurityStamp = "e8b00630-4e6a-4218-be41-726f679cef0f",
                             TwoFactorEnabled = false,
                             UserName = "jane"
                         });
@@ -541,14 +532,14 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74",
-                            ConcurrencyStamp = "4bf269de-fa63-468a-b1e5-9a351aad789b",
+                            ConcurrencyStamp = "23484b6b-e8ff-4e12-96ca-faa1b1f8cd21",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "09afe919-59ff-44b8-b656-c5e320c163a7",
-                            ConcurrencyStamp = "8b4f34d8-bd89-4b86-b47e-a9d12e3c910e",
+                            ConcurrencyStamp = "5b6b0d94-bc12-40a9-b63d-0cd3d9304e08",
                             Name = "Lead",
                             NormalizedName = "LEAD"
                         });

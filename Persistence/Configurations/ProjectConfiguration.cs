@@ -30,7 +30,12 @@ namespace Persistence.Configurations
               .HasForeignKey(o => o.ProjectId)
               .OnDelete(DeleteBehavior.Restrict);
 
-   
+            builder.HasData(
+                new Project
+                {
+                    Id = Guid.Parse("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
+                    Description = "Planmykids project that helps parents with building itineraries for kids to different camps."
+                });
         }
     }
 }

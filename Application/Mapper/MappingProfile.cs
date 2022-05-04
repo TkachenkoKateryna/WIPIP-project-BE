@@ -8,6 +8,9 @@ namespace Application.Mapper
     {
         public MappingProfile()
         {
+            CreateMap<Objective, ObjectiveResponse>();
+            CreateMap<ObjectiveRequest, Objective>();
+
             CreateMap<EmployeeSkill, EmployeeSkillDto>()
                 .ForMember(m => m.Title, opt => opt.MapFrom(m => m.Skill.Title));
             CreateMap<Employee, EmployeeDto>()

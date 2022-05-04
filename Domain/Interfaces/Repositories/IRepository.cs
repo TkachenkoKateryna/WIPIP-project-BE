@@ -9,7 +9,7 @@ namespace Domain.Interfaces.Repositories
         void Create(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
-        void SoftDelete(int id);
+        void SoftDelete(Guid id);
 
         TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate,
                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
@@ -20,6 +20,8 @@ namespace Domain.Interfaces.Repositories
         IEnumerable<TEntity> FindWithDeleted(Expression<Func<TEntity, bool>> predicate,
                                              Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 
-        public IEnumerable<TEntity> GetAll(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
+        IEnumerable<TEntity> GetAll(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
+
+        IEnumerable<TEntity> GetAllWithDeleted(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
     }
 }

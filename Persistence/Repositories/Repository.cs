@@ -30,7 +30,7 @@ namespace Persistence.Repositories
             DbSet.Remove(entity);
         }
 
-        public void SoftDelete(int id)
+        public void SoftDelete(Guid id)
         {
             DbSet.Find(id).IsDeleted = true;
         }
@@ -85,6 +85,18 @@ namespace Persistence.Repositories
             return QueryableDbSet.AsNoTracking();
         }
 
+        public IEnumerable<TEntity> GetAllWithDeleted(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
+        {
+            QueryableDbSet = DbContext.Set<TEntity>().IgnoreQueryFilters();
+
+            if (include != null)
+            {
+                QueryableDbSet = include(QueryableDbSet);
+            }
+
+            return QueryableDbSet.AsNoTracking();
+        }
+
         public IQueryable<TEntity> GetAllIQueryable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
             if (include != null)
@@ -97,18 +109,6 @@ namespace Persistence.Repositories
 
         public IQueryable<TEntity> GetAllQueryable(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
-            if (include != null)
-            {
-                QueryableDbSet = include(QueryableDbSet);
-            }
-
-            return QueryableDbSet.AsNoTracking();
-        }
-
-        public IEnumerable<TEntity> GetAllWithDeleted(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
-        {
-            QueryableDbSet = DbContext.Set<TEntity>().IgnoreQueryFilters();
-
             if (include != null)
             {
                 QueryableDbSet = include(QueryableDbSet);

@@ -15,6 +15,7 @@ namespace Domain.Entities
             Candidates = new List<ProjectCandidate>();
         }
 
+        public string Description { get; set; }
         public ICollection<ProjectStakeholder> ProjectStakeholders { get; set; }
         public ICollection<Milestone> Milestones { get; set; }
         public ICollection<Deliverable> Deliverables { get; set; }
