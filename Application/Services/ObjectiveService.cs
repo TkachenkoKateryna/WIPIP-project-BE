@@ -1,10 +1,10 @@
 ﻿using Application.Exceptions;
 using Application.Interfaces;
 using AutoMapper;
-using Domain.Dtos;
+using Domain.Dtos.Requests;
+using Domain.Dtos.Responses;
 using Domain.Entities;
 using Domain.Interfaces.Repositories;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Application.Services
 {
@@ -13,7 +13,6 @@ namespace Application.Services
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IRepository<Objective> _objectiveRepository;
-        private readonly Func<IQueryable<Objective>, IIncludableQueryable<Objective, object>> _includes;
 
         public ObjectiveService(IUnitOfWork uow, IMapper mapper)
         {
@@ -24,14 +23,14 @@ namespace Application.Services
 
         public IEnumerable<ObjectiveResponse> GetAllObjectivesByProject(string projectId)
         {
-            return _uow.GetRepository<Objective>().Find(o => o.ProjectId == Guid.Parse(projectId))
+            return _objectiveRepository.Find(o => o.ProjectId == Guid.Parse(projectId))
                 .Select(empEntity => _mapper.Map<ObjectiveResponse>(empEntity))
                 .ToList();
         }
 
         public IEnumerable<ObjectiveResponse> GetAllObjectives()
         {
-            return _uow.GetRepository<Objective>().GetAllWithDeleted()
+            return _objectiveRepository.GetAllWithDeleted()
                 .Select(empEntity => _mapper.Map<ObjectiveResponse>(empEntity))
                 .ToList();
         }

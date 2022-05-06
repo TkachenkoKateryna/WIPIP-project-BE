@@ -11,7 +11,10 @@ namespace API.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IStakeholdersService, StakeholdersService>();
             services.AddScoped<IObjectiveService, ObjectiveService>();
+            services.AddScoped<IAssumptionsService, AssumptionsService>();
+            services.AddScoped<IDeliverablesService, DeliverablesService>();
             services.AddScoped<IJWTTokenService, JWTTokenService>();
         }
     }

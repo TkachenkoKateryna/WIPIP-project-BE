@@ -1,4 +1,5 @@
-﻿using Domain.Dtos;
+﻿using Domain.Dtos.Requests;
+using Domain.Dtos.Responses;
 
 namespace Application.Interfaces
 {

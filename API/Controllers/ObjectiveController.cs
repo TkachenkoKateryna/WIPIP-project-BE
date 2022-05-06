@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
-using Domain.Dtos;
+using Domain.Dtos.Requests;
+using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -40,7 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPut("objectives/update/{objId}")]
-        public ActionResult<ObjectiveResponse> UpdateProduct(ObjectiveRequest objRequest, string objId)
+        public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, string objId)
         {
             try
             {

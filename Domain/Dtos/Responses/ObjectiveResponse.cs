@@ -1,14 +1,12 @@
 ﻿using Domain.Constants;
+using Domain.Dtos.Base;
 
-namespace Domain.Dtos
+namespace Domain.Dtos.Responses
 {
-    public class ObjectiveResponse
+    public class ObjectiveResponse : BaseResponse
     {
-        public string Id { get; set; }
         public string Description { get; set; }
         public Priority Priority { get; set; }
         public string Title { get; set; }
-        public string ProjectId { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }
