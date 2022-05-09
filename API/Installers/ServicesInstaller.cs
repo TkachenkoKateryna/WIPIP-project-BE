@@ -10,12 +10,16 @@ namespace API.Installers
     {
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IStakeholdersService, StakeholdersService>();
             services.AddScoped<IObjectiveService, ObjectiveService>();
             services.AddScoped<IAssumptionsService, AssumptionsService>();
             services.AddScoped<IDeliverablesService, DeliverablesService>();
+            services.AddScoped<IMilestoneService, MilestoneService>();
             services.AddScoped<IJWTTokenService, JWTTokenService>();
+            services.AddScoped<IFileStorageService, AzureStorageService>();
+            services.AddScoped<IPDFService, PDFService>();
         }
     }
 }

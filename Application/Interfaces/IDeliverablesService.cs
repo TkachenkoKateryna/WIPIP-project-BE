@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Dtos.Requests;
+using Domain.Dtos.Responses;
 
 namespace Application.Interfaces
 {
-    internal class IDeliverablesService
+    public interface IDeliverablesService
     {
+        IEnumerable<DeliverableResponse> GetAllDeliverablesByProject(string projectId);
+        IEnumerable<DeliverableResponse> GetAllDeliverables();
+        DeliverableResponse AddDeliverable(DeliverableRequest delRequest);
+        DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, string delId);
+        void DeleteDeliverable(string delId);
     }
 }

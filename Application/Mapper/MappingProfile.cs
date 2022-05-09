@@ -16,6 +16,14 @@ namespace Application.Mapper
             CreateMap<Assumption, AssumptionResponse>();
             CreateMap<AssumptionRequest, Assumption>();
 
+
+            CreateMap<Deliverable, DeliverableResponse>();
+            CreateMap<DeliverableRequest, Deliverable>();
+
+            CreateMap<Milestone, MilestoneResponse>();
+            CreateMap<MilestoneRequest, Milestone>()
+                .IncludeAllDerived();
+
             CreateMap<ProjectStakeholder, StakeholderResponse>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.Stakeholder.Id))
                 .ForMember(m => m.Name, opt => opt.MapFrom(m => m.Stakeholder.Name))
@@ -29,6 +37,9 @@ namespace Application.Mapper
 
             CreateMap<Stakeholder, StakeholderResponse>();
             CreateMap<StakeholderRequest, Stakeholder>();
+
+            CreateMap<Project, ProjectResponse>()
+                .IncludeAllDerived();
 
             CreateMap<EmployeeSkill, EmployeeSkillDto>()
                 .ForMember(m => m.Title, opt => opt.MapFrom(m => m.Skill.Title));

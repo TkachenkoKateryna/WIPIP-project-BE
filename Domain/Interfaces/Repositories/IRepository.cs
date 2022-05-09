@@ -7,6 +7,8 @@ namespace Domain.Interfaces.Repositories
     public interface IRepository<TEntity> where TEntity : class, IBaseEntity
     {
         void Create(TEntity entity);
+
+        Guid CreateWithVal(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
         void SoftDelete(Guid id);

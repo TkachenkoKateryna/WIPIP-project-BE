@@ -20,6 +20,13 @@ namespace Persistence.Repositories
             QueryableDbSet = DbSet;
         }
 
+        public Guid CreateWithVal(TEntity entity)
+        {
+            DbSet.Add(entity);
+
+            return entity.Id;
+        }
+
         public void Create(TEntity entity)
         {
             DbSet.Add(entity);

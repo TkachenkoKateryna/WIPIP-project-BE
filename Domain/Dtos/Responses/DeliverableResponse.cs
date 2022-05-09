@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Dtos.Base;
 
 namespace Domain.Dtos.Responses
 {
-    internal class DeliverableResponse
+    public class DeliverableResponse : BaseResponse
     {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime TimeOfComplition { get; set; }
     }
 }

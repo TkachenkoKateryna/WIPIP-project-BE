@@ -10,7 +10,7 @@ namespace Domain.Entities
         }
 
         public string Activity { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime DueDate { get; set; }
 
         public Guid ProjectId { get; set; }
         public Project Project { get; set; }

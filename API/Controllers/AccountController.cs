@@ -1,5 +1,7 @@
-﻿using Application.Interfaces.Util;
+﻿using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos;
+using Domain.Dtos.Responses;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,21 +17,26 @@ namespace API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJWTTokenService _jwtService;
+        private readonly IFileStorageService _fileStorageService;
+
+        private readonly string containerName = "wipipresources";
 
         public AccountController(UserManager<User> userManager,
             SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager,
-            IJWTTokenService jwtService)
+            IJWTTokenService jwtService,
+            IFileStorageService fileStorageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
             _roleManager = roleManager;
+            _fileStorageService = fileStorageService;
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+        public async Task<ActionResult<UserResponse>> Login(LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
@@ -47,7 +54,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register(RegisterDto registeDto)
+        public async Task<ActionResult<UserResponse>> Register(RegisterDto registeDto)
         {
             if (await _userManager.Users.AllAsync(x => x.Email == registeDto.Email))
             {
@@ -85,7 +92,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet("user")]
-        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        public async Task<ActionResult<UserResponse>> GetCurrentUser()
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
@@ -114,12 +121,33 @@ namespace API.Controllers
             }
         }
 
-        private UserDto CreateUserObject(User user)
+        [HttpPost("uploadImage")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
         {
-            return new UserDto
+            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+
+            if (user is null) return BadRequest("User not found");
+
+            if (image != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await image.CopyToAsync(memoryStream);
+                    var content = memoryStream.ToArray();
+                    var extension = Path.GetExtension(image.FileName);
+                    user.ImageLink = _fileStorageService.SaveFile(content, extension, containerName, image.ContentType);
+                }
+            }
+            var updatedUser = await _userManager.UpdateAsync(user);
+            return Ok(updatedUser);
+        }
+
+        private UserResponse CreateUserObject(User user)
+        {
+            return new UserResponse
             {
                 UserName = user.UserName,
-                Image = null,
+                ImageLink = user.ImageLink,
                 Token = _jwtService.CreateToken(user),
                 Email = user.Email,
                 Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()

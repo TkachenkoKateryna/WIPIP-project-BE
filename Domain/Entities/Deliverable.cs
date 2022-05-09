@@ -11,7 +11,7 @@ namespace Domain.Entities
         public Guid ProjectId { get; set; }
         public Project Project { get; set; }
 
-        public Guid MilestoneId { get; set; }
+        public Guid? MilestoneId { get; set; }
         public Milestone Milestone { get; set; }
     }
 }

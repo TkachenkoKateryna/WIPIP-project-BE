@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.EF;
 
@@ -11,9 +12,10 @@ using Persistence.EF;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220506145252_UpdatedMilestoneEntity")]
+    partial class UpdatedMilestoneEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,22 +44,6 @@ namespace Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Assumptions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("1c7ba364-c16a-454b-a325-a88af2c0640e"),
-                            Description = "End users will be available to test during the time they agree to.",
-                            IsDeleted = false,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        },
-                        new
-                        {
-                            Id = new Guid("7aeb7618-859a-4fb8-841d-de44920b7a1a"),
-                            Description = "Project will follow agile methodology throughout execution.",
-                            IsDeleted = false,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Deliverable", b =>
@@ -96,31 +82,26 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = new Guid("f454ef57-8b35-499b-801a-fdf733c88a5f"),
-                            Description = "Detailed description of project activities and their delivery process.",
+                            Description = "Project Plan.",
                             IsDeleted = false,
-                            MilestoneId = new Guid("e1969bcb-49eb-4d16-9d9e-50bd016516df"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 5, 23, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1501),
-                            Title = "Project Plan"
+                            TimeOfComplition = new DateTime(2022, 5, 20, 14, 52, 51, 747, DateTimeKind.Utc).AddTicks(7795)
                         },
                         new
                         {
                             Id = new Guid("edd2bd33-fb25-40ec-98ed-48b0adb4be7a"),
-                            Description = "Web Application with full functionality described in documentation.",
+                            Description = "Web application.",
                             IsDeleted = false,
-                            MilestoneId = new Guid("f05dce1f-ba10-46a8-9266-9bdc8335520a"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 11, 25, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1514),
-                            Title = "Web application"
+                            TimeOfComplition = new DateTime(2022, 11, 22, 14, 52, 51, 747, DateTimeKind.Utc).AddTicks(7805)
                         },
                         new
                         {
                             Id = new Guid("657981a2-355e-4e26-a5c9-2b585cd4d8a4"),
-                            Description = "Desktop Application with full functionality described in documentation.",
+                            Description = "Desktop Application.",
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 11, 25, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1517),
-                            Title = "Desktop Application."
+                            TimeOfComplition = new DateTime(2022, 11, 22, 14, 52, 51, 747, DateTimeKind.Utc).AddTicks(7808)
                         });
                 });
 
@@ -209,24 +190,6 @@ namespace Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Milestones");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("e1969bcb-49eb-4d16-9d9e-50bd016516df"),
-                            Activity = "Project documentation approved",
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        },
-                        new
-                        {
-                            Id = new Guid("f05dce1f-ba10-46a8-9266-9bdc8335520a"),
-                            Activity = "Web version release",
-                            DueDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Objective", b =>
@@ -255,24 +218,6 @@ namespace Persistence.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Objectives");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("68bf002d-69f8-4d6d-8f15-6da8483767a2"),
-                            Description = "Increase the number of website users to 100 in first three month",
-                            IsDeleted = false,
-                            Priority = 1,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        },
-                        new
-                        {
-                            Id = new Guid("137edc09-5547-4eb0-8b60-ab4608cae052"),
-                            Description = "Increase the number of clients to 5 in first month",
-                            IsDeleted = false,
-                            Priority = 0,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Project", b =>
@@ -554,9 +499,6 @@ namespace Persistence.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ImageLink")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -607,15 +549,15 @@ namespace Persistence.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b053bfd0-7310-453d-b4c8-1504d2865932",
+                            ConcurrencyStamp = "74bcb380-3c46-4904-86f3-3d26b4b8393b",
                             Email = "bob@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "BOB@TEXT.COM",
                             NormalizedUserName = "BOB",
-                            PasswordHash = "AQAAAAEAACcQAAAAEG7CTgwn308ns9ciCYbeuIuB1iWOxMTa1q2S8kvprJ4Z/U82THXKy89cH7DuPigcgQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELbg3kPAdjGjRDPgPL3OfQvJ7hs7H5xy0G0KpCdqXwCjnYpW7nN4sxPSdi761B6w7g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6d7c804e-71d8-4e5a-89a5-b662594fef75",
+                            SecurityStamp = "47973fb2-6984-4ecc-8ee9-4b320cc46984",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         },
@@ -623,15 +565,15 @@ namespace Persistence.Migrations
                         {
                             Id = "4f555f12-9168-49b1-9f17-b87904564904",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f9f55f8f-8707-4c51-8a22-8abc7f9eab9d",
+                            ConcurrencyStamp = "fc009572-51ef-403c-9416-1f1316f14ec7",
                             Email = "jane@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANE@TEXT.COM",
                             NormalizedUserName = "JANE",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJxj0FVfhIlmPFp9syCVhA3VUiSiiDGNasu218meNZj3hrfBfVKq296QoLE1KRHGJw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEEugh41FD3avVDMFUtcf7d9DzTXSWrQKRr662DVkCnohVcbDTWO7xe0lFUVlwwFs4Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d82e55d3-a6f8-4686-9aa7-7c3237f15595",
+                            SecurityStamp = "ef95f462-9d49-40cc-997c-0f7abd193e84",
                             TwoFactorEnabled = false,
                             UserName = "jane"
                         });
@@ -667,14 +609,14 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74",
-                            ConcurrencyStamp = "5e151fa5-f09b-44b4-82d3-745b1ffd2a37",
+                            ConcurrencyStamp = "36bf2f12-ff68-4139-a522-a955981fcf3b",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "09afe919-59ff-44b8-b656-c5e320c163a7",
-                            ConcurrencyStamp = "2df16128-e338-44ed-88f4-2aed31fa1d46",
+                            ConcurrencyStamp = "d23b248a-7f12-47a0-b2b1-90caa88d0c31",
                             Name = "Lead",
                             NormalizedName = "LEAD"
                         });

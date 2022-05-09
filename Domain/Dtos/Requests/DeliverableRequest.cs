@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Dtos.Base;
 
 namespace Domain.Dtos.Requests
 {
-    internal class DeliverableRequest
+    public class DeliverableRequest : BaseRequest
     {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime TimeOfComplition { get; set; }
+
     }
 }
