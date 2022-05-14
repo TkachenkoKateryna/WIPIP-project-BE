@@ -85,7 +85,7 @@ namespace API.Controllers
             {
                 return BadRequest("Email taken");
             }
-            if (await _userManager.Users.AnyAsync(x => x.UserName == registerRequest.Username))
+            if (await _userManager.Users.AnyAsync(x => x.UserName.Equals(registerRequest.Email)))
             {
                 return BadRequest("Username taken");
             }
@@ -111,6 +111,21 @@ namespace API.Controllers
 
             return CreateUserObject(user);
 
+        }
+
+        [AllowAnonymous]
+        [HttpPost("deleteUser/{userId}")]
+        public async Task<ActionResult> DeleteUser(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                return Ok(await _userManager.DeleteAsync(user));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [AllowAnonymous]
@@ -163,8 +178,6 @@ namespace API.Controllers
             var updatedUser = await _userManager.UpdateAsync(user);
             return Ok(updatedUser);
         }
-
-
         private UserResponse CreateUserObject(User user)
         {
             return new UserResponse
