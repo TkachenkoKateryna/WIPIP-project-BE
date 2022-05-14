@@ -16,6 +16,8 @@ namespace Domain.Entities
         public string Phone { get; set; }
         public DateTime DOB { get; set; }
         public DateTime DFD { get; set; }
+        public string ImageLink { get; set; }
+        public string Specialization { get; set; }
         public EnglishLevel EnglishLevel { get; set; }
         public ICollection<EmployeeSkill> EmployeeSkills { get; set; }
         public ICollection<ProjectCandidate> Candidates { get; set; }

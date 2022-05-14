@@ -16,6 +16,8 @@ namespace Domain.Entities
         }
 
         public string Description { get; set; }
+        public string ManagerId { get; set; }
+        public User Manager { get; set; }
         public ICollection<ProjectStakeholder> ProjectStakeholders { get; set; }
         public ICollection<Milestone> Milestones { get; set; }
         public ICollection<Deliverable> Deliverables { get; set; }

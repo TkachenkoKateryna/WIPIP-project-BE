@@ -56,10 +56,11 @@ namespace Application.Services
             var id = _milRepository.CreateWithVal(milEntity);
             _uow.Save();
 
-            foreach (var delId in milRequest.DeliverablesId)
+            foreach (var del in milRequest.DeliverablesId.Select(delId =>
+                         _delivRepository.Find(d => d.Id == Guid.Parse(delId))
+                         .FirstOrDefault())
+                         .Where(del => del != null))
             {
-                var del = _delivRepository.Find(d => d.Id == Guid.Parse(delId))
-                    .FirstOrDefault();
                 del.MilestoneId = id;
                 _delivRepository.Update(del);
             }
@@ -70,32 +71,32 @@ namespace Application.Services
 
         public MilestoneResponse UpdateMilestone(MilestoneRequest milRequest, string milId)
         {
-            var milEntity = _milRepository.Find(mil => mil.Id == Guid.Parse(milId), _includes)
+            var milEntity = _milRepository.Find(mil =>
+                    mil.Id == Guid.Parse(milId), _includes)
                 .FirstOrDefault();
 
             _ = milEntity ?? throw new NotFoundException<Objective>("Milestone with id was not found.");
 
-            foreach (var del in milEntity.Deliverables.ToList())
+            foreach (var del in milEntity.Deliverables.ToList()
+                         .Where(del => milRequest.DeliverablesId
+                             .All(id => id != del.Id.ToString())))
             {
-                if (!milRequest.DeliverablesId.Any(id => id == del.Id.ToString()))
-                {
-                    del.MilestoneId = null;
-                    _delivRepository.Update(del);
-                    _uow.Save();
-                }
+                del.MilestoneId = null;
+                _delivRepository.Update(del);
+                _uow.Save();
             }
 
             milEntity = _mapper.Map<Milestone>(milRequest);
             milEntity.Id = Guid.Parse(milId);
 
-            foreach (var delId in milRequest.DeliverablesId)
+            foreach (var del in
+                     from delId in milRequest.DeliverablesId
+                     where milEntity.Deliverables.All(del => del.Id != Guid.Parse(delId))
+                     select _delivRepository.Find(del => del.Id == Guid.Parse(delId))
+                         .FirstOrDefault())
             {
-                if (!milEntity.Deliverables.Any(del => del.Id == Guid.Parse(delId)))
-                {
-                    var del = _delivRepository.Find(del => del.Id == Guid.Parse(delId)).FirstOrDefault();
-                    del.MilestoneId = Guid.Parse(milId);
-                    _delivRepository.Update(del);
-                }
+                del.MilestoneId = Guid.Parse(milId);
+                _delivRepository.Update(del);
             }
 
             _milRepository.Update(milEntity);

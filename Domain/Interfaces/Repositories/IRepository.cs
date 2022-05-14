@@ -12,7 +12,7 @@ namespace Domain.Interfaces.Repositories
         void Update(TEntity entity);
         void Delete(TEntity entity);
         void SoftDelete(Guid id);
-
+        void Detach(TEntity entity);
         TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate,
                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 

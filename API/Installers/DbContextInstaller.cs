@@ -11,7 +11,9 @@ namespace API.Installers
             string connectionsString = configuration.GetConnectionString("DbWIPIP");
 
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(connectionsString));
+                options.UseSqlServer(connectionsString)
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                    .EnableSensitiveDataLogging());
         }
     }
 }

@@ -17,6 +17,7 @@ namespace API.Installers
             services.AddScoped<IAssumptionsService, AssumptionsService>();
             services.AddScoped<IDeliverablesService, DeliverablesService>();
             services.AddScoped<IMilestoneService, MilestoneService>();
+            services.AddScoped<IRiskService, RiskService>();
             services.AddScoped<IJWTTokenService, JWTTokenService>();
             services.AddScoped<IFileStorageService, AzureStorageService>();
             services.AddScoped<IPDFService, PDFService>();

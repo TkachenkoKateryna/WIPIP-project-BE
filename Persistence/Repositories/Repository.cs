@@ -39,7 +39,7 @@ namespace Persistence.Repositories
 
         public void SoftDelete(Guid id)
         {
-            DbSet.Find(id).IsDeleted = true;
+            DbSet.Find(id)!.IsDeleted = true;
         }
 
         public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate,
@@ -56,6 +56,11 @@ namespace Persistence.Repositories
         public void Update(TEntity entity)
         {
             DbContext.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Detach(TEntity entity)
+        {
+            DbContext.Entry(entity).State = EntityState.Detached;
         }
 
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,

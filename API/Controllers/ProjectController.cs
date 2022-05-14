@@ -22,6 +22,13 @@ namespace API.Controllers
             return Ok(_projService.GetProjectById(projId));
         }
 
+
+        [HttpGet("projects/{managerId}")]
+        public ActionResult<IEnumerable<ProjectResponse>> GetAllProjectsByManager(string managerId)
+        {
+            return Ok(_projService.GetProjectsByManager(managerId));
+        }
+
         [HttpGet("projectCharter/{projId}")]
         public FileResult GenerateProjectCharter(string projId)
         {

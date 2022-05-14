@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Domain.Dtos.Responses;
+using Microsoft.AspNetCore.Http;
 
 namespace Domain.Dtos
 {
@@ -9,5 +10,6 @@ namespace Domain.Dtos
         public string Email { get; set; }
         public IFormFile ImageFile { get; set; }
         public string Role { get; set; }
+        public List<ProjectResponse> Projects { get; set; }
     }
 }

@@ -40,11 +40,14 @@ namespace Application.Services
             return project;
         }
 
-        public void GenerateProjectStakeholder(string projId)
+        public IEnumerable<ProjectResponse> GetProjectsByManager(string managerId)
         {
-            var project = GetProjectById(projId);
 
+            var projects = _projectRepository.FindWithDeleted(p => p.ManagerId == managerId, _includes)
+                .Select(empEntity => _mapper.Map<ProjectResponse>(empEntity))
+                .ToList();
 
+            return projects;
         }
 
     }

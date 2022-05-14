@@ -1,5 +1,9 @@
 ﻿using Domain.Dtos;
 using Application.Interfaces;
+using Domain.Constants;
+using Domain.Dtos.Filters;
+using Domain.Dtos.Requests;
+using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -15,9 +19,64 @@ namespace API.Controllers
         }
 
         [HttpGet("employees")]
-        public ActionResult<IEnumerable<EmployeeDto>> GetAllEmployees()
+        public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees(EmployeeFilteringParams param)
         {
-            return Ok(_employeeService.GetAllEmployees());
+            return Ok(_employeeService.GetAllEmployees(param));
+        }
+
+        [HttpPut("employees/add")]
+        public ActionResult<EmployeeResponse> AddEmployee(EmployeeRequest empRequest)
+        {
+            try
+            {
+                var empResp = _employeeService.AddEmployee(empRequest);
+                return Ok(empResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("employees/update/{empId}")]
+        public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string empId)
+        {
+            try
+            {
+                var empResp = _employeeService.UpdateEmployee(empRequest, empId);
+                return Ok(empResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("employees/delete/{empId}")]
+        public IActionResult DeleteEmployee(string empId)
+        {
+            try
+            {
+                _employeeService.DeleteEmployee(empId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("employees/updateImage/{empId}")]
+        public IActionResult UpdateEmployeeImage(IFormFile file, string empId)
+        {
+            try
+            {
+                return Ok(_employeeService.UpdateEmployeeImage(file, empId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

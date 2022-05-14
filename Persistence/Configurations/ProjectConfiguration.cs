@@ -30,11 +30,17 @@ namespace Persistence.Configurations
               .HasForeignKey(o => o.ProjectId)
               .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(p => p.Manager)
+                .WithMany(m => m.Projects)
+                .HasForeignKey(p => p.ManagerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasData(
                 new Project
                 {
                     Id = Guid.Parse("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                    Description = "Planmykids project that helps parents with building itineraries for kids to different camps."
+                    Description = "Planmykids project that helps parents with building itineraries for kids to different camps.",
+                    ManagerId = "4f555f12-9168-49b1-9f17-b87904564904"
                 });
         }
     }

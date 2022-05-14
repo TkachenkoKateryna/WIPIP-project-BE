@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Domain.Constants;
+using Domain.Dtos.Identity;
+using Domain.Interfaces.Repositories;
 
 namespace API.Controllers
 {
@@ -15,34 +18,55 @@ namespace API.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJWTTokenService _jwtService;
         private readonly IFileStorageService _fileStorageService;
 
-        private readonly string containerName = "wipipresources";
-
         public AccountController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            RoleManager<IdentityRole> roleManager,
+            IUnitOfWork uow,
             IJWTTokenService jwtService,
             IFileStorageService fileStorageService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
-            _roleManager = roleManager;
             _fileStorageService = fileStorageService;
+        }
+
+        [Authorize]
+        [HttpGet("user")]
+        public async Task<ActionResult<UserResponse>> GetCurrentUser()
+        {
+            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+
+            var userResponse = CreateUserObject(user);
+
+            return userResponse;
+        }
+
+        [Authorize]
+        [HttpGet("users")]
+        public ActionResult<IEnumerable<UserResponse>> GetAllUsers()
+        {
+            var users = new List<UserResponse>();
+
+            foreach (var user in _userManager.Users)
+            {
+                users.Add(CreateUserObject(user));
+            }
+
+            return users;
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<UserResponse>> Login(LoginDto loginDto)
+        public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
 
             if (user == null) return Unauthorized();
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, false);
 
             if (result.Succeeded)
             {
@@ -54,65 +78,60 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserResponse>> Register(RegisterDto registeDto)
+        public async Task<ActionResult<UserResponse>> Register(RegisterRequest registerRequest)
         {
-            if (await _userManager.Users.AllAsync(x => x.Email == registeDto.Email))
+
+            if (await _userManager.Users.AnyAsync(x => x.Email.Equals(registerRequest.Email)))
             {
                 return BadRequest("Email taken");
             }
-            if (await _userManager.Users.AllAsync(x => x.UserName == registeDto.Username))
+            if (await _userManager.Users.AnyAsync(x => x.UserName == registerRequest.Username))
             {
                 return BadRequest("Username taken");
             }
 
             var user = new User
             {
-                UserName = registeDto.Username,
-                Email = registeDto.Email,
+                UserName = registerRequest.Username,
+                Email = registerRequest.Email,
             };
 
-            var passGen = await _userManager.CreateAsync(user, registeDto.Password);
+            var passGen = await _userManager.CreateAsync(user, registerRequest.Password);
 
-            if (passGen.Succeeded)
+            if (!passGen.Succeeded) return BadRequest("Problem registering user");
+
+            if (registerRequest.IsLead)
             {
-                if (registeDto.isLead)
-                {
-                    await _userManager.AddToRoleAsync(user, "Lead");
-                }
-                else
-                {
-                    await _userManager.AddToRoleAsync(user, "Manager");
-                }
-
-                return CreateUserObject(user);
+                await _userManager.AddToRoleAsync(user, "Lead");
+            }
+            else
+            {
+                await _userManager.AddToRoleAsync(user, "Manager");
             }
 
-            return BadRequest("Problem regstering user");
-        }
-
-        [Authorize]
-        [HttpGet("user")]
-        public async Task<ActionResult<UserResponse>> GetCurrentUser()
-        {
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
-
             return CreateUserObject(user);
+
         }
 
         [AllowAnonymous]
         [HttpPost("changePassword")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePassword)
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest changePassword)
         {
             User user = await _userManager.FindByEmailAsync(changePassword.Email);
 
             if (user is null) return BadRequest("User not found");
 
-            IdentityResult result =
+            if (!CheckPassword(changePassword.NewPassword, changePassword.OldPassword))
+            {
+                return BadRequest("Passwords are not equal");
+            }
+
+            var result =
                     await _userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
 
             if (result.Succeeded)
             {
-                User updatedUser = await _userManager.FindByEmailAsync(changePassword.Email);
+                var updatedUser = await _userManager.FindByEmailAsync(changePassword.Email);
                 return Ok(CreateUserObject(updatedUser));
             }
             else
@@ -121,8 +140,8 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("uploadImage")]
-        public async Task<IActionResult> UploadImage(IFormFile image)
+        [HttpPost("userUpdateImage")]
+        public async Task<IActionResult> UserUpdateImage(IFormFile image)
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
@@ -130,17 +149,21 @@ namespace API.Controllers
 
             if (image != null)
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await image.CopyToAsync(memoryStream);
-                    var content = memoryStream.ToArray();
-                    var extension = Path.GetExtension(image.FileName);
-                    user.ImageLink = _fileStorageService.SaveFile(content, extension, containerName, image.ContentType);
-                }
+                using var memoryStream = new MemoryStream();
+                await image.CopyToAsync(memoryStream);
+                var content = memoryStream.ToArray();
+                var extension = Path.GetExtension(image.FileName);
+                user.ImageLink = _fileStorageService.SaveFile(content, extension, Constants.FileContainerName, image.ContentType);
             }
+            else
+            {
+                user.ImageLink = null;
+            }
+
             var updatedUser = await _userManager.UpdateAsync(user);
             return Ok(updatedUser);
         }
+
 
         private UserResponse CreateUserObject(User user)
         {
@@ -150,8 +173,13 @@ namespace API.Controllers
                 ImageLink = user.ImageLink,
                 Token = _jwtService.CreateToken(user),
                 Email = user.Email,
-                Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()
+                Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault(),
             };
+        }
+
+        private bool CheckPassword(string newPassword, string confirmedPassword)
+        {
+            return newPassword.Equals(confirmedPassword);
         }
     }
 }

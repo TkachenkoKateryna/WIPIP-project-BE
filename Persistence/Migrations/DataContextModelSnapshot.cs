@@ -100,7 +100,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("e1969bcb-49eb-4d16-9d9e-50bd016516df"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 5, 23, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1501),
+                            TimeOfComplition = new DateTime(2022, 5, 28, 20, 37, 40, 804, DateTimeKind.Utc).AddTicks(7018),
                             Title = "Project Plan"
                         },
                         new
@@ -110,7 +110,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("f05dce1f-ba10-46a8-9266-9bdc8335520a"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 11, 25, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1514),
+                            TimeOfComplition = new DateTime(2022, 11, 30, 20, 37, 40, 804, DateTimeKind.Utc).AddTicks(7032),
                             Title = "Web application"
                         },
                         new
@@ -119,7 +119,7 @@ namespace Persistence.Migrations
                             Description = "Desktop Application with full functionality described in documentation.",
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 11, 25, 18, 42, 30, 701, DateTimeKind.Utc).AddTicks(1517),
+                            TimeOfComplition = new DateTime(2022, 11, 30, 20, 37, 40, 804, DateTimeKind.Utc).AddTicks(7040),
                             Title = "Desktop Application."
                         });
                 });
@@ -142,6 +142,9 @@ namespace Persistence.Migrations
                     b.Property<int>("EnglishLevel")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -149,6 +152,9 @@ namespace Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialization")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -287,7 +293,12 @@ namespace Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ManagerId");
 
                     b.ToTable("Projects");
 
@@ -296,7 +307,8 @@ namespace Persistence.Migrations
                         {
                             Id = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             Description = "Planmykids project that helps parents with building itineraries for kids to different camps.",
-                            IsDeleted = false
+                            IsDeleted = false,
+                            ManagerId = "4f555f12-9168-49b1-9f17-b87904564904"
                         });
                 });
 
@@ -457,6 +469,56 @@ namespace Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RiskCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("94fd9fef-cbf0-4f34-a33c-dbb16b6b408f"),
+                            IsDeleted = false,
+                            Title = "Operational Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("072d2488-b193-4322-8132-dac1a5741a19"),
+                            IsDeleted = false,
+                            Title = "Budget Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("73723c0a-935d-46f0-a580-d05d17c20fc6"),
+                            IsDeleted = false,
+                            Title = "Schedule Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("77dbf4db-8b5c-4b5d-98e5-e8e4f9044713"),
+                            IsDeleted = false,
+                            Title = "Technical Solutions"
+                        },
+                        new
+                        {
+                            Id = new Guid("0124991d-1191-4914-afb7-02ab237dc2a6"),
+                            IsDeleted = false,
+                            Title = "Resource Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e11c76b-648a-4778-a11e-c21db56e7c52"),
+                            IsDeleted = false,
+                            Title = "Stakeholder Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("6d464351-efef-43db-9113-0b2de42ef20d"),
+                            IsDeleted = false,
+                            Title = "Scope and Requirements Risk"
+                        },
+                        new
+                        {
+                            Id = new Guid("3c4d64e1-fac2-4cc4-87fd-0186bec6429a"),
+                            IsDeleted = false,
+                            Title = "Communications and Decision Making"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Skill", b =>
@@ -607,15 +669,15 @@ namespace Persistence.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b053bfd0-7310-453d-b4c8-1504d2865932",
+                            ConcurrencyStamp = "cd4a8e89-eb17-48ac-ac70-f18c17623c32",
                             Email = "bob@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "BOB@TEXT.COM",
                             NormalizedUserName = "BOB",
-                            PasswordHash = "AQAAAAEAACcQAAAAEG7CTgwn308ns9ciCYbeuIuB1iWOxMTa1q2S8kvprJ4Z/U82THXKy89cH7DuPigcgQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEJwrb67eoUsJTZdwkZs0Nb1DSmtM9BPJAJHpd2O3Gq0bkaW/U24Z+1AQtUQA8+ijYA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6d7c804e-71d8-4e5a-89a5-b662594fef75",
+                            SecurityStamp = "71892543-6996-4c30-a003-d03d33ad4237",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         },
@@ -623,15 +685,15 @@ namespace Persistence.Migrations
                         {
                             Id = "4f555f12-9168-49b1-9f17-b87904564904",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f9f55f8f-8707-4c51-8a22-8abc7f9eab9d",
+                            ConcurrencyStamp = "fa8f5457-9fc2-490b-9c9d-66dd3209f0f0",
                             Email = "jane@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANE@TEXT.COM",
                             NormalizedUserName = "JANE",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJxj0FVfhIlmPFp9syCVhA3VUiSiiDGNasu218meNZj3hrfBfVKq296QoLE1KRHGJw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEMBsa17ERxL7n7AlhkxXNT+frNV7x9/fV+jtyqsINg1EilSJ4gF0LtvtMdmbcCiaKw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d82e55d3-a6f8-4686-9aa7-7c3237f15595",
+                            SecurityStamp = "d39c282b-8b48-4207-b1eb-09b38d5c4ef4",
                             TwoFactorEnabled = false,
                             UserName = "jane"
                         });
@@ -667,14 +729,14 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74",
-                            ConcurrencyStamp = "5e151fa5-f09b-44b4-82d3-745b1ffd2a37",
+                            ConcurrencyStamp = "dca7963c-e924-493e-83f6-79142e490d07",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "09afe919-59ff-44b8-b656-c5e320c163a7",
-                            ConcurrencyStamp = "2df16128-e338-44ed-88f4-2aed31fa1d46",
+                            ConcurrencyStamp = "fb13953b-9091-41dc-bf7e-63a832bfdb52",
                             Name = "Lead",
                             NormalizedName = "LEAD"
                         });
@@ -868,6 +930,16 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Project", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "Manager")
+                        .WithMany("Projects")
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Manager");
+                });
+
             modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
                 {
                     b.HasOne("Domain.Entities.Employee", "Employee")
@@ -1044,6 +1116,11 @@ namespace Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Stakeholder", b =>
                 {
                     b.Navigation("ProjectStakeholders");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

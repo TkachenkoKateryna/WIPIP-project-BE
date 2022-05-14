@@ -41,11 +41,19 @@ namespace Application.Mapper
             CreateMap<Project, ProjectResponse>()
                 .IncludeAllDerived();
 
-            CreateMap<EmployeeSkill, EmployeeSkillDto>()
+            CreateMap<EmployeeSkill, EmployeeSkillResponse>()
                 .ForMember(m => m.Title, opt => opt.MapFrom(m => m.Skill.Title));
 
-            CreateMap<Employee, EmployeeDto>()
-                .IncludeAllDerived(); ;
+            CreateMap<EmployeeSkillRequest, EmployeeSkill>();
+
+            CreateMap<Employee, EmployeeResponse>()
+                .IncludeAllDerived();
+
+
+            CreateMap<EmployeeRequest, Employee>()
+                .ForMember(m => m.EmployeeSkills, opt => opt.Ignore());
+
+            CreateMap<Project, ProjectResponse>();
         }
 
     }
