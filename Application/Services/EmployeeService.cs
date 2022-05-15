@@ -3,6 +3,7 @@ using Domain.Dtos;
 using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.Internal;
+using Domain.Constants;
 using Domain.Dtos.Filters;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
@@ -40,14 +41,12 @@ namespace Application.Services
             var employees = _employeeRepository
                 .GetAll(_includes).AsQueryable();
 
-            var searchBy = param.SearchBy.Trim().ToLowerInvariant();
-
-            if (!string.IsNullOrEmpty(searchBy))
+            if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
             {
                 employees = employees
-                    .Where(e => e.Name.ToLower().Contains(searchBy)
-                                || e.Email.ToLower().Contains(searchBy)
-                                || e.Phone.ToLower().Contains(searchBy));
+                    .Where(e => e.Name.ToLower().Contains(param.SearchBy)
+                                || e.Email.ToLower().Contains(param.SearchBy)
+                                || e.Phone.ToLower().Contains(param.SearchBy));
             }
 
 

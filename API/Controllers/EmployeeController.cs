@@ -1,11 +1,8 @@
-﻿using Domain.Dtos;
-using Application.Interfaces;
-using Domain.Constants;
+﻿using Application.Interfaces;
 using Domain.Dtos.Filters;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -19,7 +16,7 @@ namespace API.Controllers
         }
 
         [HttpGet("employees")]
-        public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees(EmployeeFilteringParams param)
+        public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees([FromQuery] EmployeeFilteringParams param)
         {
             return Ok(_employeeService.GetAllEmployees(param));
         }
@@ -52,7 +49,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("employees/delete/{empId}")]
+        [Microsoft.AspNetCore.Mvc.HttpDelete("employees/delete/{empId}")]
         public IActionResult DeleteEmployee(string empId)
         {
             try
@@ -66,7 +63,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("employees/updateImage/{empId}")]
+        [Microsoft.AspNetCore.Mvc.HttpPut("employees/updateImage/{empId}")]
         public IActionResult UpdateEmployeeImage(IFormFile file, string empId)
         {
             try
