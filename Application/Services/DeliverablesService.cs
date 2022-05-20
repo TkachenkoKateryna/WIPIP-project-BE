@@ -21,13 +21,6 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<DeliverableResponse> GetAllDeliverablesByProject(string projectId)
-        {
-            return _delivRepository.Find(o => o.ProjectId == Guid.Parse(projectId))
-                .Select(delEntity => _mapper.Map<DeliverableResponse>(delEntity))
-                .ToList();
-        }
-
         public IEnumerable<DeliverableResponse> GetAllDeliverables()
         {
             return _delivRepository.GetAllWithDeleted()

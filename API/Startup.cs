@@ -2,6 +2,8 @@ using API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
+using Localization.SqlLocalizer;
+using Microsoft.Extensions.Options;
 
 namespace API;
 

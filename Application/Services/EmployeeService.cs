@@ -10,6 +10,7 @@ using Domain.Dtos.Responses;
 using Domain.Entities;
 using Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -19,27 +20,36 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _uow;
         private readonly IRepository<Employee> _employeeRepository;
+        private readonly IRepository<ProjectCandidate> _candidateRepository;
         private readonly IRepository<EmployeeSkill> _employeeSkillRepository;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMapper _mapper;
-        private readonly Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> _includes;
+        private readonly Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> _employeeIncludes;
+        private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _candidateIncludes;
 
         private readonly string containerName = "wipipresources";
 
-        public EmployeeService(IUnitOfWork uow, IMapper mapper, IFileStorageService fileStorageService)
+        public EmployeeService(IUnitOfWork uow,
+            IMapper mapper,
+            IFileStorageService fileStorageService)
         {
             _uow = uow;
             _employeeRepository = _uow.GetRepository<Employee>();
+            _candidateRepository = _uow.GetRepository<ProjectCandidate>();
             _employeeSkillRepository = _uow.GetRepository<EmployeeSkill>();
             _fileStorageService = fileStorageService;
             _mapper = mapper;
-            _includes = employees => employees.Include(e => e.EmployeeSkills).ThenInclude(es => es.Skill);
+            _employeeIncludes = employees => employees
+                .Include(e => e.EmployeeSkills).ThenInclude(es => es.Skill);
+            _candidateIncludes = candidate => candidate
+                .Include(c => c.Skill)
+                .Include(c => c.Employee);
         }
 
         public IEnumerable<EmployeeResponse> GetAllEmployees(EmployeeFilteringParams param)
         {
             var employees = _employeeRepository
-                .GetAll(_includes).AsQueryable();
+                .GetAll(_employeeIncludes).AsQueryable();
 
             if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
             {
@@ -48,7 +58,6 @@ namespace Application.Services
                                 || e.Email.ToLower().Contains(param.SearchBy)
                                 || e.Phone.ToLower().Contains(param.SearchBy));
             }
-
 
             if (param.MinEnglishLevel != null)
             {
@@ -105,7 +114,7 @@ namespace Application.Services
             _uow.Save();
 
             return _mapper.Map<EmployeeResponse>(_employeeRepository
-                .Find(emp => emp.Id == empEntity.Id, _includes).FirstOrDefault());
+                .Find(emp => emp.Id == empEntity.Id, _employeeIncludes).FirstOrDefault());
         }
 
         public void DeleteEmployee(string empId)
@@ -142,6 +151,29 @@ namespace Application.Services
             _uow.Save();
 
             return empEntity.ImageLink;
+        }
+
+        public IEnumerable<EmployeeResponse> GeneratePossibleTeamOptions(string projectId)
+        {
+            var candidates = _candidateRepository
+                .Find(c => c.ProjectId == Guid.Parse(projectId), _candidateIncludes)
+                .ToList();
+
+            var teamMembers = new List<Guid>();
+
+            foreach (var candidate in candidates)
+            {
+                var members = _employeeSkillRepository.Find(empSk =>
+                    (empSk.SkillId == candidate.SkillId) &&
+                    (empSk.Proficiency == candidate.Proficiency) &&
+                    (empSk.Primary == true))
+                    .Select(emp => emp.EmployeeId);
+
+                teamMembers.AddRange(members);
+            }
+
+            return _employeeRepository.Find(emp => teamMembers.Contains(emp.Id), _employeeIncludes)
+                .Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity));
         }
 
         private void RemoveEmployeeSkill(string empId)

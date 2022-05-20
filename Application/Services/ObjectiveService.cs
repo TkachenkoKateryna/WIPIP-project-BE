@@ -21,13 +21,6 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ObjectiveResponse> GetAllObjectivesByProject(string projectId)
-        {
-            return _objectiveRepository.Find(o => o.ProjectId == Guid.Parse(projectId))
-                .Select(empEntity => _mapper.Map<ObjectiveResponse>(empEntity))
-                .ToList();
-        }
-
         public IEnumerable<ObjectiveResponse> GetAllObjectives()
         {
             return _objectiveRepository.GetAllWithDeleted()

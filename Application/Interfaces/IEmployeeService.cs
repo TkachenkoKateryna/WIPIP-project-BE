@@ -13,6 +13,7 @@ namespace Application.Interfaces
         EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, string empId);
         void DeleteEmployee(string empId);
         string UpdateEmployeeImage(IFormFile image, string empId);
+        IEnumerable<EmployeeResponse> GeneratePossibleTeamOptions(string projectId);
 
     }
 }

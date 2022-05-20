@@ -28,13 +28,6 @@ namespace Application.Services
             _includes = milestone => milestone.Include(m => m.Deliverables);
         }
 
-        public IEnumerable<MilestoneResponse> GetAllMilestonesByProject(string projectId)
-        {
-            return _milRepository.Find(o => o.ProjectId == Guid.Parse(projectId), _includes)
-                .Select(milEntity => _mapper.Map<MilestoneResponse>(milEntity))
-                .ToList();
-        }
-
         public IEnumerable<MilestoneResponse> GetAllMilestones()
         {
             return _milRepository.GetAllWithDeleted(_includes)
@@ -104,6 +97,7 @@ namespace Application.Services
 
             return _mapper.Map<MilestoneResponse>(_milRepository.Find(ob => ob.Id == milEntity.Id, _includes).FirstOrDefault());
         }
+
         public void DeleteMilestone(string milId)
         {
             var milEntity = _milRepository.FindWithDeleted(mil => mil.Id.ToString() == milId)

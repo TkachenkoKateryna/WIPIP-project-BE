@@ -5,7 +5,6 @@ namespace Application.Interfaces
     public interface IProjectService
     {
         ProjectResponse GetProjectById(string projId);
-
-        IEnumerable<ProjectResponse> GetProjectsByManager(string managerId);
+        ProjectBudgetResponse CalculateProjectBudget(string projectId);
     }
 }

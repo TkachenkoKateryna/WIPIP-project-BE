@@ -5,7 +5,6 @@ namespace Application.Interfaces
 {
     public interface IDeliverablesService
     {
-        IEnumerable<DeliverableResponse> GetAllDeliverablesByProject(string projectId);
         IEnumerable<DeliverableResponse> GetAllDeliverables();
         DeliverableResponse AddDeliverable(DeliverableRequest delRequest);
         DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, string delId);

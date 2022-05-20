@@ -28,6 +28,7 @@ namespace Persistence.EF
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

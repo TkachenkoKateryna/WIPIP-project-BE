@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +11,10 @@ namespace API.Controllers
     {
         readonly IStakeholdersService _stakeholderService;
 
-        public StakeholdersController(IStakeholdersService stakeholderService)
+        public StakeholdersController(
+            IStakeholdersService stakeholderService)
         {
             _stakeholderService = stakeholderService;
-        }
-
-        [HttpGet("stakeholdersByProject/{projId}")]
-        public ActionResult<IEnumerable<StakeholderResponse>> GetAllStakeholdersByProject(string projId)
-        {
-            return Ok(_stakeholderService.GetAllStakeholdersByProject(projId));
         }
 
         [HttpGet("stakeholders")]
@@ -26,7 +23,7 @@ namespace API.Controllers
             return Ok(_stakeholderService.GetAllStakeholders());
         }
 
-        [HttpPut("stakeholders/add")]
+        [HttpPost("stakeholders")]
         public ActionResult<StakeholderResponse> AddStakeholder(StakeholderRequest stRequest)
         {
             try
@@ -40,7 +37,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("stakeholders/update/{stId}")]
+        [HttpPut("stakeholders/{stId}")]
         public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stId)
         {
             try
@@ -54,7 +51,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("stakeholders/delete")]
+        [HttpDelete("stakeholders")]
         public IActionResult DeleteStakeholder(StakeholderDeleteRequest stRequest)
         {
             try

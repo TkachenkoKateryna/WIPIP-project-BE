@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using API.Controllers.Base;
 using Domain.Constants;
 using Domain.Dtos.Identity;
 using Domain.Interfaces.Repositories;
@@ -114,7 +115,7 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("deleteUser/{userId}")]
+        [HttpPost("users/{userId}")]
         public async Task<ActionResult> DeleteUser(string userId)
         {
             try
@@ -155,7 +156,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("userUpdateImage")]
+        [HttpPost("users/UpdateImage")]
         public async Task<IActionResult> UserUpdateImage(IFormFile image)
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
@@ -178,6 +179,7 @@ namespace API.Controllers
             var updatedUser = await _userManager.UpdateAsync(user);
             return Ok(updatedUser);
         }
+
         private UserResponse CreateUserObject(User user)
         {
             return new UserResponse
@@ -189,7 +191,6 @@ namespace API.Controllers
                 Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault(),
             };
         }
-
         private bool CheckPassword(string newPassword, string confirmedPassword)
         {
             return newPassword.Equals(confirmedPassword);

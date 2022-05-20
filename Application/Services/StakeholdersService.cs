@@ -29,13 +29,6 @@ namespace Application.Services
             _includesSt = stakeholders => stakeholders.Include(s => s.ProjectStakeholders).ThenInclude(s => s.Project);
         }
 
-        public IEnumerable<StakeholderResponse> GetAllStakeholdersByProject(string projectId)
-        {
-            return _projStakeholdersRepository.Find(st => st.ProjectId == Guid.Parse(projectId), _includesStp)
-            .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-            .ToList();
-        }
-
         public IEnumerable<StakeholderResponse> GetAllStakeholders()
         {
             return _projStakeholdersRepository.GetAllWithDeleted(_includesStp)

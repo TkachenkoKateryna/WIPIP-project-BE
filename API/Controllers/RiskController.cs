@@ -1,23 +1,28 @@
-﻿using Application.Interfaces;
+﻿using System.Diagnostics;
+using System.Drawing.Text;
+using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 
 namespace API.Controllers
 {
     public class RiskController : BaseApiController
     {
-        readonly IRiskService _riskService;
+        private readonly IRiskService _riskService;
+        private readonly IExcelService _excelService;
 
-        public RiskController(IRiskService riskService)
+        public RiskController(
+            IRiskService riskService,
+            IExcelService excelService)
         {
             _riskService = riskService;
-        }
-
-        [HttpGet("risksByProject/{projId}")]
-        public ActionResult<IEnumerable<RiskResponse>> GetAllRiskByProject(string projId)
-        {
-            return Ok(_riskService.GetAllRisksByProject(projId));
+            _excelService = excelService;
         }
 
         [HttpGet("risks")]
@@ -26,7 +31,7 @@ namespace API.Controllers
             return Ok(_riskService.GetAllRisks());
         }
 
-        [HttpPut("risks/add")]
+        [HttpPost("risks")]
         public ActionResult<RiskResponse> AddObjective(RiskRequest riskRequest)
         {
             try
@@ -40,7 +45,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("risks/update/{objId}")]
+        [HttpPut("risks/{riskId}")]
         public ActionResult<RiskResponse> UpdateRisk(RiskRequest riskRequest, string riskId)
         {
             try
@@ -54,7 +59,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("risks/delete/{riskId}")]
+        [HttpDelete("risks/{riskId}")]
         public IActionResult DeleteRisk(string riskId)
         {
             try
@@ -66,6 +71,15 @@ namespace API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("risks/dowbloadExcel")]
+        public FileResult Excel([FromQuery] string projectId)
+        {
+            return File(
+                _excelService.GenerateRiskRegisterXml(projectId),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "risks.xlsx");
         }
     }
 }

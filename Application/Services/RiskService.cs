@@ -17,6 +17,8 @@ namespace Application.Services
         private readonly IRepository<Risk> _riskRepository;
         private readonly IRepository<ProjectRisk> _projRiskRepository;
         private readonly Func<IQueryable<Risk>, IIncludableQueryable<Risk, object>> _includes;
+        private readonly Func<IQueryable<ProjectRisk>, IIncludableQueryable<ProjectRisk, object>> _projRiskIncludes;
+
 
         public RiskService(IUnitOfWork uow, IMapper mapper)
         {
@@ -24,37 +26,44 @@ namespace Application.Services
             _riskRepository = _uow.GetRepository<Risk>();
             _projRiskRepository = _uow.GetRepository<ProjectRisk>();
             _mapper = mapper;
-            _includes = risk => risk.Include(r => r.RiskCategory)
+            _includes = risk => risk
+                .Include(r => r.RiskCategory)
                 .Include(r => r.ProjectRisks).ThenInclude(pr => pr.Project);
-        }
-
-        public IEnumerable<RiskResponse> GetAllRisksByProject(string projectId)
-        {
-            return _projRiskRepository.Find(r => r.ProjectId == Guid.Parse(projectId))
-                .Select(entity => _mapper.Map<RiskResponse>(entity))
-                .ToList();
+            _projRiskIncludes = projectRisk => projectRisk
+                .Include(pr => pr.Risk).ThenInclude(r => r.RiskCategory);
         }
 
         public IEnumerable<RiskResponse> GetAllRisks()
         {
-            return _riskRepository.GetAllWithDeleted(_includes)
+            return _riskRepository
+                .GetAllWithDeleted(_includes)
+                .Select(entity => _mapper.Map<RiskResponse>(entity))
+                .ToList();
+        }
+
+        public IEnumerable<RiskResponse> GetRisksByProject(string projectId)
+        {
+            return _projRiskRepository
+                .Find(risk => risk.ProjectId == Guid.Parse(projectId), _projRiskIncludes)
                 .Select(entity => _mapper.Map<RiskResponse>(entity))
                 .ToList();
         }
 
         public RiskResponse AddRisk(RiskRequest riskRequest)
         {
-            var riskEntity = _riskRepository.FindWithDeleted(r => r.Title == riskRequest.Title)
+            var riskEntity = _riskRepository
+                .FindWithDeleted(r => r.Title == riskRequest.Title)
                 .FirstOrDefault();
 
             if (riskEntity != null)
             {
-                throw new AlreadyExistsException<Objective>($"Risk with such {riskRequest.Title} already exists.");
+                throw new AlreadyExistsException<Objective>(
+                    $"Risk with such {riskRequest.Title} already exists.");
             }
 
             riskEntity = _mapper.Map<Risk>(riskRequest);
 
-            _riskRepository.Create(riskEntity);
+            var id = _riskRepository.CreateWithVal(riskEntity);
 
             _projRiskRepository.Create(new ProjectRisk()
             {
@@ -65,28 +74,37 @@ namespace Application.Services
             _uow.Save();
 
             return _mapper.Map<RiskResponse>(_riskRepository
-                .Find(r => r.Id == riskEntity.Id).FirstOrDefault());
+                .Find(risk => risk.Id == id)
+                .FirstOrDefault()); ;
         }
 
         public RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId)
         {
-            var riskEntity = _riskRepository.Find(ob => ob.Id.ToString() == riskId)
+            var riskEntity = _riskRepository
+                .Find(risk => risk.Id.ToString() == riskId)
                 .FirstOrDefault();
-            _ = riskEntity ?? throw new NotFoundException<Objective>("Objective with id was not found.");
+            _ = riskEntity ?? throw new NotFoundException<Risk>(
+                $"Risk with id {riskId} was not found.");
 
             riskEntity = _mapper.Map<Risk>(riskRequest);
             riskEntity.Id = Guid.Parse(riskId);
             _riskRepository.Update(riskEntity);
             _uow.Save();
 
-            return _mapper.Map<RiskResponse>(_riskRepository.Find(ob => ob.Id.ToString() == riskId).FirstOrDefault());
+            var res = _mapper.Map<RiskResponse>(_riskRepository
+                .Find(ob => ob.Id.ToString() == riskId, _includes)
+                .FirstOrDefault());
+
+            return res;
         }
 
         public void DeleteRisk(string riskId)
         {
-            var riskEntity = _riskRepository.FindWithDeleted(obj => obj.Id.ToString() == riskId)
+            var riskEntity = _riskRepository
+                .FindWithDeleted(risk => risk.Id.ToString() == riskId)
                 .FirstOrDefault();
-            _ = riskEntity ?? throw new NotFoundException<Objective>($"Risk with id {riskId} was not found.");
+            _ = riskEntity ?? throw new NotFoundException<Risk>(
+                $"Risk with id {riskId} was not found.");
 
             _riskRepository.SoftDelete(Guid.Parse(riskId));
             _uow.Save();

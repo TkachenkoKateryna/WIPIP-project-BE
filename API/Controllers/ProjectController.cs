@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
 using Application.Interfaces.Util;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -10,24 +11,20 @@ namespace API.Controllers
         readonly IProjectService _projService;
         readonly IPDFService _pdfService;
 
-        public ProjectController(IProjectService projService, IPDFService pdfService)
+        public ProjectController(
+            IProjectService projService,
+            IPDFService pdfService)
         {
             _projService = projService;
             _pdfService = pdfService;
         }
 
-        [HttpGet("project/{projId}")]
+        [HttpGet("projects/{projId}")]
         public ActionResult<IEnumerable<ProjectResponse>> GetAllProjectById(string projId)
         {
             return Ok(_projService.GetProjectById(projId));
         }
 
-
-        [HttpGet("projects/{managerId}")]
-        public ActionResult<IEnumerable<ProjectResponse>> GetAllProjectsByManager(string managerId)
-        {
-            return Ok(_projService.GetProjectsByManager(managerId));
-        }
 
         [HttpGet("projectCharter/{projId}")]
         public FileResult GenerateProjectCharter(string projId)
@@ -41,6 +38,13 @@ namespace API.Controllers
             string fileName = "Output.pdf";
 
             return File(fileStream, contentType, fileName);
+        }
+
+
+        [HttpGet("projects/{projId}/budget")]
+        public ActionResult<ProjectBudgetResponse> CalculateProjectBudget(string projId)
+        {
+            return Ok(_projService.CalculateProjectBudget(projId));
         }
     }
 }

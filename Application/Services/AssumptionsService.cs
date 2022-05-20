@@ -21,17 +21,13 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<AssumptionResponse> GetAllAssumptionsByProject(string projectId)
+        public IEnumerable<AssumptionResponse> GetAssumptions(string projectId = null)
         {
-            return _assumpRepository.Find(o => o.ProjectId == Guid.Parse(projectId))
-                .Select(entity => _mapper.Map<AssumptionResponse>(entity))
-                .ToList();
-        }
+            var assumptions = projectId != null ?
+                _assumpRepository.Find(o => o.ProjectId == Guid.Parse(projectId)) :
+                _assumpRepository.GetAllWithDeleted();
 
-        public IEnumerable<AssumptionResponse> GetAllAssumptions()
-        {
-            return _assumpRepository.GetAllWithDeleted()
-                .Select(entity => _mapper.Map<AssumptionResponse>(entity))
+            return assumptions.Select(entity => _mapper.Map<AssumptionResponse>(entity))
                 .ToList();
         }
 

@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +11,10 @@ namespace API.Controllers
     {
         readonly IDeliverablesService _delService;
 
-        public DeliverablesController(IDeliverablesService delService)
+        public DeliverablesController(
+            IDeliverablesService delService)
         {
             _delService = delService;
-        }
-
-        [HttpGet("deliverablesByProject/{projId}")]
-        public ActionResult<IEnumerable<DeliverableResponse>> GetAllDeliverablesByProject(string projId)
-        {
-            return Ok(_delService.GetAllDeliverablesByProject(projId));
         }
 
         [HttpGet("deliverables")]
@@ -26,7 +23,7 @@ namespace API.Controllers
             return Ok(_delService.GetAllDeliverables());
         }
 
-        [HttpPut("deliverables/add")]
+        [HttpPost("deliverables")]
         public ActionResult<DeliverableResponse> AddDeliverable(DeliverableRequest delRequest)
         {
             try
@@ -40,8 +37,8 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("deliverables/update/{delId}")]
-        public ActionResult<ObjectiveResponse> UpdateObjective(DeliverableRequest delRequest, string delId)
+        [HttpPut("deliverables/{delId}")]
+        public ActionResult<DeliverableResponse> UpdateDeliverable(DeliverableRequest delRequest, string delId)
         {
             try
             {
@@ -54,7 +51,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("deliverables/delete/{delId}")]
+        [HttpDelete("deliverables/{delId}")]
         public IActionResult DeleteDeliverables(string delId)
         {
             try

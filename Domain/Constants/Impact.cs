@@ -3,7 +3,7 @@ namespace Domain.Constants
 {
     public enum Impact
     {
-        Negligible,
+        Negligible = 1, 
         Minor,
         Moderate,
         Major,

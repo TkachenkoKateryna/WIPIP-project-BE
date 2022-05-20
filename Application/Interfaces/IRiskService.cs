@@ -5,8 +5,8 @@ namespace Application.Interfaces
 {
     public interface IRiskService
     {
-        IEnumerable<RiskResponse> GetAllRisksByProject(string projectId);
         IEnumerable<RiskResponse> GetAllRisks();
+        IEnumerable<RiskResponse> GetRisksByProject(string projectId);
         RiskResponse AddRisk(RiskRequest riskRequest);
         RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
         void DeleteRisk(string riskId);

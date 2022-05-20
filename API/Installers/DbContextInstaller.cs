@@ -12,7 +12,6 @@ namespace API.Installers
 
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(connectionsString)
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                     .EnableSensitiveDataLogging());
         }
     }

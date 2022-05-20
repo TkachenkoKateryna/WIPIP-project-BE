@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -9,24 +11,19 @@ namespace API.Controllers
     {
         readonly IAssumptionsService _assumpService;
 
-        public AssumptionsController(IAssumptionsService assumpService)
+        public AssumptionsController(
+            IAssumptionsService assumpService)
         {
             _assumpService = assumpService;
         }
 
-        [HttpGet("assumptionsByProject/{projId}")]
-        public ActionResult<IEnumerable<AssumptionResponse>> GetAllAssumptionsByProject(string projId)
-        {
-            return Ok(_assumpService.GetAllAssumptionsByProject(projId));
-        }
-
         [HttpGet("assumptions")]
-        public ActionResult<IEnumerable<AssumptionResponse>> GetAllAssumptions()
+        public ActionResult<IEnumerable<AssumptionResponse>> GetAllAssumptions([FromQuery] string projId = null)
         {
-            return Ok(_assumpService.GetAllAssumptions());
+            return Ok(_assumpService.GetAssumptions(projId));
         }
 
-        [HttpPut("assumptions/add")]
+        [HttpPost("assumptions")]
         public ActionResult<AssumptionResponse> AddObjective(AssumptionRequest assumpRequest)
         {
             try
@@ -40,7 +37,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("assumptions/update/{assumpId}")]
+        [HttpPut("assumptions/{assumpId}")]
         public ActionResult<AssumptionResponse> UpdateAssumption(AssumptionRequest assumpRequest, string assumpId)
         {
             try
@@ -54,7 +51,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("assumptions/delete/{assumpId}")]
+        [HttpDelete("assumptions/{assumpId}")]
         public IActionResult DeleteAssumption(string assumpId)
         {
             try

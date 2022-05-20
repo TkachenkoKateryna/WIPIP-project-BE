@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +11,10 @@ namespace API.Controllers
     {
         readonly IObjectiveService _objService;
 
-        public ObjectiveController(IObjectiveService objService)
+        public ObjectiveController(
+            IObjectiveService objService)
         {
             _objService = objService;
-        }
-
-        [HttpGet("objectivesByProject/{projId}")]
-        public ActionResult<IEnumerable<ObjectiveResponse>> GetAllObjectiveByProject(string projId)
-        {
-            return Ok(_objService.GetAllObjectivesByProject(projId));
         }
 
         [HttpGet("objectives")]
@@ -26,7 +23,7 @@ namespace API.Controllers
             return Ok(_objService.GetAllObjectives());
         }
 
-        [HttpPut("objectives/add")]
+        [HttpPost("objectives")]
         public ActionResult<ObjectiveResponse> AddObjective(ObjectiveRequest objRequest)
         {
             try
@@ -40,7 +37,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("objectives/update/{objId}")]
+        [HttpPut("objectives/{objId}")]
         public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, string objId)
         {
             try
@@ -54,7 +51,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("objectives/delete/{objId}")]
+        [HttpDelete("objectives/{objId}")]
         public IActionResult DeleteObjective(string objId)
         {
             try

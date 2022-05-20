@@ -9,7 +9,6 @@ namespace Domain.Dtos.Requests
         public Likelihood Likelihood { get; set; }
         public Impact Impact { get; set; }
         public string Mitigation { get; set; }
-
-        public string CategoryId { get; set; }
+        public string RiskCategoryId { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Filters;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
@@ -10,7 +12,8 @@ namespace API.Controllers
     {
         readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(
+            IEmployeeService employeeService)
         {
             _employeeService = employeeService;
         }
@@ -21,7 +24,7 @@ namespace API.Controllers
             return Ok(_employeeService.GetAllEmployees(param));
         }
 
-        [HttpPut("employees/add")]
+        [HttpPost("employees/add")]
         public ActionResult<EmployeeResponse> AddEmployee(EmployeeRequest empRequest)
         {
             try
@@ -35,7 +38,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("employees/update/{empId}")]
+        [HttpPut("employees/{empId}")]
         public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string empId)
         {
             try
@@ -49,7 +52,7 @@ namespace API.Controllers
             }
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpDelete("employees/delete/{empId}")]
+        [HttpDelete("employees/{empId}")]
         public IActionResult DeleteEmployee(string empId)
         {
             try
@@ -63,7 +66,8 @@ namespace API.Controllers
             }
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPut("employees/updateImage/{empId}")]
+
+        [HttpPut("employees/{empId}/updateImage")]
         public IActionResult UpdateEmployeeImage(IFormFile file, string empId)
         {
             try
@@ -73,6 +77,21 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet("teamMembers")]
+        public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)
+        {
+            try
+            {
+                var empResp = _employeeService.GeneratePossibleTeamOptions(projectId);
+                return Ok(empResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException);
             }
         }
     }

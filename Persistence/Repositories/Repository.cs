@@ -39,7 +39,7 @@ namespace Persistence.Repositories
 
         public void SoftDelete(Guid id)
         {
-            DbSet.Find(id)!.IsDeleted = true;
+            DbSet.Find(id).IsDeleted = true;
         }
 
         public TEntity FirstOrDefault(Expression<Func<TEntity, bool>> predicate,

@@ -2,7 +2,7 @@
 {
     public enum Likelihood
     {
-        Rare,
+        Rare = 1,
         Unlikely,
         Possible,
         Likely,

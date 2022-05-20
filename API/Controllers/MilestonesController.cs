@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using API.Controllers.Base;
+using Application.Interfaces;
+using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +11,10 @@ namespace API.Controllers
     {
         readonly IMilestoneService _milService;
 
-        public MilestonesController(IMilestoneService milService)
+        public MilestonesController(
+            IMilestoneService milService)
         {
             _milService = milService;
-        }
-
-        [HttpGet("milestonesByProject/{projId}")]
-        public ActionResult<IEnumerable<MilestoneResponse>> GetAllMilestonesByProject(string projId)
-        {
-            return Ok(_milService.GetAllMilestonesByProject(projId));
         }
 
         [HttpGet("milestones")]
@@ -26,7 +23,7 @@ namespace API.Controllers
             return Ok(_milService.GetAllMilestones());
         }
 
-        [HttpPut("milestones/add")]
+        [HttpPost("milestones")]
         public ActionResult<MilestoneResponse> AddMilestone(MilestoneRequest milRequest)
         {
             try
@@ -40,7 +37,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("milestones/update/{milId}")]
+        [HttpPut("milestones/{milId}")]
         public ActionResult<MilestoneResponse> UpdateMilestone(MilestoneRequest milRequest, string milId)
         {
             try
@@ -54,7 +51,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("milestones/delete/{milId}")]
+        [HttpDelete("milestones/{milId}")]
         public IActionResult DeleteMilestone(string milId)
         {
             try

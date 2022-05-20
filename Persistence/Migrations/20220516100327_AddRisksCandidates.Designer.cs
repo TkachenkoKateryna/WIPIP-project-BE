@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.EF;
 
@@ -11,9 +12,10 @@ using Persistence.EF;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220516100327_AddRisksCandidates")]
+    partial class AddRisksCandidates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,7 +102,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("e1969bcb-49eb-4d16-9d9e-50bd016516df"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 6, 3, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9097),
+                            TimeOfComplition = new DateTime(2022, 5, 30, 10, 3, 25, 762, DateTimeKind.Utc).AddTicks(1987),
                             Title = "Project Plan"
                         },
                         new
@@ -110,7 +112,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("f05dce1f-ba10-46a8-9266-9bdc8335520a"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 12, 6, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9108),
+                            TimeOfComplition = new DateTime(2022, 12, 2, 10, 3, 25, 762, DateTimeKind.Utc).AddTicks(2004),
                             Title = "Web application"
                         },
                         new
@@ -119,7 +121,7 @@ namespace Persistence.Migrations
                             Description = "Desktop Application with full functionality described in documentation.",
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 12, 6, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9112),
+                            TimeOfComplition = new DateTime(2022, 12, 2, 10, 3, 25, 762, DateTimeKind.Utc).AddTicks(2010),
                             Title = "Desktop Application."
                         });
                 });
@@ -152,6 +154,9 @@ namespace Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialization")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -226,7 +231,7 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9cf294a8-3902-4717-b141-a22a484e2b61"),
+                            Id = new Guid("1b11d8bf-e7ea-4266-a52c-184d195cc191"),
                             EmployeeId = new Guid("db366b85-04ef-4e28-9ef3-24a0174159f3"),
                             IsDeleted = false,
                             Primary = true,
@@ -235,7 +240,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("aa3f402b-f2e4-441d-8651-fe47dd94722e"),
+                            Id = new Guid("30682b1d-9cdd-418a-bf96-0c229c7d065b"),
                             EmployeeId = new Guid("39ca7391-d752-402e-8ef6-0b255ebefa7f"),
                             IsDeleted = false,
                             Primary = true,
@@ -244,7 +249,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ee90f28f-2741-4337-8a0a-cab3daf32e5f"),
+                            Id = new Guid("5e25ce9e-dd1b-4442-a5a5-2343c946cb1e"),
                             EmployeeId = new Guid("39ca7391-d752-402e-8ef6-0b255ebefa7f"),
                             IsDeleted = false,
                             Primary = true,
@@ -253,7 +258,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fc5f5159-c361-4976-ba31-e9bf2f83658c"),
+                            Id = new Guid("3b0c2bc9-67be-4ee5-87c3-e60ed51627c8"),
                             EmployeeId = new Guid("1178ff11-3f8f-49d8-90bf-28090ea5c4fc"),
                             IsDeleted = false,
                             Primary = true,
@@ -493,28 +498,28 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5a51b6c3-77cd-4dc4-8b1a-997bc8378187"),
+                            Id = new Guid("fcb3dd07-432c-4f75-9a77-534dc6c71753"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("24b91b47-9e30-4080-b386-dd708f959de9")
                         },
                         new
                         {
-                            Id = new Guid("8b6dee4d-8f76-4a1c-ad4e-481650551cb3"),
+                            Id = new Guid("35a72c63-6bcd-4e70-9cfa-c842e75610fa"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("f31a73d2-d48b-4ac3-95e4-af8e4ec9be39")
                         },
                         new
                         {
-                            Id = new Guid("a7aa96e7-e047-40f2-bbdf-cf8a53bb2976"),
+                            Id = new Guid("c7d58e8e-8163-44ae-ad83-e2571cc86d1a"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("d29a25cb-aa62-461e-baf9-2b382cfb5c1e")
                         },
                         new
                         {
-                            Id = new Guid("16a4000e-8a06-4ce1-a65f-3e475349a0a5"),
+                            Id = new Guid("da1a698f-878a-4236-836a-1a998fd1593b"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("d540c798-13ee-4eea-ba0b-01efa4b86326")
@@ -567,12 +572,6 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Consequence")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Impact")
                         .HasColumnType("int");
 
@@ -601,9 +600,9 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = new Guid("24b91b47-9e30-4080-b386-dd708f959de9"),
-                            Impact = 4,
+                            Impact = 3,
                             IsDeleted = false,
-                            Likelihood = 1,
+                            Likelihood = 0,
                             Mitigation = "Identify stakeholders, analyze power and influence and create a stakeholder engagement plan. Project Board to authorise the plan. Revisit the plan at regular intervals to check all stakeholders are managed.",
                             RiskCategoryId = new Guid("6e11c76b-648a-4778-a11e-c21db56e7c52"),
                             Title = "Stakeholder action delays project"
@@ -611,9 +610,9 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = new Guid("f31a73d2-d48b-4ac3-95e4-af8e4ec9be39"),
-                            Impact = 4,
+                            Impact = 3,
                             IsDeleted = false,
-                            Likelihood = 1,
+                            Likelihood = 0,
                             Mitigation = "Plan project team. Acknowledge problems to the HR team. Talk to other project managers whether their team members' fte is full.",
                             RiskCategoryId = new Guid("0124991d-1191-4914-afb7-02ab237dc2a6"),
                             Title = "Lack of resources"
@@ -621,9 +620,9 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = new Guid("d29a25cb-aa62-461e-baf9-2b382cfb5c1e"),
-                            Impact = 4,
+                            Impact = 3,
                             IsDeleted = false,
-                            Likelihood = 1,
+                            Likelihood = 0,
                             Mitigation = "Write a communication plan. Identify stakeholders early and make sure they are considered in the communication plan. Use most appropriate channel of communication for audience",
                             RiskCategoryId = new Guid("3c4d64e1-fac2-4cc4-87fd-0186bec6429a"),
                             Title = "Lack of communication"
@@ -631,9 +630,9 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = new Guid("d540c798-13ee-4eea-ba0b-01efa4b86326"),
-                            Impact = 4,
+                            Impact = 3,
                             IsDeleted = false,
-                            Likelihood = 1,
+                            Likelihood = 0,
                             Mitigation = "Attend project scheduling workshops.Document all assumptions made in planning and communicate to the project manager before project kick off.",
                             RiskCategoryId = new Guid("6d464351-efef-43db-9113-0b2de42ef20d"),
                             Title = "Unplanned work that must be accommodated"
@@ -875,15 +874,15 @@ namespace Persistence.Migrations
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "25cace2f-ecd7-4e5d-85bb-0f4395cf320d",
+                            ConcurrencyStamp = "bdef6c50-9dd2-42ca-9933-30402edcf443",
                             Email = "bob@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "BOB@TEXT.COM",
                             NormalizedUserName = "BOB",
-                            PasswordHash = "AQAAAAEAACcQAAAAEFJxFQJdXRAtfwvKoXM2vOvL7+tp/QPMpWLy1UyltP8VfuKkVyI/YzK2B0LBy3Zufg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEK1sTd8iwNT5RVZXv1oNFnRI3Mm/h04ZcB9HnsCgwyMDAwU1HZaGN4SVE0VrtDoRqw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3d1986ad-0eca-439e-8ed1-88752092afb5",
+                            SecurityStamp = "63c5005d-5521-4609-ac45-b879d317efd9",
                             TwoFactorEnabled = false,
                             UserName = "bob"
                         },
@@ -891,15 +890,15 @@ namespace Persistence.Migrations
                         {
                             Id = "4f555f12-9168-49b1-9f17-b87904564904",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "46b9d07a-27c5-4eb8-a369-83858f0c781f",
+                            ConcurrencyStamp = "f575f51f-eb3b-49c1-9e2e-c09d24c7c8b8",
                             Email = "jane@text.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "JANE@TEXT.COM",
                             NormalizedUserName = "JANE",
-                            PasswordHash = "AQAAAAEAACcQAAAAELbDSafjtpOHF1Vahdhx3gYgeBFxSZS6s8vDO4RNl0AstDoc2OFzruSYC9pNgupJig==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEDQlM4yslhUgrxHFlz3+mXI9TtAkuCjoMyffd1puG+x9GdvzpdrVkQyXhoufAkU02w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e4d5f651-e304-4bcc-aca7-22d203a545ef",
+                            SecurityStamp = "f26470fa-fcf7-4d15-9635-104c15313388",
                             TwoFactorEnabled = false,
                             UserName = "jane"
                         });
@@ -935,14 +934,14 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74",
-                            ConcurrencyStamp = "b093a033-787a-41a8-af73-f52ab481e468",
+                            ConcurrencyStamp = "885d5ef2-cd08-4885-86ca-143a8d31109f",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "09afe919-59ff-44b8-b656-c5e320c163a7",
-                            ConcurrencyStamp = "8ab8f538-2744-4883-b88b-ef6822906c78",
+                            ConcurrencyStamp = "9b3e2698-2c54-4de8-aaf1-07cf82a15220",
                             Name = "Lead",
                             NormalizedName = "LEAD"
                         });
