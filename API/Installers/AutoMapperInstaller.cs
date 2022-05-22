@@ -1,6 +1,6 @@
-﻿using Application.Mapper;
-using AutoMapper;
+﻿using AutoMapper;
 using Domain.Interfaces;
+using Domain.Mapper;
 
 namespace API.Installers
 {

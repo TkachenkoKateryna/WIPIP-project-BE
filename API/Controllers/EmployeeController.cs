@@ -1,9 +1,8 @@
 ﻿using API.Controllers.Base;
-using Application.Interfaces;
-using Application.Interfaces.Util;
 using Domain.Dtos.Filters;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
+using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -65,21 +64,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-        [HttpPut("employees/{empId}/updateImage")]
-        public IActionResult UpdateEmployeeImage(IFormFile file, string empId)
-        {
-            try
-            {
-                return Ok(_employeeService.UpdateEmployeeImage(file, empId));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
 
         [HttpGet("teamMembers")]
         public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)

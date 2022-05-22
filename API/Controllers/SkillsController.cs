@@ -1,6 +1,6 @@
 ﻿using API.Controllers.Base;
-using Application.Interfaces;
 using Domain.Dtos.Responses;
+using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

@@ -1,9 +1,8 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Util;
-using Application.Services;
-using Application.Services.Util;
-using Domain.Entities;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.Services.Util;
+using Domain.Services;
+using Domain.Services.Util;
 
 namespace API.Installers
 {

@@ -1,8 +1,7 @@
 ﻿using API.Controllers.Base;
-using Application.Interfaces;
-using Application.Interfaces.Util;
 using Domain.Dtos.Requests;
 using Domain.Dtos.Responses;
+using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

@@ -1,8 +1,4 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Util;
-using Domain.Dtos;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +8,8 @@ using API.Controllers.Base;
 using Domain.Constants;
 using Domain.Dtos.Identity;
 using Domain.Interfaces.Repositories;
+using Domain.Interfaces.Services;
+using Domain.Interfaces.Services.Util;
 
 namespace API.Controllers
 {
@@ -155,31 +153,6 @@ namespace API.Controllers
                 return BadRequest("Error while changing the password");
             }
         }
-
-        [HttpPost("users/UpdateImage")]
-        public async Task<IActionResult> UserUpdateImage(IFormFile image)
-        {
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
-
-            if (user is null) return BadRequest("User not found");
-
-            if (image != null)
-            {
-                using var memoryStream = new MemoryStream();
-                await image.CopyToAsync(memoryStream);
-                var content = memoryStream.ToArray();
-                var extension = Path.GetExtension(image.FileName);
-                user.ImageLink = _fileStorageService.SaveFile(content, extension, Constants.FileContainerName, image.ContentType);
-            }
-            else
-            {
-                user.ImageLink = null;
-            }
-
-            var updatedUser = await _userManager.UpdateAsync(user);
-            return Ok(updatedUser);
-        }
-
         private UserResponse CreateUserObject(User user)
         {
             return new UserResponse

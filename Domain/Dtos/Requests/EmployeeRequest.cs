@@ -11,6 +11,7 @@ namespace Domain.Dtos.Requests
         public DateTime DOB { get; set; }
         public DateTime DFD { get; set; }
         public string Specialization { get; set; }
+        public string ImageFile { get; set; }
         public EnglishLevel EnglishLevel { get; set; }
         public List<EmployeeSkillRequest> EmployeeSkills { get; set; }
     }
