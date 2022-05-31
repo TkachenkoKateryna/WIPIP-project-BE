@@ -1,5 +1,5 @@
-﻿using Domain.Constants;
-using Domain.Entities;
+﻿using Domain.Models.Constants;
+using Domain.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,6 +10,8 @@ namespace Persistence.Configurations
         public void Configure(EntityTypeBuilder<Stakeholder> builder)
         {
             builder.HasQueryFilter(b => !b.IsDeleted);
+            builder.Property(b => b.Email).IsRequired();
+            builder.Property(b => b.Name).IsRequired();
 
             builder.HasData(
                 new Stakeholder()
@@ -20,7 +22,11 @@ namespace Persistence.Configurations
                     Address = "Miami, Florida 92A",
                     Payment = Payment.LittleDelay,
                     Class = StakeholderClass.KeepSatisfied,
-                    Engagement = Engagement.Pertiial
+                    Influence = StakeholderInfluence.Medium,
+                    Interest = StakeholderInterest.Medium,
+                    Role = StakeholderRole.ProductManager,
+                    CommunicationChannel = CommunicationChannel.VideoConference,
+                    Category = StakeholderCategory.External
                 },
                  new Stakeholder()
                  {
@@ -30,7 +36,11 @@ namespace Persistence.Configurations
                      Address = "Miami, Florida 92A",
                      Payment = Payment.LittleDelay,
                      Class = StakeholderClass.KeyPlayer,
-                     Engagement = Engagement.Full
+                     Influence = StakeholderInfluence.High,
+                     Interest = StakeholderInterest.Low,
+                     Role = StakeholderRole.Sponsor,
+                     CommunicationChannel = CommunicationChannel.Email,
+                     Category = StakeholderCategory.External
                  });
         }
     }

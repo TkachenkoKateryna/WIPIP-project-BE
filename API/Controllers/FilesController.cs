@@ -15,7 +15,7 @@ namespace API.Controllers
         }
 
         [HttpPost("imageUpload")]
-        public IActionResult UpdateEmployeeImage(IFormFile file)
+        public IActionResult UploadImage(IFormFile file)
         {
             try
             {

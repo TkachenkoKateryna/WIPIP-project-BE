@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Constants;
+using Domain.Models.Constants;
 
 namespace Persistence.Configurations
 {
@@ -14,14 +14,14 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ProjectCandidate> builder)
         {
-            builder.HasOne(d => d.Employee)
-                .WithMany(m => m.Candidates)
-                .HasForeignKey(d => d.EmployeeId)
+            builder.HasOne(pc => pc.Employee)
+                .WithMany(e => e.Candidates)
+                .HasForeignKey(pc => pc.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(d => d.Project)
-                .WithMany(m => m.Candidates)
-                .HasForeignKey(d => d.ProjectId)
+            builder.HasOne(pc => pc.Project)
+                .WithMany(p => p.Candidates)
+                .HasForeignKey(pc => pc.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasData(

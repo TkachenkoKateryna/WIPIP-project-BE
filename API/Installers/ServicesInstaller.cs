@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
+using Domain.Interfaces.Util;
 using Domain.Services;
 using Domain.Services.Util;
 
@@ -24,6 +25,7 @@ namespace API.Installers
             services.AddScoped<IFileStorageService, AzureStorageService>();
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IPDFService, PDFService>();
+            services.AddSingleton<ILoggerManager, LoggerManager>();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domain.Dtos.Responses;
+﻿using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
 {

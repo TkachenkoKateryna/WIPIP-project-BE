@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Models.Entities.Identity;
 
 namespace Persistence.Configurations.Identity
 {

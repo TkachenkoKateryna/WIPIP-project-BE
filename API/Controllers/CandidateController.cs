@@ -1,6 +1,7 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Constants;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,25 +11,18 @@ namespace API.Controllers
     {
         readonly ICandidateService _candidateService;
 
-        public CandidateController(
-            ICandidateService candidateService)
+        public CandidateController(ICandidateService candidateService)
         {
             _candidateService = candidateService;
         }
 
-        [HttpGet("candidates")]
-        public ActionResult<IEnumerable<ProjectCandidateResponse>> GetAllRisks()
-        {
-            return Ok(_candidateService.GetCandidates());
-        }
-
-        [HttpPost("candidates")]
-        public ActionResult<ProjectCandidateResponse> AddObjective(ProjectCandidateRequest candidateRequest)
+        [HttpPost(Strings.CandidateRoute)]
+        public ActionResult<CandidateResponse> AddCandidate(CandidateRequest candidateRequest)
         {
             try
             {
-                var candResp = _candidateService.AddCandidate(candidateRequest);
-                return Ok(candResp);
+                var candidateResp = _candidateService.AddCandidate(candidateRequest);
+                return Ok(candidateResp);
             }
             catch (Exception ex)
             {
@@ -36,13 +30,13 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("candidates/{candId}")]
-        public ActionResult<ProjectCandidateResponse> UpdateRisk(ProjectCandidateRequest candRequest, string candId)
+        [HttpPut(Strings.CandidateRoute + "{candidateId}")]
+        public ActionResult<CandidateResponse> UpdateCandidate(CandidateRequest candidateRequest, string candidateId)
         {
             try
             {
-                var candResp = _candidateService.UpdateCandidate(candRequest, candId);
-                return Ok(candResp);
+                var candidateResp = _candidateService.UpdateCandidate(candidateRequest, candidateId);
+                return Ok(candidateResp);
             }
             catch (Exception ex)
             {
@@ -50,12 +44,26 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("candidates/{candId}")]
-        public IActionResult DeleteCandidate(string candId)
+        [HttpPatch(Strings.CandidateRoute + "{candidateId}")]
+        public ActionResult<CandidateResponse> AssignEmployeeToCandidate([FromQuery] string employeeId, string candidateId)
         {
             try
             {
-                _candidateService.DeleteCandidate(candId);
+                var candidateResp = _candidateService.AssingEmployeeToCandidate(employeeId, candidateId);
+                return Ok(candidateResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete(Strings.CandidateRoute + "{candidateId}")]
+        public IActionResult DeleteCandidate(string candidateId)
+        {
+            try
+            {
+                _candidateService.DeleteCandidate(candidateId);
                 return Ok();
             }
             catch (Exception ex)

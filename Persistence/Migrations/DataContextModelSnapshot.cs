@@ -22,13 +22,14 @@ namespace Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Domain.Entities.Assumption", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Assumption", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -60,7 +61,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Deliverable", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Deliverable", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -82,6 +83,7 @@ namespace Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -100,7 +102,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("e1969bcb-49eb-4d16-9d9e-50bd016516df"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 6, 3, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9097),
+                            TimeOfComplition = new DateTime(2022, 6, 14, 20, 53, 23, 347, DateTimeKind.Utc).AddTicks(7731),
                             Title = "Project Plan"
                         },
                         new
@@ -110,7 +112,7 @@ namespace Persistence.Migrations
                             IsDeleted = false,
                             MilestoneId = new Guid("f05dce1f-ba10-46a8-9266-9bdc8335520a"),
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 12, 6, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9108),
+                            TimeOfComplition = new DateTime(2022, 12, 17, 20, 53, 23, 347, DateTimeKind.Utc).AddTicks(7745),
                             Title = "Web application"
                         },
                         new
@@ -119,12 +121,12 @@ namespace Persistence.Migrations
                             Description = "Desktop Application with full functionality described in documentation.",
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
-                            TimeOfComplition = new DateTime(2022, 12, 6, 7, 42, 40, 654, DateTimeKind.Utc).AddTicks(9112),
+                            TimeOfComplition = new DateTime(2022, 12, 17, 20, 53, 23, 347, DateTimeKind.Utc).AddTicks(7751),
                             Title = "Desktop Application."
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -137,6 +139,7 @@ namespace Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EnglishLevel")
@@ -149,6 +152,7 @@ namespace Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
@@ -194,7 +198,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.EmployeeSkill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.EmployeeSkill", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -217,7 +221,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasAlternateKey("EmployeeId", "SkillId");
 
                     b.HasIndex("SkillId");
 
@@ -226,7 +230,7 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9cf294a8-3902-4717-b141-a22a484e2b61"),
+                            Id = new Guid("67c98844-03a7-4671-aa44-f3d282c8c8bd"),
                             EmployeeId = new Guid("db366b85-04ef-4e28-9ef3-24a0174159f3"),
                             IsDeleted = false,
                             Primary = true,
@@ -235,7 +239,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("aa3f402b-f2e4-441d-8651-fe47dd94722e"),
+                            Id = new Guid("8d2612fb-c47c-47c9-bca7-8babc86686c3"),
                             EmployeeId = new Guid("39ca7391-d752-402e-8ef6-0b255ebefa7f"),
                             IsDeleted = false,
                             Primary = true,
@@ -244,7 +248,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ee90f28f-2741-4337-8a0a-cab3daf32e5f"),
+                            Id = new Guid("063122b5-110a-4539-ab05-e643b9b84522"),
                             EmployeeId = new Guid("39ca7391-d752-402e-8ef6-0b255ebefa7f"),
                             IsDeleted = false,
                             Primary = true,
@@ -253,7 +257,7 @@ namespace Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fc5f5159-c361-4976-ba31-e9bf2f83658c"),
+                            Id = new Guid("1a80b174-b394-4245-995b-c14baec713af"),
                             EmployeeId = new Guid("1178ff11-3f8f-49d8-90bf-28090ea5c4fc"),
                             IsDeleted = false,
                             Primary = true,
@@ -262,13 +266,116 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Identity.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "600a82e6-ba8b-4032-b733-e4ac5afbb1d0",
+                            Email = "bob@text.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "BOB@TEXT.COM",
+                            NormalizedUserName = "BOB",
+                            PasswordHash = "AQAAAAEAACcQAAAAEP4XsOa9K7kilorMMa3yuqU2nk6I/FL/Ln1LxcXgNyEahhA5NS76MmBs6/gC9ZBySw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "7393b5e1-d68f-49e8-8837-92aad2d9d930",
+                            TwoFactorEnabled = false,
+                            UserName = "bob"
+                        },
+                        new
+                        {
+                            Id = "4f555f12-9168-49b1-9f17-b87904564904",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ddd85f51-0066-40bc-89bf-66b732f63774",
+                            Email = "jane@text.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JANE@TEXT.COM",
+                            NormalizedUserName = "JANE",
+                            PasswordHash = "AQAAAAEAACcQAAAAEO0VNu3hmeKQZgLK/5tEmhfrGHcASGfYTAR2RL/NT1z5eXZpy9QEGdIXIwp9EUEe9Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "9410e058-b88b-480e-b64f-6376a93abc79",
+                            TwoFactorEnabled = false,
+                            UserName = "jane"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Activity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DueDate")
@@ -305,13 +412,14 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Objective", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Objective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -339,7 +447,8 @@ namespace Persistence.Migrations
                             Description = "Increase the number of website users to 100 in first three month",
                             IsDeleted = false,
                             Priority = 1,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
+                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
+                            Title = "Number of websites users"
                         },
                         new
                         {
@@ -347,11 +456,12 @@ namespace Persistence.Migrations
                             Description = "Increase the number of clients to 5 in first month",
                             IsDeleted = false,
                             Priority = 0,
-                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f")
+                            ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
+                            Title = "Number of websites clients"
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -364,7 +474,24 @@ namespace Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ManagerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("MonthlyIncome")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MonthlyOutcome")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MonthlyProfit")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -378,11 +505,16 @@ namespace Persistence.Migrations
                             Id = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             Description = "Planmykids project that helps parents with building itineraries for kids to different camps.",
                             IsDeleted = false,
-                            ManagerId = "4f555f12-9168-49b1-9f17-b87904564904"
+                            ManagerId = "4f555f12-9168-49b1-9f17-b87904564904",
+                            MonthlyIncome = 0.0,
+                            MonthlyOutcome = 0.0,
+                            MonthlyProfit = 0.0,
+                            Status = 0,
+                            Title = "PlanMyKids"
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectCandidate", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -467,7 +599,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectRisk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectRisk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -484,7 +616,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasAlternateKey("ProjectId", "RiskId");
 
                     b.HasIndex("RiskId");
 
@@ -493,35 +625,35 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5a51b6c3-77cd-4dc4-8b1a-997bc8378187"),
+                            Id = new Guid("abd1abac-35db-4c01-b549-608caff07457"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("24b91b47-9e30-4080-b386-dd708f959de9")
                         },
                         new
                         {
-                            Id = new Guid("8b6dee4d-8f76-4a1c-ad4e-481650551cb3"),
+                            Id = new Guid("a3ba1107-4cf2-4d3e-80a9-4e894ce3fcd1"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("f31a73d2-d48b-4ac3-95e4-af8e4ec9be39")
                         },
                         new
                         {
-                            Id = new Guid("a7aa96e7-e047-40f2-bbdf-cf8a53bb2976"),
+                            Id = new Guid("7d025742-0927-48d1-9140-63272dbf2539"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("d29a25cb-aa62-461e-baf9-2b382cfb5c1e")
                         },
                         new
                         {
-                            Id = new Guid("16a4000e-8a06-4ce1-a65f-3e475349a0a5"),
+                            Id = new Guid("e97513d5-90be-4746-96d0-bc718d0b9a0a"),
                             IsDeleted = false,
                             ProjectId = new Guid("340cf520-35e7-47f3-ad61-5e15d705cb6f"),
                             RiskId = new Guid("d540c798-13ee-4eea-ba0b-01efa4b86326")
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectStakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectStakeholder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -538,7 +670,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasAlternateKey("ProjectId", "StakeholderId");
 
                     b.HasIndex("StakeholderId");
 
@@ -561,7 +693,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -640,7 +772,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.RiskCategory", b =>
+            modelBuilder.Entity("Domain.Models.Entities.RiskCategory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -707,7 +839,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Skill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Skill", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -744,7 +876,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Stakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Stakeholder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -753,25 +885,42 @@ namespace Persistence.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Class")
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Class")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CommunicationChannel")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Engagement")
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Influence")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Interest")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Payment")
+                    b.Property<int?>("Payment")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -783,125 +932,31 @@ namespace Persistence.Migrations
                         {
                             Id = new Guid("d0203d35-a1f3-4dda-bca6-f6da30177102"),
                             Address = "Miami, Florida 92A",
+                            Category = 1,
                             Class = 1,
+                            CommunicationChannel = 3,
                             Email = "gil@test.com",
-                            Engagement = 1,
+                            Influence = 1,
+                            Interest = 1,
                             IsDeleted = false,
                             Name = "Gil Spencor",
-                            Payment = 1
+                            Payment = 1,
+                            Role = 2
                         },
                         new
                         {
                             Id = new Guid("d9b199e5-263e-4e59-bb38-9420f5acdfc0"),
                             Address = "Miami, Florida 92A",
+                            Category = 1,
                             Class = 0,
+                            CommunicationChannel = 0,
                             Email = "amanda@test.com",
-                            Engagement = 0,
+                            Influence = 2,
+                            Interest = 0,
                             IsDeleted = false,
                             Name = "Amanda Froid",
-                            Payment = 1
-                        });
-                });
-
-            modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ImageLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "25cace2f-ecd7-4e5d-85bb-0f4395cf320d",
-                            Email = "bob@text.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "BOB@TEXT.COM",
-                            NormalizedUserName = "BOB",
-                            PasswordHash = "AQAAAAEAACcQAAAAEFJxFQJdXRAtfwvKoXM2vOvL7+tp/QPMpWLy1UyltP8VfuKkVyI/YzK2B0LBy3Zufg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "3d1986ad-0eca-439e-8ed1-88752092afb5",
-                            TwoFactorEnabled = false,
-                            UserName = "bob"
-                        },
-                        new
-                        {
-                            Id = "4f555f12-9168-49b1-9f17-b87904564904",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "46b9d07a-27c5-4eb8-a369-83858f0c781f",
-                            Email = "jane@text.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "JANE@TEXT.COM",
-                            NormalizedUserName = "JANE",
-                            PasswordHash = "AQAAAAEAACcQAAAAELbDSafjtpOHF1Vahdhx3gYgeBFxSZS6s8vDO4RNl0AstDoc2OFzruSYC9pNgupJig==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "e4d5f651-e304-4bcc-aca7-22d203a545ef",
-                            TwoFactorEnabled = false,
-                            UserName = "jane"
+                            Payment = 1,
+                            Role = 0
                         });
                 });
 
@@ -935,14 +990,14 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74",
-                            ConcurrencyStamp = "b093a033-787a-41a8-af73-f52ab481e468",
+                            ConcurrencyStamp = "1ba845df-3cd9-45c8-8827-d821d2147961",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "09afe919-59ff-44b8-b656-c5e320c163a7",
-                            ConcurrencyStamp = "8ab8f538-2744-4883-b88b-ef6822906c78",
+                            ConcurrencyStamp = "eb422b23-a778-424a-92c7-ad5aa77ef566",
                             Name = "Lead",
                             NormalizedName = "LEAD"
                         });
@@ -1066,9 +1121,9 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Assumption", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Assumption", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Assumptions")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1077,14 +1132,14 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Deliverable", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Deliverable", b =>
                 {
-                    b.HasOne("Domain.Entities.Milestone", "Milestone")
+                    b.HasOne("Domain.Models.Entities.Milestone", "Milestone")
                         .WithMany("Deliverables")
                         .HasForeignKey("MilestoneId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Deliverables")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1095,15 +1150,15 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.EmployeeSkill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.EmployeeSkill", b =>
                 {
-                    b.HasOne("Domain.Entities.Employee", "Employee")
+                    b.HasOne("Domain.Models.Entities.Employee", "Employee")
                         .WithMany("EmployeeSkills")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Skill", "Skill")
+                    b.HasOne("Domain.Models.Entities.Skill", "Skill")
                         .WithMany("EmployeeSkills")
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1114,9 +1169,9 @@ namespace Persistence.Migrations
                     b.Navigation("Skill");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Milestones")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1125,9 +1180,9 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Objective", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Objective", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Objectives")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1136,30 +1191,31 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "Manager")
+                    b.HasOne("Domain.Models.Entities.Identity.User", "Manager")
                         .WithMany("Projects")
                         .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectCandidate", b =>
                 {
-                    b.HasOne("Domain.Entities.Employee", "Employee")
+                    b.HasOne("Domain.Models.Entities.Employee", "Employee")
                         .WithMany("Candidates")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Candidates")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Skill", "Skill")
+                    b.HasOne("Domain.Models.Entities.Skill", "Skill")
                         .WithMany("Candidates")
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1172,15 +1228,15 @@ namespace Persistence.Migrations
                     b.Navigation("Skill");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectRisk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectRisk", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("ProjectRisks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Risk", "Risk")
+                    b.HasOne("Domain.Models.Entities.Risk", "Risk")
                         .WithMany("ProjectRisks")
                         .HasForeignKey("RiskId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1191,15 +1247,15 @@ namespace Persistence.Migrations
                     b.Navigation("Risk");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectStakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectStakeholder", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("ProjectStakeholders")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Stakeholder", "Stakeholder")
+                    b.HasOne("Domain.Models.Entities.Stakeholder", "Stakeholder")
                         .WithMany("ProjectStakeholders")
                         .HasForeignKey("StakeholderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1210,9 +1266,9 @@ namespace Persistence.Migrations
                     b.Navigation("Stakeholder");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
-                    b.HasOne("Domain.Entities.RiskCategory", "RiskCategory")
+                    b.HasOne("Domain.Models.Entities.RiskCategory", "RiskCategory")
                         .WithMany("Risks")
                         .HasForeignKey("RiskCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1232,7 +1288,7 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.Identity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1241,7 +1297,7 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.Identity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1256,7 +1312,7 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.Identity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1265,26 +1321,31 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.Identity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Employee", b =>
                 {
                     b.Navigation("Candidates");
 
                     b.Navigation("EmployeeSkills");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Identity.User", b =>
+                {
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
                     b.Navigation("Deliverables");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
                     b.Navigation("Assumptions");
 
@@ -1301,31 +1362,26 @@ namespace Persistence.Migrations
                     b.Navigation("ProjectStakeholders");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
                     b.Navigation("ProjectRisks");
                 });
 
-            modelBuilder.Entity("Domain.Entities.RiskCategory", b =>
+            modelBuilder.Entity("Domain.Models.Entities.RiskCategory", b =>
                 {
                     b.Navigation("Risks");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Skill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Skill", b =>
                 {
                     b.Navigation("Candidates");
 
                     b.Navigation("EmployeeSkills");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Stakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Stakeholder", b =>
                 {
                     b.Navigation("ProjectStakeholders");
-                });
-
-            modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

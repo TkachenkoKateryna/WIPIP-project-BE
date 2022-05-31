@@ -1,28 +1,66 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.Util;
+using Domain.Models.Constants;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Dtos.Stakeholder;
+using Domain.Models.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
+
     public class StakeholdersController : BaseApiController
     {
-        readonly IStakeholdersService _stakeholderService;
+        private readonly IStakeholdersService _stakeholderService;
+        private readonly UserManager<User> _userManager;
+        private readonly ILoggerManager _logger;
 
         public StakeholdersController(
-            IStakeholdersService stakeholderService)
+            IStakeholdersService stakeholderService,
+            UserManager<User> userManager,
+            ILoggerManager logger)
         {
             _stakeholderService = stakeholderService;
+            _userManager = userManager;
+            _logger = logger;
         }
 
-        [HttpGet("stakeholders")]
-        public ActionResult<IEnumerable<StakeholderResponse>> GetAllStakeholders(string projId)
+        [HttpGet(Strings.StakeholderRoute)]
+        public async Task<ActionResult<IEnumerable<StakeholderResponse>>> GetStakeholders()
         {
-            return Ok(_stakeholderService.GetAllStakeholders());
+            _logger.LogInfo("Fetching current user");
+
+            var manager = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+
+            _logger.LogInfo($"Returning username with email: {manager.Email}.");
+
+            var roles = await _userManager.GetRolesAsync(manager);
+
+            _logger.LogInfo("Fetching stakeholders");
+
+            var stakeholders = _stakeholderService.GetStakeholders(manager.Id, roles);
+
+            _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
+
+            return Ok(stakeholders);
         }
 
-        [HttpPost("stakeholders")]
+        [HttpGet(Strings.ProjectStakeholderRoute)]
+        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders([FromQuery] string projectId)
+        {
+            _logger.LogInfo($"Fetching stakeholders that are not assigned to project with id {projectId}");
+
+            var stakeholders = _stakeholderService.GetStakeholders(projectId);
+
+            _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
+
+            return Ok(stakeholders);
+        }
+
+        [HttpPost(Strings.StakeholderRoute)]
         public ActionResult<StakeholderResponse> AddStakeholder(StakeholderRequest stRequest)
         {
             try
@@ -36,7 +74,22 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("stakeholders/{stId}")]
+        [HttpPost(Strings.ProjectStakeholderRoute)]
+        public ActionResult<StakeholderResponse> AddStakeholderToProject(StakeholderProjectRequest stRequest)
+        {
+            try
+            {
+                var stResp = _stakeholderService.AddStakeholderToProject(stRequest);
+                return Ok(stResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpPut(Strings.StakeholderRoute + "{stId}")]
         public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stId)
         {
             try
@@ -50,8 +103,8 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("stakeholders")]
-        public IActionResult DeleteStakeholder(StakeholderDeleteRequest stRequest)
+        [HttpDelete(Strings.StakeholderRoute)]
+        public IActionResult DeleteStakeholder(StakeholderProjectRequest stRequest)
         {
             try
             {

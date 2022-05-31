@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Models.Entities.Base;
 
 namespace Domain.Interfaces.Repositories
 {

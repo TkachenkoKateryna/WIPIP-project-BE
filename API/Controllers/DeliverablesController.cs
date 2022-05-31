@@ -1,11 +1,13 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [AllowAnonymous]
     public class DeliverablesController : BaseApiController
     {
         readonly IDeliverablesService _delService;
@@ -16,10 +18,11 @@ namespace API.Controllers
             _delService = delService;
         }
 
+        [AllowAnonymous]
         [HttpGet("deliverables")]
-        public ActionResult<IEnumerable<DeliverableResponse>> GetAllDeliverables()
+        public ActionResult<IEnumerable<DeliverableResponse>> GetAllDeliverables([FromQuery] string projectId)
         {
-            return Ok(_delService.GetAllDeliverables());
+            return Ok(_delService.GetDeliverablesByProject(projectId));
         }
 
         [HttpPost("deliverables")]

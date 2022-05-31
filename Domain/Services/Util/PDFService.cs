@@ -1,10 +1,11 @@
-﻿using Domain.Dtos.Responses;
+﻿using Domain.Models.Dtos.Responses;
 using Syncfusion.Drawing;
 using Syncfusion.Pdf;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Pdf.Grid;
 using Syncfusion.Pdf.Parsing;
 using System.Data;
+using Domain.Models.Dtos.Project;
 using Domain.Interfaces.Services.Util;
 
 namespace Domain.Services.Util
@@ -23,8 +24,8 @@ namespace Domain.Services.Util
             PdfGraphics graphics = page.Graphics;
 
             //Loads the image as stream
-            FileStream imageStream = new FileStream("wwwroot/images/projecteam.png", FileMode.Open, FileAccess.Read);
-            RectangleF bounds = new RectangleF(176, 0, 390, 130);
+            FileStream imageStream = new("wwwroot/images/projecteam.png", FileMode.Open, FileAccess.Read);
+            RectangleF bounds = new(176, 0, 390, 130);
             PdfImage image = PdfImage.FromStream(imageStream);
             //Draws the image to the PDF page
             page.Graphics.DrawImage(image, bounds);
@@ -36,8 +37,10 @@ namespace Domain.Services.Util
             //Creates a font for adding the heading in the page
             PdfFont subHeadingFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 14);
             //Creates a text element to add the invoice number
-            PdfTextElement element = new PdfTextElement("INVOICE " + project.Id.ToString(), subHeadingFont);
-            element.Brush = PdfBrushes.White;
+            PdfTextElement element = new("INVOICE " + project.Id.ToString(), subHeadingFont)
+            {
+                Brush = PdfBrushes.White
+            };
 
             //Draws the heading on the page
             PdfLayoutResult result = element.Draw(page, new PointF(10, bounds.Top + 8));
@@ -95,7 +98,7 @@ namespace Domain.Services.Util
             PdfGridLayoutResult gridResult = grid.Draw(page, new RectangleF(new PointF(0, result.Bounds.Bottom + 40), new SizeF(graphics.ClientSize.Width, graphics.ClientSize.Height - 100)), layoutFormat);
 
             //Save the PDF document to stream
-            MemoryStream stream = new MemoryStream();
+            MemoryStream stream = new();
             document.Save(stream);
             //If the position is not set to '0' then the PDF will be empty.
             stream.Position = 0;

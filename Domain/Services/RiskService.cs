@@ -1,8 +1,8 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using AutoMapper;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,7 @@ namespace Domain.Services
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IRepository<Risk> _riskRepository;
+        private readonly IRepository<RiskCategory> _riskCategoryRepository;
         private readonly IRepository<ProjectRisk> _projRiskRepository;
         private readonly Func<IQueryable<Risk>, IIncludableQueryable<Risk, object>> _includes;
         private readonly Func<IQueryable<ProjectRisk>, IIncludableQueryable<ProjectRisk, object>> _projRiskIncludes;
@@ -25,6 +26,7 @@ namespace Domain.Services
             _uow = uow;
             _riskRepository = _uow.GetRepository<Risk>();
             _projRiskRepository = _uow.GetRepository<ProjectRisk>();
+            _riskCategoryRepository = _uow.GetRepository<RiskCategory>();
             _mapper = mapper;
             _includes = risk => risk
                 .Include(r => r.RiskCategory)
@@ -65,17 +67,21 @@ namespace Domain.Services
 
             var id = _riskRepository.CreateWithVal(riskEntity);
 
-            _projRiskRepository.Create(new ProjectRisk()
+            if (riskRequest.ProjectId != null)
             {
-                ProjectId = Guid.Parse(riskRequest.ProjectId),
-                RiskId = riskEntity.Id
-            });
+                _projRiskRepository.Create(new ProjectRisk()
+                {
+                    ProjectId = Guid.Parse(riskRequest.ProjectId),
+                    RiskId = riskEntity.Id
+                });
 
+            }
             _uow.Save();
 
             return _mapper.Map<RiskResponse>(_riskRepository
                 .Find(risk => risk.Id == id)
-                .FirstOrDefault()); ;
+                .FirstOrDefault());
+            ;
         }
 
         public RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId)
@@ -108,6 +114,14 @@ namespace Domain.Services
 
             _riskRepository.SoftDelete(Guid.Parse(riskId));
             _uow.Save();
+        }
+
+        public IEnumerable<RiskCategoryResponse> GetRiskCategories()
+        {
+            return _riskCategoryRepository
+                .GetAll()
+                .Select(r => _mapper.Map<RiskCategoryResponse>(r))
+                .ToList();
         }
     }
 }

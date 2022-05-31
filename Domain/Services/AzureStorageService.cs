@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage;

@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
@@ -16,7 +16,21 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://wipipvault.vault.azure.net/",
+        "AZURE_USERNAME": "katetkacenko@gmail.com"
+      }
+    },
+    "Azure": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://api20220531120613.azurewebsites.net",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "VaultUri": "https://wipipvault.vault.azure.net/",
+        "AZURE_USERNAME": "katetkacenko@gmail.com"
       }
     },
     "IIS Express": {
@@ -24,7 +38,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://wipipvault.vault.azure.net/",
+        "AZURE_USERNAME": "katetkacenko@gmail.com"
       }
     }
   }

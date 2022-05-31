@@ -1,6 +1,6 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 

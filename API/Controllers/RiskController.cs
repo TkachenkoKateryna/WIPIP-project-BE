@@ -3,10 +3,11 @@ using System.Drawing.Text;
 using API.Controllers.Base;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 
@@ -29,6 +30,13 @@ namespace API.Controllers
         public ActionResult<IEnumerable<RiskResponse>> GetAllRisks()
         {
             return Ok(_riskService.GetAllRisks());
+        }
+
+        [AllowAnonymous]
+        [HttpGet("riskCategories")]
+        public ActionResult<IEnumerable<RiskCategoryResponse>> GetAllRiskCategories()
+        {
+            return Ok(_riskService.GetRiskCategories());
         }
 
         [HttpPost("risks")]

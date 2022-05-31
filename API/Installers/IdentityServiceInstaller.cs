@@ -1,10 +1,11 @@
-﻿using Domain.Entities;
+﻿using Domain.Models.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.EF;
 using System.Text;
+using Domain.Models.Entities.Identity;
 
 namespace API.Installers
 {
@@ -18,12 +19,14 @@ namespace API.Installers
                 services.AddIdentityCore<User>(opt =>
                 {
                     opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequireUppercase = false;
                 })
                     .AddRoles<IdentityRole>()
                     .AddEntityFrameworkStores<DataContext>()
                     .AddSignInManager<SignInManager<User>>();
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super secret key"));
 
                 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(opt =>

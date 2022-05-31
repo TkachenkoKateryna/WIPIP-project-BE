@@ -1,13 +1,14 @@
-﻿using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+﻿using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
 {
     public interface ICandidateService
     {
-        IEnumerable<ProjectCandidateResponse> GetCandidates();
-        ProjectCandidateResponse AddCandidate(ProjectCandidateRequest candRequest);
-        ProjectCandidateResponse UpdateCandidate(ProjectCandidateRequest candRequest, string candId);
+        IEnumerable<CandidateResponse> GetCandidates();
+        CandidateResponse AddCandidate(CandidateRequest candRequest);
+        CandidateResponse UpdateCandidate(CandidateRequest candRequest, string candId);
+        CandidateResponse AssingEmployeeToCandidate(string employeeId, string candidateId);
         void DeleteCandidate(string candId);
     }
 }

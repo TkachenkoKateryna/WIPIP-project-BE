@@ -1,5 +1,5 @@
-﻿using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+﻿using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
 {

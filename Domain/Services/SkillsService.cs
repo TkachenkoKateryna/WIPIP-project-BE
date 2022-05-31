@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 

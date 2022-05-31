@@ -1,5 +1,5 @@
-﻿using Domain.Constants;
-using Domain.Entities;
+﻿using Domain.Models.Constants;
+using Domain.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,14 +9,16 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EmployeeSkill> builder)
         {
-            builder.HasOne(d => d.Employee)
-                .WithMany(m => m.EmployeeSkills)
-                .HasForeignKey(d => d.EmployeeId)
+            builder.HasAlternateKey(es => new { es.EmployeeId, es.SkillId });
+
+            builder.HasOne(s => s.Employee)
+                .WithMany(e => e.EmployeeSkills)
+                .HasForeignKey(s => s.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(d => d.Skill)
-                .WithMany(m => m.EmployeeSkills)
-                .HasForeignKey(d => d.SkillId)
+            builder.HasOne(e => e.Skill)
+                .WithMany(s => s.EmployeeSkills)
+                .HasForeignKey(e => e.SkillId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasData(

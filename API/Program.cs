@@ -1,7 +1,9 @@
 using API.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace API
 {
+
     public class Program
     {
         public static void Main(string[] args)
@@ -10,11 +12,11 @@ namespace API
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>()
-                     .UseWebRoot("Content");
-                });
+          Host.CreateDefaultBuilder(args)
+              .ConfigureWebHostDefaults(webBuilder =>
+              {
+                  webBuilder.UseStartup<Startup>()
+                   .UseWebRoot("Content");
+              });
     }
 }

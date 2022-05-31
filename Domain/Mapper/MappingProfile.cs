@@ -1,8 +1,10 @@
-﻿using Domain.Dtos;
-using AutoMapper;
-using Domain.Entities;
-using Domain.Dtos.Responses;
-using Domain.Dtos.Requests;
+﻿using AutoMapper;
+using Domain.Models.Dtos.Project;
+using Domain.Models.Entities;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Stakeholder;
+using Domain.Models.Entities.Identity;
 
 namespace Domain.Mapper
 {
@@ -30,10 +32,12 @@ namespace Domain.Mapper
                 .ForMember(m => m.Address, opt => opt.MapFrom(m => m.Stakeholder.Address))
                 .ForMember(m => m.Notes, opt => opt.MapFrom(m => m.Stakeholder.Notes))
                 .ForMember(m => m.Payment, opt => opt.MapFrom(m => m.Stakeholder.Payment))
-                .ForMember(m => m.Engagement, opt => opt.MapFrom(m => m.Stakeholder.Engagement))
                 .ForMember(m => m.Class, opt => opt.MapFrom(m => m.Stakeholder.Class))
                 .ForMember(m => m.IsDeleted, opt => opt.MapFrom(m => m.Stakeholder.IsDeleted));
             CreateMap<Stakeholder, StakeholderResponse>();
+            CreateMap<ProjectStakeholder, ProjectStakeholderResponse>()
+                .ForMember(m => m.Id, opt => opt.MapFrom(m => m.ProjectId))
+                .ForMember(m => m.Title, opt => opt.MapFrom(m => m.Project.Title));
             CreateMap<StakeholderRequest, Stakeholder>();
 
             CreateMap<Skill, SkillResponse>();
@@ -46,8 +50,8 @@ namespace Domain.Mapper
             CreateMap<EmployeeRequest, Employee>()
                 .ForMember(m => m.EmployeeSkills, opt => opt.Ignore());
 
-            CreateMap<ProjectCandidate, ProjectCandidateResponse>();
-            CreateMap<ProjectCandidateRequest, ProjectCandidate>();
+            CreateMap<ProjectCandidate, CandidateResponse>();
+            CreateMap<CandidateRequest, ProjectCandidate>();
 
             CreateMap<ProjectRisk, ProjectRiskResponse>();
             CreateMap<ProjectRisk, RiskResponse>()
@@ -64,9 +68,20 @@ namespace Domain.Mapper
                 .ForMember(m => m.Level, opt => opt.MapFrom(r => (int)r.Impact * (int)r.Likelihood))
                 .ForMember(r => r.RiskCategotyTitle, opt => opt.MapFrom(r => r.RiskCategory.Title));
             CreateMap<RiskRequest, Risk>();
+            CreateMap<RiskCategory, RiskCategoryResponse>();
 
-            CreateMap<Project, ProjectResponse>()
-                .IncludeAllDerived();
+            CreateMap<User, ManagerResponse>()
+                .ForMember(p => p.Id, opt => opt.MapFrom(p => p.Id))
+                .ForMember(p => p.Name, opt => opt.MapFrom(p => p.UserName));
+
+            CreateMap<Project, ProjectsResponse>()
+                .ForPath(p => p.Manager.Id, opt => opt.MapFrom(p => p.ManagerId))
+                .ForPath(p => p.Manager.Name, opt => opt.MapFrom(p => p.Manager.UserName));
+
+            CreateMap<Project, ProjectResponse>();
+            CreateMap<ProjectRequest, Project>()
+                .ForMember(p => p.ManagerId, opt => opt.MapFrom(p => p.ManagerId));
+
         }
 
     }

@@ -1,8 +1,8 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using AutoMapper;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 
@@ -21,9 +21,10 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<DeliverableResponse> GetAllDeliverables()
+        public IEnumerable<DeliverableResponse> GetDeliverablesByProject(string projectId)
         {
-            return _delivRepository.GetAllWithDeleted()
+            return _delivRepository.
+                Find(d => d.ProjectId == Guid.Parse(projectId))
                 .Select(delEntity => _mapper.Map<DeliverableResponse>(delEntity))
                 .ToList();
         }
@@ -68,7 +69,8 @@ namespace Domain.Services
                 .FirstOrDefault();
             _ = delEntity ?? throw new NotFoundException<Objective>("Deliverable with id was not found.");
 
-            _delivRepository.SoftDelete(Guid.Parse(delId));
+            _delivRepository.Delete(delEntity);
+
             _uow.Save();
         }
     }

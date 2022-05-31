@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +9,7 @@ namespace Persistence.Configurations
         public void Configure(EntityTypeBuilder<Milestone> builder)
         {
             builder.HasQueryFilter(b => !b.IsDeleted);
+            builder.Property(b => b.Activity).IsRequired();
 
             builder.HasData(
                 new Milestone

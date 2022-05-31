@@ -1,5 +1,5 @@
-﻿using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+﻿using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
 {
@@ -10,5 +10,6 @@ namespace Domain.Interfaces.Services
         RiskResponse AddRisk(RiskRequest riskRequest);
         RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
         void DeleteRisk(string riskId);
+        IEnumerable<RiskCategoryResponse> GetRiskCategories();
     }
 }

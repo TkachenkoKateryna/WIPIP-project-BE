@@ -1,7 +1,7 @@
-﻿using Domain.Constants;
-using Domain.Dtos.Filters;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+﻿using Domain.Models.Constants;
+using Domain.Models.Filters;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Microsoft.AspNetCore.Http;
 
 namespace Domain.Interfaces.Services

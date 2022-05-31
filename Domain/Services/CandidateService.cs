@@ -1,8 +1,8 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using AutoMapper;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
@@ -28,25 +28,38 @@ namespace Domain.Services
                 .Include(c => c.Skill);
         }
 
-        public IEnumerable<ProjectCandidateResponse> GetCandidates()
+        public IEnumerable<CandidateResponse> GetCandidates()
         {
             return _candidateRepository.GetAllWithDeleted(_includes)
-                .Select(c => _mapper.Map<ProjectCandidateResponse>(c))
+                .Select(c => _mapper.Map<CandidateResponse>(c))
                 .ToList();
         }
 
-        public ProjectCandidateResponse AddCandidate(ProjectCandidateRequest candRequest)
+        public CandidateResponse AddCandidate(CandidateRequest candRequest)
         {
             var candEntity = _mapper.Map<ProjectCandidate>(candRequest);
             var id = _candidateRepository.CreateWithVal(candEntity);
             _uow.Save();
 
-            return _mapper.Map<ProjectCandidateResponse>(_candidateRepository
+            return _mapper.Map<CandidateResponse>(_candidateRepository
                     .Find(cand => cand.Id == id, _includes)
                     .FirstOrDefault());
         }
 
-        public ProjectCandidateResponse UpdateCandidate(ProjectCandidateRequest candidateRequest, string candId)
+        public CandidateResponse AssingEmployeeToCandidate(string employeeId, string candidateId)
+        {
+            var candEntity = _candidateRepository
+                .Find(cand => cand.Id == Guid.Parse(candidateId), _includes)
+                .FirstOrDefault();
+
+            candEntity.EmployeeId = Guid.Parse(employeeId);
+            _candidateRepository.Update(candEntity);
+            _uow.Save();
+
+            return _mapper.Map<CandidateResponse>(candEntity);
+        }
+
+        public CandidateResponse UpdateCandidate(CandidateRequest candidateRequest, string candId)
         {
             var candEntity = _candidateRepository.Find(cand =>
                     cand.Id == Guid.Parse(candId), _includes)
@@ -61,7 +74,7 @@ namespace Domain.Services
             _candidateRepository.Update(candEntity);
             _uow.Save();
 
-            return _mapper.Map<ProjectCandidateResponse>(_candidateRepository
+            return _mapper.Map<CandidateResponse>(_candidateRepository
                 .Find(cand => cand.Id == candEntity.Id, _includes)
                 .FirstOrDefault());
         }
@@ -74,7 +87,10 @@ namespace Domain.Services
             _ = candEntity ?? throw new NotFoundException<ProjectCandidate>
                 ($"Candidate with id: {candId} was not found.");
 
+            candEntity.EmployeeId = null;
+            _candidateRepository.Update(candEntity);
             _candidateRepository.SoftDelete(Guid.Parse(candId));
+
             _uow.Save();
         }
 

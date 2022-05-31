@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Models.Entities.Base;
 using Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;

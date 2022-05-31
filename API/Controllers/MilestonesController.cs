@@ -1,11 +1,13 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [AllowAnonymous]
     public class MilestonesController : BaseApiController
     {
         readonly IMilestoneService _milService;

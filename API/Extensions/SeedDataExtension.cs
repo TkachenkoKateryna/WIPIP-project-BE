@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Domain.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Persistence.EF;
 

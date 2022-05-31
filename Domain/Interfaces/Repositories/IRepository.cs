@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Models.Entities.Base;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 

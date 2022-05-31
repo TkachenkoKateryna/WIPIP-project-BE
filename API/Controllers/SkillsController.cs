@@ -1,5 +1,5 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Responses;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 

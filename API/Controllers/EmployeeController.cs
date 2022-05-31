@@ -1,7 +1,8 @@
 ﻿using API.Controllers.Base;
-using Domain.Dtos.Filters;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
+using Domain.Models.Constants;
+using Domain.Models.Filters;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,13 +18,13 @@ namespace API.Controllers
             _employeeService = employeeService;
         }
 
-        [HttpGet("employees")]
+        [HttpGet(Strings.EmployeeRoute)]
         public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees([FromQuery] EmployeeFilteringParams param)
         {
             return Ok(_employeeService.GetAllEmployees(param));
         }
 
-        [HttpPost("employees/add")]
+        [HttpPost(Strings.EmployeeRoute)]
         public ActionResult<EmployeeResponse> AddEmployee(EmployeeRequest empRequest)
         {
             try
@@ -37,7 +38,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("employees/{empId}")]
+        [HttpPut(Strings.EmployeeRoute + "{empId}")]
         public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string empId)
         {
             try
@@ -51,7 +52,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("employees/{empId}")]
+        [HttpDelete(Strings.EmployeeRoute + "{empId}")]
         public IActionResult DeleteEmployee(string empId)
         {
             try

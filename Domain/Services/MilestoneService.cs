@@ -1,8 +1,8 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using AutoMapper;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
@@ -37,12 +37,14 @@ namespace Domain.Services
 
         public MilestoneResponse AddMilestone(MilestoneRequest milRequest)
         {
-            var milEntity = _milRepository.FindWithDeleted(mil => mil.Activity == milRequest.Activity)
+            var milEntity = _milRepository
+                .FindWithDeleted(mil => mil.Activity == milRequest.Activity)
                 .FirstOrDefault();
 
             if (milEntity != null)
             {
-                throw new AlreadyExistsException<Milestone>("Milestone with such activity already exists.");
+                throw new AlreadyExistsException<Milestone>
+                    ($"Milestone with such activity {milRequest.Activity} already exists.");
             }
 
             milEntity = _mapper.Map<Milestone>(milRequest);

@@ -1,8 +1,8 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Models.Exceptions;
 using AutoMapper;
-using Domain.Dtos.Requests;
-using Domain.Dtos.Responses;
-using Domain.Entities;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 

@@ -1,12 +1,11 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using API.Controllers.Base;
-using Domain.Constants;
-using Domain.Dtos.Identity;
+using Domain.Models.Dtos.Identity;
+using Domain.Models.Entities.Identity;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
@@ -18,18 +17,14 @@ namespace API.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJWTTokenService _jwtService;
-        private readonly IFileStorageService _fileStorageService;
 
         public AccountController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IUnitOfWork uow,
-            IJWTTokenService jwtService,
-            IFileStorageService fileStorageService)
+            IJWTTokenService jwtService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
-            _fileStorageService = fileStorageService;
         }
 
         [Authorize]

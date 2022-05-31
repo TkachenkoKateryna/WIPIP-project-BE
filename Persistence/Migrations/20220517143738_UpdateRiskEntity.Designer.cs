@@ -24,7 +24,7 @@ namespace Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Domain.Entities.Assumption", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Assumption", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,7 +62,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Deliverable", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Deliverable", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,7 +126,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -199,7 +199,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.EmployeeSkill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.EmployeeSkill", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -267,7 +267,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -310,7 +310,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Objective", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Objective", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -356,7 +356,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -387,7 +387,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectCandidate", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -472,7 +472,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectRisk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectRisk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -526,7 +526,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectStakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectStakeholder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -566,7 +566,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -652,7 +652,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.RiskCategory", b =>
+            modelBuilder.Entity("Domain.Models.Entities.RiskCategory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -719,7 +719,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Skill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Skill", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -756,7 +756,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Stakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Stakeholder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -815,7 +815,7 @@ namespace Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.User", b =>
+            modelBuilder.Entity("Domain.Models.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -1078,9 +1078,9 @@ namespace Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Assumption", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Assumption", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Assumptions")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1089,14 +1089,14 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Deliverable", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Deliverable", b =>
                 {
-                    b.HasOne("Domain.Entities.Milestone", "Milestone")
+                    b.HasOne("Domain.Models.Entities.Milestone", "Milestone")
                         .WithMany("Deliverables")
                         .HasForeignKey("MilestoneId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Deliverables")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1107,15 +1107,15 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.EmployeeSkill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.EmployeeSkill", b =>
                 {
-                    b.HasOne("Domain.Entities.Employee", "Employee")
+                    b.HasOne("Domain.Models.Entities.Employee", "Employee")
                         .WithMany("EmployeeSkills")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Skill", "Skill")
+                    b.HasOne("Domain.Models.Entities.Skill", "Skill")
                         .WithMany("EmployeeSkills")
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1126,9 +1126,9 @@ namespace Persistence.Migrations
                     b.Navigation("Skill");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Milestones")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1137,9 +1137,9 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Objective", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Objective", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Objectives")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1148,9 +1148,9 @@ namespace Persistence.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "Manager")
+                    b.HasOne("Domain.Models.Entities.User", "Manager")
                         .WithMany("Projects")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1158,20 +1158,20 @@ namespace Persistence.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectCandidate", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectCandidate", b =>
                 {
-                    b.HasOne("Domain.Entities.Employee", "Employee")
+                    b.HasOne("Domain.Models.Entities.Employee", "Employee")
                         .WithMany("Candidates")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("Candidates")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Skill", "Skill")
+                    b.HasOne("Domain.Models.Entities.Skill", "Skill")
                         .WithMany("Candidates")
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1184,15 +1184,15 @@ namespace Persistence.Migrations
                     b.Navigation("Skill");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectRisk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectRisk", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("ProjectRisks")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Risk", "Risk")
+                    b.HasOne("Domain.Models.Entities.Risk", "Risk")
                         .WithMany("ProjectRisks")
                         .HasForeignKey("RiskId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1203,15 +1203,15 @@ namespace Persistence.Migrations
                     b.Navigation("Risk");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectStakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.ProjectStakeholder", b =>
                 {
-                    b.HasOne("Domain.Entities.Project", "Project")
+                    b.HasOne("Domain.Models.Entities.Project", "Project")
                         .WithMany("ProjectStakeholders")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Stakeholder", "Stakeholder")
+                    b.HasOne("Domain.Models.Entities.Stakeholder", "Stakeholder")
                         .WithMany("ProjectStakeholders")
                         .HasForeignKey("StakeholderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1222,9 +1222,9 @@ namespace Persistence.Migrations
                     b.Navigation("Stakeholder");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
-                    b.HasOne("Domain.Entities.RiskCategory", "RiskCategory")
+                    b.HasOne("Domain.Models.Entities.RiskCategory", "RiskCategory")
                         .WithMany("Risks")
                         .HasForeignKey("RiskCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1244,7 +1244,7 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1253,7 +1253,7 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1268,7 +1268,7 @@ namespace Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1277,26 +1277,26 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Models.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.Employee", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Employee", b =>
                 {
                     b.Navigation("Candidates");
 
                     b.Navigation("EmployeeSkills");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Milestone", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Milestone", b =>
                 {
                     b.Navigation("Deliverables");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Project", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Project", b =>
                 {
                     b.Navigation("Assumptions");
 
@@ -1313,29 +1313,29 @@ namespace Persistence.Migrations
                     b.Navigation("ProjectStakeholders");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Risk", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Risk", b =>
                 {
                     b.Navigation("ProjectRisks");
                 });
 
-            modelBuilder.Entity("Domain.Entities.RiskCategory", b =>
+            modelBuilder.Entity("Domain.Models.Entities.RiskCategory", b =>
                 {
                     b.Navigation("Risks");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Skill", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Skill", b =>
                 {
                     b.Navigation("Candidates");
 
                     b.Navigation("EmployeeSkills");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Stakeholder", b =>
+            modelBuilder.Entity("Domain.Models.Entities.Stakeholder", b =>
                 {
                     b.Navigation("ProjectStakeholders");
                 });
 
-            modelBuilder.Entity("Domain.Entities.User", b =>
+            modelBuilder.Entity("Domain.Models.Entities.User", b =>
                 {
                     b.Navigation("Projects");
                 });
