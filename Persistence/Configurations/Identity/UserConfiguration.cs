@@ -1,13 +1,7 @@
-﻿using Domain.Models.Entities;
+﻿using Domain.Models.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Models.Entities.Identity;
 
 namespace Persistence.Configurations.Identity
 {
@@ -15,7 +9,6 @@ namespace Persistence.Configurations.Identity
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-
             builder.HasData(
                   new User
                   {
@@ -23,8 +16,9 @@ namespace Persistence.Configurations.Identity
                       UserName = "bob",
                       NormalizedUserName = "BOB",
                       PasswordHash = new PasswordHasher<User>().HashPassword(null, "Pa$$w0rd"),
-                      Email = "bob@text.com",
-                      NormalizedEmail = "BOB@TEXT.COM"
+                      Email = "bob@test.com",
+                      NormalizedEmail = "BOB@TEXT.COM",
+                      RoleId = "967e08ad-b71e-46e8-8e80-ffdce9ab9e74"
                   },
                    new User
                    {
@@ -32,8 +26,19 @@ namespace Persistence.Configurations.Identity
                        UserName = "jane",
                        NormalizedUserName = "JANE",
                        PasswordHash = new PasswordHasher<User>().HashPassword(null, "Pa$$w0rd"),
-                       Email = "jane@text.com",
-                       NormalizedEmail = "JANE@TEXT.COM"
+                       Email = "jane@test.com",
+                       NormalizedEmail = "JANE@TEXT.COM",
+                       RoleId = "09afe919-59ff-44b8-b656-c5e320c163a7"
+                   },
+                   new User
+                   {
+                       Id = "251f0a6f-d01c-4eaa-a697-95cb183ff6a9",
+                       UserName = "alla",
+                       NormalizedUserName = "ALLA",
+                       PasswordHash = new PasswordHasher<User>().HashPassword(null, "Pa$$w0rd"),
+                       Email = "alla@test.com",
+                       NormalizedEmail = "ALLA@TEST.COM",
+                       RoleId = "27a697ec-3ab1-4c03-9534-d3dd0d797fd6"
                    }
             );
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Domain.Models.Constants;
+using Microsoft.AspNetCore.Http;
 
 namespace Domain.Models.Dtos.Requests
 {
@@ -8,6 +9,6 @@ namespace Domain.Models.Dtos.Requests
         public string Token { get; set; }
         public string Email { get; set; }
         public IFormFile ImageFile { get; set; }
-        public string Role { get; set; }
+        public Roles Role { get; set; }
     }
 }

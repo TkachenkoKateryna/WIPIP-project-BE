@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Models.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models.Dtos.Identity
 {
@@ -13,6 +14,6 @@ namespace Domain.Models.Dtos.Identity
 
         [Required]
         public string Username { get; set; }
-        public bool IsLead { get; set; }
+        public Roles Role { get; set; }
     }
 }

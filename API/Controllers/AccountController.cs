@@ -6,56 +6,79 @@ using System.Security.Claims;
 using API.Controllers.Base;
 using Domain.Models.Dtos.Identity;
 using Domain.Models.Entities.Identity;
-using Domain.Interfaces.Repositories;
-using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
+using Domain.Models.Dtos.Responses;
+using Domain.Models.Constants;
 
 namespace API.Controllers
 {
     public class AccountController : BaseApiController
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJWTTokenService _jwtService;
 
         public AccountController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IJWTTokenService jwtService)
+            IJWTTokenService jwtService,
+            RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
+            _roleManager = roleManager;
         }
 
         [Authorize]
-        [HttpGet("user")]
+        [HttpGet(Strings.UserRoute)]
         public async Task<ActionResult<UserResponse>> GetCurrentUser()
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            var role = await _roleManager.FindByIdAsync(user.RoleId);
 
-            var userResponse = CreateUserObject(user);
+            var userResponse = CreateUserObject(user, role.Name);
 
             return userResponse;
         }
 
         [Authorize]
-        [HttpGet("users")]
-        public ActionResult<IEnumerable<UserResponse>> GetAllUsers()
+        [HttpGet(Strings.UsersRoute)]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllUsers()
         {
             var users = new List<UserResponse>();
 
-            foreach (var user in _userManager.Users)
+            foreach (var user in _userManager.Users.ToList())
             {
-                users.Add(CreateUserObject(user));
+                var role = await _roleManager.FindByIdAsync(user.RoleId);
+                users.Add(CreateUserObject(user, role.Name));
             }
 
             return users;
         }
 
+
+        [Authorize]
+        [HttpGet(Strings.ManagersRoute)]
+        public async Task<IEnumerable<ManagerResponse>> GetAllManagers()
+        {
+            var managers = new List<ManagerResponse>();
+
+            foreach (var manager in _userManager.Users.ToList())
+            {
+                var role = await _roleManager.FindByIdAsync(manager.RoleId);
+                managers.Add(CreateManagerObject(manager, role.Name));
+            }
+
+            return managers;
+        }
+
         [AllowAnonymous]
-        [HttpPost("login")]
+        [HttpPost(Strings.LoginRoute)]
         public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
         {
+            var users = _userManager.Users.ToList();
+
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
 
             if (user == null) return Unauthorized();
@@ -64,17 +87,17 @@ namespace API.Controllers
 
             if (result.Succeeded)
             {
-                return CreateUserObject(user);
+                var role = await _roleManager.FindByIdAsync(user.RoleId);
+                return CreateUserObject(user, role.Name);
             }
 
             return Unauthorized();
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
+        [HttpPost(Strings.RegisterRoute)]
         public async Task<ActionResult<UserResponse>> Register(RegisterRequest registerRequest)
         {
-
             if (await _userManager.Users.AnyAsync(x => x.Email.Equals(registerRequest.Email)))
             {
                 return BadRequest("Email taken");
@@ -90,25 +113,30 @@ namespace API.Controllers
                 Email = registerRequest.Email,
             };
 
+            switch (registerRequest.Role)
+            {
+                case Roles.Admin:
+                    user.RoleId = await GetRoleId(Strings.AdminRole);
+                    break;
+                case Roles.Lead:
+                    user.RoleId = await GetRoleId(Strings.LeadRole);
+                    break;
+                case Roles.Manager:
+                    user.RoleId = await GetRoleId(Strings.ManagerRole);
+                    break;
+            }
+
             var passGen = await _userManager.CreateAsync(user, registerRequest.Password);
 
             if (!passGen.Succeeded) return BadRequest("Problem registering user");
 
-            if (registerRequest.IsLead)
-            {
-                await _userManager.AddToRoleAsync(user, "Lead");
-            }
-            else
-            {
-                await _userManager.AddToRoleAsync(user, "Manager");
-            }
+            var role = await _roleManager.FindByIdAsync(user.RoleId);
 
-            return CreateUserObject(user);
-
+            return CreateUserObject(user, role.Name);
         }
 
         [AllowAnonymous]
-        [HttpPost("users/{userId}")]
+        [HttpPost(Strings.UsersRoute + "{userId}")]
         public async Task<ActionResult> DeleteUser(string userId)
         {
             try
@@ -123,7 +151,7 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("changePassword")]
+        [HttpPost(Strings.ChangePasswordRoute)]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest changePassword)
         {
             User user = await _userManager.FindByEmailAsync(changePassword.Email);
@@ -141,14 +169,17 @@ namespace API.Controllers
             if (result.Succeeded)
             {
                 var updatedUser = await _userManager.FindByEmailAsync(changePassword.Email);
-                return Ok(CreateUserObject(updatedUser));
+                var role = await _roleManager.FindByIdAsync(user.RoleId);
+
+                return Ok(CreateUserObject(updatedUser, role.Name));
             }
             else
             {
                 return BadRequest("Error while changing the password");
             }
         }
-        private UserResponse CreateUserObject(User user)
+
+        private UserResponse CreateUserObject(User user, string roleName)
         {
             return new UserResponse
             {
@@ -156,12 +187,30 @@ namespace API.Controllers
                 ImageLink = user.ImageLink,
                 Token = _jwtService.CreateToken(user),
                 Email = user.Email,
-                Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault(),
+                Role = roleName,
             };
         }
+
+        private ManagerResponse CreateManagerObject(User user, string roleName)
+        {
+            return new ManagerResponse
+            {
+                Id = user.Id,
+                Name = user.UserName,
+                Role = roleName
+            };
+        }
+
         private bool CheckPassword(string newPassword, string confirmedPassword)
         {
             return newPassword.Equals(confirmedPassword);
         }
+
+        private async Task<string> GetRoleId(string roleName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            return role.Id;
+        }
     }
+
 }

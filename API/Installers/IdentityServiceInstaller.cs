@@ -22,9 +22,11 @@ namespace API.Installers
                     opt.Password.RequireDigit = false;
                     opt.Password.RequireUppercase = false;
                 })
-                    .AddRoles<IdentityRole>()
+                    .AddRoles<Role>()
                     .AddEntityFrameworkStores<DataContext>()
-                    .AddSignInManager<SignInManager<User>>();
+                    .AddSignInManager<SignInManager<User>>()
+                    .AddRoleManager<RoleManager<Role>>();
+
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super secret key"));
 

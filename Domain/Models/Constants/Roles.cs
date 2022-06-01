@@ -3,6 +3,7 @@
     public enum Roles
     {
         Lead,
-        Manager
+        Manager,
+        Admin
     }
 }
