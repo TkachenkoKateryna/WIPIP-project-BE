@@ -6,12 +6,13 @@ namespace Domain.Models.Dtos.Responses
     {
         public string Id { get; set; }
         public string Title { get; set; }
+        public string Description { get; set; }
+        public string Consequence { get; set; }
         public Likelihood Likelihood { get; set; }
         public Impact Impact { get; set; }
         public int Level { get; set; }
         public string Mitigation { get; set; }
-        public string RiskCategoryId { get; set; }
-        public string RiskCategotyTitle { get; set; }
+        public RiskCategoryResponse RiskCategory { get; set; }
         public List<ProjectRiskResponse> ProjectRisks { get; set; } = new List<ProjectRiskResponse>();
         public bool IsDeleted { get; set; }
     }

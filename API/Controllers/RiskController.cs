@@ -32,6 +32,12 @@ namespace API.Controllers
             return Ok(_riskService.GetAllRisks());
         }
 
+        [HttpGet("generateRisks")]
+        public ActionResult<IEnumerable<RiskResponse>> GenerateRisks([FromQuery] string projectId)
+        {
+            return Ok(_riskService.GenerateRisks(projectId));
+        }
+
         [AllowAnonymous]
         [HttpGet("riskCategories")]
         public ActionResult<IEnumerable<RiskCategoryResponse>> GetAllRiskCategories()
@@ -81,12 +87,27 @@ namespace API.Controllers
             }
         }
 
+
+        [HttpDelete("projectrisks/{riskId}")]
+        public IActionResult RemoveRisk(string riskId, [FromQuery] string projectId)
+        {
+            try
+            {
+                _riskService.RemoveRisk(riskId, projectId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("risks/dowbloadExcel")]
         public FileResult Excel([FromQuery] string projectId)
         {
             return File(
                 _excelService.GenerateRiskRegisterXml(projectId),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/xml",
                 "risks.xlsx");
         }
     }

@@ -57,7 +57,6 @@ namespace API.Controllers
             return users;
         }
 
-
         [Authorize]
         [HttpGet(Strings.ManagersRoute)]
         public async Task<IEnumerable<ManagerResponse>> GetAllManagers()

@@ -7,6 +7,7 @@ using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Domain.Models.Constants;
 
 namespace Domain.Services
 {
@@ -19,6 +20,9 @@ namespace Domain.Services
         private readonly IRepository<ProjectRisk> _projRiskRepository;
         private readonly Func<IQueryable<Risk>, IIncludableQueryable<Risk, object>> _includes;
         private readonly Func<IQueryable<ProjectRisk>, IIncludableQueryable<ProjectRisk, object>> _projRiskIncludes;
+        private readonly Func<IQueryable<Project>, IIncludableQueryable<Project, object>> _projIncludes;
+        private readonly Func<IQueryable<ProjectStakeholder>, IIncludableQueryable<ProjectStakeholder, object>> _projStakIncludes;
+        private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _projCandInclude;
 
 
         public RiskService(IUnitOfWork uow, IMapper mapper)
@@ -33,6 +37,18 @@ namespace Domain.Services
                 .Include(r => r.ProjectRisks).ThenInclude(pr => pr.Project);
             _projRiskIncludes = projectRisk => projectRisk
                 .Include(pr => pr.Risk).ThenInclude(r => r.RiskCategory);
+            _projIncludes = project => project
+                .Include(p => p.Objectives)
+                .Include(p => p.Assumptions)
+                .Include(p => p.Deliverables)
+                .Include(p => p.Manager)
+                .Include(p => p.Milestones).ThenInclude(m => m.Deliverables)
+                .Include(p => p.ProjectStakeholders).ThenInclude(st => st.Stakeholder);
+            _projStakIncludes = stak => stak
+                .Include(st => st.Stakeholder);
+            _projCandInclude = cand => cand
+                .Include(c => c.Skill)
+                .Include(c => c.Employee);
         }
 
         public IEnumerable<RiskResponse> GetAllRisks()
@@ -79,7 +95,7 @@ namespace Domain.Services
             _uow.Save();
 
             return _mapper.Map<RiskResponse>(_riskRepository
-                .Find(risk => risk.Id == id)
+                .Find(risk => risk.Id == id, _includes)
                 .FirstOrDefault());
             ;
         }
@@ -113,8 +129,23 @@ namespace Domain.Services
                 $"Risk with id {riskId} was not found.");
 
             _riskRepository.SoftDelete(Guid.Parse(riskId));
+
             _uow.Save();
         }
+
+        public void RemoveRisk(string riskId, string projectId)
+        {
+            var projectRiskEntity = _projRiskRepository
+                .Find(r => r.RiskId == Guid.Parse(riskId) && r.ProjectId == Guid.Parse(projectId))
+                .FirstOrDefault();
+
+            _ = projectRiskEntity ?? throw new NotFoundException<Risk>(
+                $"Risk with id {riskId} was not found.");
+
+            _projRiskRepository.Delete(projectRiskEntity);
+            _uow.Save();
+        }
+
 
         public IEnumerable<RiskCategoryResponse> GetRiskCategories()
         {
@@ -122,6 +153,61 @@ namespace Domain.Services
                 .GetAll()
                 .Select(r => _mapper.Map<RiskCategoryResponse>(r))
                 .ToList();
+        }
+
+        public IEnumerable<RiskResponse> GenerateRisks(string projectId)
+        {
+            var risks = new List<Risk>();
+
+            var project = _uow.GetRepository<Project>()
+                .Find(p => p.Id == Guid.Parse(projectId), _projIncludes)
+                .FirstOrDefault();
+
+            project.Candidates = _uow.GetRepository<ProjectCandidate>()
+                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude)
+                .ToList();
+
+            if (project == null)
+            {
+                throw new NotFoundException<Project>($"Project with id {projectId} wasn't found");
+            }
+
+            if (!project.Assumptions.Any())
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Assumptions Risks"));
+            }
+
+            if (!project.Objectives.Any())
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Project goals Risks"));
+            }
+
+            if (project.Candidates.Any(c => c.EmployeeId == null))
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Resource Risks"));
+            }
+
+            if (project.ProjectStakeholders.Any(c => c.Stakeholder.Payment == Payment.BigDelay ||
+            c.Stakeholder.Payment == Payment.BigDelay))
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Payment Risks"));
+            }
+            if (project.ProjectStakeholders.Any(c => c.Stakeholder.CommunicationChannel == null))
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Communication Risks"));
+            }
+
+            if (project.Deliverables.Any())
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Scope Risks"));
+            }
+
+            if (project.MonthlyProfit < (double)44)
+            {
+                risks.AddRange(_riskRepository.Find(risk => risk.RiskCategory.Title == "Budget Risks"));
+            }
+
+            return risks.Select(r => _mapper.Map<RiskResponse>(r));
         }
     }
 }

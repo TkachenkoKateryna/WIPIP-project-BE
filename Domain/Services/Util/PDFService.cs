@@ -3,10 +3,10 @@ using Syncfusion.Drawing;
 using Syncfusion.Pdf;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Pdf.Grid;
-using Syncfusion.Pdf.Parsing;
-using System.Data;
-using Domain.Models.Dtos.Project;
 using Domain.Interfaces.Services.Util;
+using System.Data;
+using Syncfusion.Pdf.Tables;
+using Microsoft.OpenApi.Extensions;
 
 namespace Domain.Services.Util
 {
@@ -14,88 +14,123 @@ namespace Domain.Services.Util
     {
         public Stream GenerateProjectCharter(ProjectResponse project)
         {
-            //Creates a new PDF document
+
             PdfDocument document = new PdfDocument();
-            //Adds page settings
+
             document.PageSettings.Orientation = PdfPageOrientation.Landscape;
             document.PageSettings.Margins.All = 50;
-            //Adds a page to the document
             PdfPage page = document.Pages.Add();
+
             PdfGraphics graphics = page.Graphics;
 
-            //Loads the image as stream
-            FileStream imageStream = new("wwwroot/images/projecteam.png", FileMode.Open, FileAccess.Read);
-            RectangleF bounds = new(176, 0, 390, 130);
-            PdfImage image = PdfImage.FromStream(imageStream);
-            //Draws the image to the PDF page
-            page.Graphics.DrawImage(image, bounds);
-
             PdfBrush solidBrush = new PdfSolidBrush(new PdfColor(126, 151, 173));
-            bounds = new RectangleF(0, bounds.Bottom + 90, graphics.ClientSize.Width, 30);
-            //Draws a rectangle to place the heading in that region.
-            graphics.DrawRectangle(solidBrush, bounds);
-            //Creates a font for adding the heading in the page
-            PdfFont subHeadingFont = new PdfStandardFont(PdfFontFamily.TimesRoman, 14);
-            //Creates a text element to add the invoice number
-            PdfTextElement element = new("INVOICE " + project.Id.ToString(), subHeadingFont)
+            #region Title
+            PdfFont font = new PdfStandardFont(PdfFontFamily.TimesRoman, 18, PdfFontStyle.Bold);
+            PdfStringFormat format = new PdfStringFormat();
+            format.Alignment = PdfTextAlignment.Center;
+            graphics.DrawString("Project Charter", font, PdfBrushes.Black, new RectangleF(200, 0, 300, 250), format);
+            #endregion
+
+            #region Summary
+            PdfLightTable pdfLightTable = new PdfLightTable();
+            //Initialize DataTable to assign as DataSource to the light table.
+            DataTable table = new DataTable();
+            //Include columns to the DataTable.
+            table.Columns.Add();
+            table.Columns.Add();
+            table.Columns.Add();
+            table.Columns.Add();
+
+            //Include rows to the DataTable.
+            table.Rows.Add(new string[] { "Project Title", project.Title, "Date", DateTime.UtcNow.Date.ToString("dd/mm/yyyy") });
+            table.Rows.Add(new string[] { "Projet Manager", project.Manager.Name, "Project Sponsor", GetSponsorName(project) });
+            // Assign data source.
+            pdfLightTable.DataSource = table;
+            // Draw PdfLightTable.
+            pdfLightTable.Draw(page, new PointF(0, 50));
+            #endregion
+
+            PdfGrid pdfGrid = new PdfGrid();
+
+            pdfGrid.Columns.Add(2);
+            pdfGrid.Columns[0].Width = 75f;
+
+            //first row
+            var objectivesRow = pdfGrid.Rows.Add();
+            objectivesRow.Cells[0].Value = "Objectives";
+
+            PdfGrid objectiveGrid = new PdfGrid();
+
+            objectiveGrid.Columns.Add(3);
+
+            objectiveGrid.Headers.Add(1);
+            objectiveGrid.Headers[0].Cells[0].Value = "Title";
+            objectiveGrid.Headers[0].Cells[1].Value = "Description";
+            objectiveGrid.Headers[0].Cells[2].Value = "Priority";
+
+
+            foreach (var obj in project.Objectives)
             {
-                Brush = PdfBrushes.White
-            };
-
-            //Draws the heading on the page
-            PdfLayoutResult result = element.Draw(page, new PointF(10, bounds.Top + 8));
-            string currentDate = "DATE " + DateTime.Now.ToString("MM/dd/yyyy");
-            //Measures the width of the text to place it in the correct location
-            SizeF textSize = subHeadingFont.MeasureString(currentDate);
-            PointF textPosition = new PointF(graphics.ClientSize.Width - textSize.Width - 10, result.Bounds.Y);
-            //Draws the date by using DrawString method
-            graphics.DrawString(currentDate, subHeadingFont, element.Brush, textPosition);
-            PdfFont timesRoman = new PdfStandardFont(PdfFontFamily.TimesRoman, 10);
-            //Creates text elements to add the address and draw it to the page.
-            element = new PdfTextElement("BILL TO ", timesRoman);
-            element.Brush = new PdfSolidBrush(new PdfColor(126, 155, 203));
-            result = element.Draw(page, new PointF(10, result.Bounds.Bottom + 25));
-            PdfPen linePen = new PdfPen(new PdfColor(126, 151, 173), 0.70f);
-            PointF startPoint = new PointF(0, result.Bounds.Bottom + 3);
-            PointF endPoint = new PointF(graphics.ClientSize.Width, result.Bounds.Bottom + 3);
-            //Draws a line at the bottom of the address
-            graphics.DrawLine(linePen, startPoint, endPoint);
-
-            //Creates a PDF grid
-            PdfGrid grid = new PdfGrid();
-            //Adds the data source
-            grid.DataSource = project.Assumptions;
-            //Creates the grid cell styles
-            PdfGridCellStyle cellStyle = new PdfGridCellStyle();
-            cellStyle.Borders.All = PdfPens.White;
-            PdfGridRow header = grid.Headers[0];
-            //Creates the header style
-            PdfGridCellStyle headerStyle = new PdfGridCellStyle();
-            headerStyle.Borders.All = new PdfPen(new PdfColor(126, 151, 173));
-            headerStyle.BackgroundBrush = new PdfSolidBrush(new PdfColor(126, 151, 173));
-            headerStyle.TextBrush = PdfBrushes.White;
-            headerStyle.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 14f, PdfFontStyle.Regular);
-
-            //Adds cell customizations
-            for (int i = 0; i < header.Cells.Count; i++)
-            {
-                if (i == 0 || i == 1)
-                    header.Cells[i].StringFormat = new PdfStringFormat(PdfTextAlignment.Left, PdfVerticalAlignment.Middle);
-                else
-                    header.Cells[i].StringFormat = new PdfStringFormat(PdfTextAlignment.Right, PdfVerticalAlignment.Middle);
+                var objectiveRow = objectiveGrid.Rows.Add();
+                objectiveRow.Cells[0].Value = obj.Title;
+                objectiveRow.Cells[1].Value = obj.Description;
+                objectiveRow.Cells[2].Value = obj.Priority.GetDisplayName();
             }
 
-            //Applies the header style
-            header.ApplyStyle(headerStyle);
-            cellStyle.Borders.Bottom = new PdfPen(new PdfColor(217, 217, 217), 0.70f);
-            cellStyle.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 12f);
-            cellStyle.TextBrush = new PdfSolidBrush(new PdfColor(131, 130, 136));
-            //Creates the layout format for grid
-            PdfGridLayoutFormat layoutFormat = new PdfGridLayoutFormat();
-            // Creates layout format settings to allow the table pagination
-            layoutFormat.Layout = PdfLayoutType.Paginate;
-            //Draws the grid to the PDF page.
-            PdfGridLayoutResult gridResult = grid.Draw(page, new RectangleF(new PointF(0, result.Bounds.Bottom + 40), new SizeF(graphics.ClientSize.Width, graphics.ClientSize.Height - 100)), layoutFormat);
+            objectivesRow.Cells[1].Value = objectiveGrid;
+
+
+            //second row
+            var assumptionsRow = pdfGrid.Rows.Add();
+            assumptionsRow.Cells[0].Value = "Assumptions";
+
+            PdfGrid assumptionsGrid = new PdfGrid();
+
+            assumptionsGrid.Columns.Add(1);
+
+            assumptionsGrid.Headers.Add(1);
+            assumptionsGrid.Headers[0].Cells[0].Value = "Description";
+
+            foreach (var assump in project.Assumptions)
+            {
+                var assumptionRow = assumptionsGrid.Rows.Add();
+                assumptionRow.Cells[0].Value = assump.Description;
+            }
+
+            assumptionsRow.Cells[1].Value = assumptionsGrid;
+
+            //third row
+            var candidatesRow = pdfGrid.Rows.Add();
+            candidatesRow.Cells[0].Value = "Candidates";
+
+            PdfGrid candidatesGrid = new PdfGrid();
+
+            candidatesGrid.Columns.Add(8);
+
+            candidatesGrid.Headers.Add(1);
+            candidatesGrid.Headers[0].Cells[0].Value = "Skill";
+            candidatesGrid.Headers[0].Cells[0].Value = "Proficiency";
+            candidatesGrid.Headers[0].Cells[0].Value = "FTE";
+            candidatesGrid.Headers[0].Cells[0].Value = "English Level";
+            candidatesGrid.Headers[0].Cells[0].Value = "Internal Rate";
+            candidatesGrid.Headers[0].Cells[0].Value = "External Rate";
+            candidatesGrid.Headers[0].Cells[0].Value = "Employee";
+
+            foreach (var cand in project.Candidates)
+            {
+                var candidateRow = candidatesGrid.Rows.Add();
+                candidateRow.Cells[0].Value = cand.Skill.Title;
+                candidateRow.Cells[1].Value = cand.Proficiency;
+                candidateRow.Cells[2].Value = cand.FTE;
+                candidateRow.Cells[3].Value = cand.EnglishLevel;
+                candidateRow.Cells[4].Value = cand.InternalRate;
+                candidateRow.Cells[5].Value = cand.ExternalRate;
+                candidateRow.Cells[6].Value = cand?.Employee.Name;
+            }
+
+            assumptionsRow.Cells[1].Value = assumptionsGrid;
+
+            pdfGrid.Draw(page, new PointF(0f, 100f));
 
             //Save the PDF document to stream
             MemoryStream stream = new();
@@ -106,6 +141,22 @@ namespace Domain.Services.Util
             document.Close(true);
 
             return stream;
+        }
+
+        private string GetSponsorName(ProjectResponse project)
+        {
+            var sponsor = project.Stakeholders
+                .Where(st => st.Role == Models.Constants.StakeholderRole.Sponsor)
+                .FirstOrDefault();
+
+            if (sponsor != null)
+            {
+                return sponsor.Name;
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

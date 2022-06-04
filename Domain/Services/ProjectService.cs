@@ -46,11 +46,11 @@ namespace Domain.Services
                 .Include(p => p.Objectives)
                 .Include(p => p.Assumptions)
                 .Include(p => p.Deliverables)
-                .Include(p => p.Manager)
+                .Include(p => p.Manager).ThenInclude(p => p.Role)
                 .Include(p => p.Milestones).ThenInclude(m => m.Deliverables)
                 .Include(p => p.ProjectStakeholders).ThenInclude(st => st.Stakeholder);
             _projRiskIncludes = risk => risk
-                .Include(r => r.Risk);
+                .Include(r => r.Risk).ThenInclude(r => r.RiskCategory);
             _projStakIncludes = stak => stak
                 .Include(st => st.Stakeholder);
             _projCandInclude = cand => cand

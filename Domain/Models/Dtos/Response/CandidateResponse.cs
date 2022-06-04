@@ -1,4 +1,5 @@
 ﻿using Domain.Models.Constants;
+using Domain.Models.Dtos.Response;
 
 namespace Domain.Models.Dtos.Responses
 {
@@ -13,7 +14,7 @@ namespace Domain.Models.Dtos.Responses
         public string Comment { get; set; }
         public SkillResponse Skill { get; set; }
         public Proficiency Proficiency { get; set; }
-        public string EmployeeId { get; set; }
+        public CandidateEmployeeResponse Employee { get; set; }
         public string ProjectId { get; set; }
     }
 }

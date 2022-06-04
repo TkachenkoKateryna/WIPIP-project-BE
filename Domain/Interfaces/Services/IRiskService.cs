@@ -10,6 +10,8 @@ namespace Domain.Interfaces.Services
         RiskResponse AddRisk(RiskRequest riskRequest);
         RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
         void DeleteRisk(string riskId);
+        void RemoveRisk(string riskId, string projectId);
         IEnumerable<RiskCategoryResponse> GetRiskCategories();
+        IEnumerable<RiskResponse> GenerateRisks(string projectId);
     }
 }

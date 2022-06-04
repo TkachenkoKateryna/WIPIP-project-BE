@@ -1,5 +1,6 @@
 ﻿using API.Controllers.Base;
 using Domain.Interfaces.Services;
+using Domain.Interfaces.Services.Util;
 using Domain.Interfaces.Util;
 using Domain.Models.Constants;
 using Domain.Models.Dtos.Responses;
@@ -17,15 +18,19 @@ namespace API.Controllers
         private readonly IStakeholdersService _stakeholderService;
         private readonly UserManager<User> _userManager;
         private readonly ILoggerManager _logger;
+        private readonly IExcelService _excelService;
+
 
         public StakeholdersController(
             IStakeholdersService stakeholderService,
             UserManager<User> userManager,
-            ILoggerManager logger)
+            ILoggerManager logger,
+            IExcelService excelService)
         {
             _stakeholderService = stakeholderService;
             _userManager = userManager;
             _logger = logger;
+            _excelService = excelService;
         }
 
         [HttpGet(Strings.StakeholderRoute)]
@@ -115,6 +120,15 @@ namespace API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet(Strings.StakeholderRoute + "dowbloadExcel")]
+        public FileResult Excel([FromQuery] string projectId, [FromQuery] string projectTitle)
+        {
+            return File(
+                _excelService.GenerateStakeholderRegisterXml(projectId, projectTitle),
+                "application/xml",
+                "stakeholders.xlsx");
         }
     }
 }
