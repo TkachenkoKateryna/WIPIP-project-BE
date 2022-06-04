@@ -7,6 +7,7 @@ using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Domain.Models.Dtos.Request;
 
 namespace Domain.Services
 {
@@ -46,17 +47,28 @@ namespace Domain.Services
                     .FirstOrDefault());
         }
 
-        public CandidateResponse AssingEmployeeToCandidate(string employeeId, string candidateId)
+        public CandidateResponse UpdateEmployeeToCandidate(CandidateEmployeeRequest candidateRequest)
         {
-            var candEntity = _candidateRepository
-                .Find(cand => cand.Id == Guid.Parse(candidateId), _includes)
+            var cand = _candidateRepository
+                .Find(cand => cand.Id == Guid.Parse(candidateRequest.CandidateId) && cand.EmployeeId == Guid.Parse(candidateRequest.EmployeeId))
                 .FirstOrDefault();
 
-            candEntity.EmployeeId = Guid.Parse(employeeId);
+            if (cand != null)
+            {
+                throw new AlreadyExistsException<ProjectCandidate>("Such candidate already exists");
+            }
+
+            var candEntity = _candidateRepository
+                .Find(cand => cand.Id == Guid.Parse(candidateRequest.CandidateId), _includes)
+                .FirstOrDefault();
+
+            candEntity.EmployeeId = Guid.Parse(candidateRequest.EmployeeId);
             _candidateRepository.Update(candEntity);
             _uow.Save();
 
-            return _mapper.Map<CandidateResponse>(candEntity);
+            return _mapper.Map<CandidateResponse>(_candidateRepository
+                .Find(cand => cand.Id == candEntity.Id, _includes)
+                .FirstOrDefault());
         }
 
         public CandidateResponse UpdateCandidate(CandidateRequest candidateRequest, string candId)

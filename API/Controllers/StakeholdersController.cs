@@ -36,17 +36,9 @@ namespace API.Controllers
         [HttpGet(Strings.StakeholderRoute)]
         public async Task<ActionResult<IEnumerable<StakeholderResponse>>> GetStakeholders()
         {
-            _logger.LogInfo("Fetching current user");
-
-            var manager = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
-
-            _logger.LogInfo($"Returning username with email: {manager.Email}.");
-
-            var roles = await _userManager.GetRolesAsync(manager);
-
             _logger.LogInfo("Fetching stakeholders");
 
-            var stakeholders = _stakeholderService.GetStakeholders(manager.Id, roles);
+            var stakeholders = _stakeholderService.GetStakeholders();
 
             _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
 
@@ -72,6 +64,20 @@ namespace API.Controllers
             {
                 var stResp = _stakeholderService.AddStakeholder(stRequest);
                 return Ok(stResp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete(Strings.ProjectStakeholderRoute)]
+        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(StakeholderProjectRequest stRequest)
+        {
+            try
+            {
+                _stakeholderService.RemoveStakeholderFromProject(stRequest);
+                return Ok();
             }
             catch (Exception ex)
             {

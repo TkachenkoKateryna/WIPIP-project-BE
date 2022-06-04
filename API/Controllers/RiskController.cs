@@ -10,6 +10,7 @@ using Domain.Interfaces.Services.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
+using Domain.Models.Dtos.Request;
 
 namespace API.Controllers
 {
@@ -88,12 +89,26 @@ namespace API.Controllers
         }
 
 
-        [HttpDelete("projectrisks/{riskId}")]
-        public IActionResult RemoveRisk(string riskId, [FromQuery] string projectId)
+        [HttpDelete("projectrisks")]
+        public IActionResult RemoveRiskFromProject(RiskProjectRequest riskProject)
         {
             try
             {
-                _riskService.RemoveRisk(riskId, projectId);
+                _riskService.RemoveRiskFromProject(riskProject);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("projectrisks")]
+        public IActionResult AssignRiskToProject(RiskProjectRequest riskProject)
+        {
+            try
+            {
+                _riskService.AssignRiskToProject(riskProject);
                 return Ok();
             }
             catch (Exception ex)

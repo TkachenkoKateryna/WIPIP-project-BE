@@ -37,36 +37,14 @@ namespace Domain.Services
                 .ThenInclude(s => s.Project);
         }
 
-        public IEnumerable<StakeholderResponse> GetStakeholders(string managerId, IEnumerable<string> roles)
+        public IEnumerable<StakeholderResponse> GetStakeholders()
         {
             List<StakeholderResponse> stakeholders;
 
-            _ = roles ?? throw new NullReferenceException
-                (Strings.GetNullRefExcMethodParameterMessage("roles"));
-
-            var roleList = roles.ToList();
-
-            if (roleList.Contains(Strings.ManagerRole))
-            {
-                stakeholders = _projStakeholdersRepository
-                    .Find(prSt => prSt.Project.ManagerId == managerId, _includesStp)
-                    .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                    .ToList();
-            }
-            else if (roleList.Contains(Strings.LeadRole))
-            {
-                stakeholders = _projStakeholdersRepository
-                    .GetAll(_includesStp)
-                    .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                    .ToList();
-            }
-            else
-            {
-                stakeholders = _projStakeholdersRepository
-                    .GetAllWithDeleted(_includesStp)
-                    .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                    .ToList();
-            }
+            stakeholders = _projStakeholdersRepository
+                .GetAll(_includesStp)
+                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
+                .ToList();
 
             stakeholders.ForEach(st => st.Projects = _projStakeholdersRepository
                 .Find(stp => stp.StakeholderId == Guid.Parse(st.Id))
@@ -124,6 +102,18 @@ namespace Domain.Services
                 .Find(st => st.Id.ToString() == projStakeholderRequest.StakeholderId)
                 .Select(st => _mapper.Map<StakeholderResponse>(st))
                 .FirstOrDefault();
+        }
+
+        public void RemoveStakeholderFromProject(StakeholderProjectRequest projStakeholderRequest)
+        {
+            var projectStak = _projStakeholdersRepository
+                .Find(ps => ps.ProjectId == Guid.Parse(projStakeholderRequest.ProjectId)
+                && ps.StakeholderId == Guid.Parse(projStakeholderRequest.StakeholderId))
+                .FirstOrDefault();
+            _ = projectStak ?? throw new NotFoundException<ProjectStakeholder>("Stakeholder in project wasn't found");
+
+            _projStakeholdersRepository.Delete(projectStak);
+            _uow.Save();
         }
 
         public StakeholderResponse UpdateStakeholder(StakeholderRequest stRequest, string stId)

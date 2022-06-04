@@ -4,6 +4,7 @@ using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Domain.Models.Dtos.Request;
 
 namespace API.Controllers
 {
@@ -44,12 +45,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpPatch(Strings.CandidateRoute + "{candidateId}")]
-        public ActionResult<CandidateResponse> AssignEmployeeToCandidate([FromQuery] string employeeId, string candidateId)
+        [HttpPut(Strings.CandidateRoute)]
+        public ActionResult<CandidateResponse> UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest)
         {
             try
             {
-                var candidateResp = _candidateService.AssingEmployeeToCandidate(employeeId, candidateId);
+                var candidateResp = _candidateService.UpdateEmployeeToCandidate(candRequest);
                 return Ok(candidateResp);
             }
             catch (Exception ex)

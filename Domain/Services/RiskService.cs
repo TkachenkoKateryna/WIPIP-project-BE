@@ -8,6 +8,7 @@ using Domain.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Domain.Models.Constants;
+using Domain.Models.Dtos.Request;
 
 namespace Domain.Services
 {
@@ -133,19 +134,43 @@ namespace Domain.Services
             _uow.Save();
         }
 
-        public void RemoveRisk(string riskId, string projectId)
+        public void RemoveRiskFromProject(RiskProjectRequest projectRiskRequest)
         {
             var projectRiskEntity = _projRiskRepository
-                .Find(r => r.RiskId == Guid.Parse(riskId) && r.ProjectId == Guid.Parse(projectId))
+                .Find(r => r.RiskId == Guid.Parse(projectRiskRequest.RiskId) && r.ProjectId == Guid.Parse(projectRiskRequest.ProjectId))
                 .FirstOrDefault();
 
             _ = projectRiskEntity ?? throw new NotFoundException<Risk>(
-                $"Risk with id {riskId} was not found.");
+                $"Risk with id {projectRiskRequest.RiskId} was not found.");
 
             _projRiskRepository.Delete(projectRiskEntity);
             _uow.Save();
         }
 
+        public RiskResponse AssignRiskToProject(RiskProjectRequest projectRiskRequest)
+        {
+            var projectRiskEntity = _projRiskRepository
+                .Find(r => r.RiskId == Guid.Parse(projectRiskRequest.RiskId) && r.ProjectId == Guid.Parse(projectRiskRequest.ProjectId))
+                .FirstOrDefault();
+
+            if (projectRiskEntity != null)
+            {
+                throw new AlreadyExistsException<ProjectRisk>("Such project risk already exists");
+            }
+
+            projectRiskEntity = new ProjectRisk()
+            {
+                ProjectId = Guid.Parse(projectRiskRequest.ProjectId),
+                RiskId = Guid.Parse(projectRiskRequest.RiskId)
+            };
+
+            var id = _projRiskRepository.CreateWithVal(projectRiskEntity);
+            _uow.Save();
+
+            return _mapper.Map<RiskResponse>(_riskRepository
+                .Find(r => r.Id == id, _includes)
+                .FirstOrDefault());
+        }
 
         public IEnumerable<RiskCategoryResponse> GetRiskCategories()
         {

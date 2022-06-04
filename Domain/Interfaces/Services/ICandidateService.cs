@@ -1,4 +1,5 @@
-﻿using Domain.Models.Dtos.Requests;
+﻿using Domain.Models.Dtos.Request;
+using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
@@ -8,7 +9,7 @@ namespace Domain.Interfaces.Services
         IEnumerable<CandidateResponse> GetCandidates();
         CandidateResponse AddCandidate(CandidateRequest candRequest);
         CandidateResponse UpdateCandidate(CandidateRequest candRequest, string candId);
-        CandidateResponse AssingEmployeeToCandidate(string employeeId, string candidateId);
+        CandidateResponse UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest);
         void DeleteCandidate(string candId);
     }
 }

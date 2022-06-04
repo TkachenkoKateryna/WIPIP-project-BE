@@ -1,4 +1,5 @@
-﻿using Domain.Models.Dtos.Requests;
+﻿using Domain.Models.Dtos.Request;
+using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
@@ -10,7 +11,8 @@ namespace Domain.Interfaces.Services
         RiskResponse AddRisk(RiskRequest riskRequest);
         RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
         void DeleteRisk(string riskId);
-        void RemoveRisk(string riskId, string projectId);
+        void RemoveRiskFromProject(RiskProjectRequest projectRiskRequest);
+        RiskResponse AssignRiskToProject(RiskProjectRequest projectRiskRequest);
         IEnumerable<RiskCategoryResponse> GetRiskCategories();
         IEnumerable<RiskResponse> GenerateRisks(string projectId);
     }

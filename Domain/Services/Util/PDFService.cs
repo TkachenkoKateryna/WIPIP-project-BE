@@ -59,45 +59,25 @@ namespace Domain.Services.Util
             var objectivesRow = pdfGrid.Rows.Add();
             objectivesRow.Cells[0].Value = "Objectives";
 
-            PdfGrid objectiveGrid = new PdfGrid();
-
-            objectiveGrid.Columns.Add(3);
-
-            objectiveGrid.Headers.Add(1);
-            objectiveGrid.Headers[0].Cells[0].Value = "Title";
-            objectiveGrid.Headers[0].Cells[1].Value = "Description";
-            objectiveGrid.Headers[0].Cells[2].Value = "Priority";
-
-
+            var objectives = "";
             foreach (var obj in project.Objectives)
             {
-                var objectiveRow = objectiveGrid.Rows.Add();
-                objectiveRow.Cells[0].Value = obj.Title;
-                objectiveRow.Cells[1].Value = obj.Description;
-                objectiveRow.Cells[2].Value = obj.Priority.GetDisplayName();
-            }
 
-            objectivesRow.Cells[1].Value = objectiveGrid;
+                objectives += obj.Description + " [ " + obj.Title + " ] " + " [ " + obj.Priority + " ] " + "\n";
+            }
+            objectivesRow.Cells[1].Value = objectives;
 
 
             //second row
             var assumptionsRow = pdfGrid.Rows.Add();
             assumptionsRow.Cells[0].Value = "Assumptions";
 
-            PdfGrid assumptionsGrid = new PdfGrid();
-
-            assumptionsGrid.Columns.Add(1);
-
-            assumptionsGrid.Headers.Add(1);
-            assumptionsGrid.Headers[0].Cells[0].Value = "Description";
-
+            var assumptions = "";
             foreach (var assump in project.Assumptions)
             {
-                var assumptionRow = assumptionsGrid.Rows.Add();
-                assumptionRow.Cells[0].Value = assump.Description;
+                assumptions += assump.Description + "\n";
             }
-
-            assumptionsRow.Cells[1].Value = assumptionsGrid;
+            assumptionsRow.Cells[1].Value = assumptions;
 
             //third row
             var candidatesRow = pdfGrid.Rows.Add();
@@ -105,30 +85,114 @@ namespace Domain.Services.Util
 
             PdfGrid candidatesGrid = new PdfGrid();
 
-            candidatesGrid.Columns.Add(8);
+            candidatesGrid.Columns.Add(5);
 
             candidatesGrid.Headers.Add(1);
             candidatesGrid.Headers[0].Cells[0].Value = "Skill";
-            candidatesGrid.Headers[0].Cells[0].Value = "Proficiency";
-            candidatesGrid.Headers[0].Cells[0].Value = "FTE";
-            candidatesGrid.Headers[0].Cells[0].Value = "English Level";
-            candidatesGrid.Headers[0].Cells[0].Value = "Internal Rate";
-            candidatesGrid.Headers[0].Cells[0].Value = "External Rate";
-            candidatesGrid.Headers[0].Cells[0].Value = "Employee";
+            candidatesGrid.Headers[0].Cells[1].Value = "FTE";
+            candidatesGrid.Headers[0].Cells[2].Value = "English Level";
+            candidatesGrid.Headers[0].Cells[3].Value = "External Rate";
+            candidatesGrid.Headers[0].Cells[4].Value = "Employee";
 
             foreach (var cand in project.Candidates)
             {
                 var candidateRow = candidatesGrid.Rows.Add();
                 candidateRow.Cells[0].Value = cand.Skill.Title;
-                candidateRow.Cells[1].Value = cand.Proficiency;
-                candidateRow.Cells[2].Value = cand.FTE;
-                candidateRow.Cells[3].Value = cand.EnglishLevel;
-                candidateRow.Cells[4].Value = cand.InternalRate;
-                candidateRow.Cells[5].Value = cand.ExternalRate;
-                candidateRow.Cells[6].Value = cand?.Employee.Name;
+                candidateRow.Cells[1].Value = cand.FTE.ToString();
+                candidateRow.Cells[2].Value = cand.EnglishLevel.GetDisplayName();
+                candidateRow.Cells[3].Value = cand.ExternalRate.ToString();
+                _ = cand.Employee == null ? candidateRow.Cells[4].Value = "" : candidateRow.Cells[4].Value = cand.Employee.Name;
             }
 
-            assumptionsRow.Cells[1].Value = assumptionsGrid;
+            candidatesRow.Cells[1].Value = candidatesGrid;
+            candidatesRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+
+            //forth row
+            var stakeholdersRow = pdfGrid.Rows.Add();
+            stakeholdersRow.Cells[0].Value = "Stakeholders";
+
+            PdfGrid stakeholdersGrid = new PdfGrid();
+
+            stakeholdersGrid.Columns.Add(5);
+
+            stakeholdersGrid.Headers.Add(1);
+            stakeholdersGrid.Headers[0].Cells[0].Value = "Name";
+            stakeholdersGrid.Headers[0].Cells[1].Value = "Email";
+            stakeholdersGrid.Headers[0].Cells[2].Value = "Role";
+            stakeholdersGrid.Headers[0].Cells[3].Value = "Category";
+            stakeholdersGrid.Headers[0].Cells[4].Value = "Address";
+
+            foreach (var stak in project.Stakeholders)
+            {
+                var stakeholderRow = stakeholdersGrid.Rows.Add();
+                stakeholderRow.Cells[0].Value = stak.Name;
+                stakeholderRow.Cells[1].Value = stak.Email;
+                stakeholderRow.Cells[2].Value = stak.Role.GetDisplayName();
+                stakeholderRow.Cells[3].Value = stak.Category.GetDisplayName();
+                stakeholderRow.Cells[4].Value = stak.Address;
+            }
+            stakeholdersRow.Cells[1].Value = stakeholdersGrid;
+            stakeholdersRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+            //fifth row
+            var deliverablesRow = pdfGrid.Rows.Add();
+            deliverablesRow.Cells[0].Value = "Deliverables";
+
+            var deliverables = "";
+            var i = 0;
+
+            foreach (var del in project.Deliverables)
+            {
+                i++;
+                deliverables += i + " ) " + del.Title + ": " + del.Description + " [ " + del.TimeOfComplition.Date.ToString() + " ] " + "\n";
+            }
+
+            deliverablesRow.Cells[1].Value = deliverables;
+
+            //sixth row
+            var milestonesRow = pdfGrid.Rows.Add();
+            milestonesRow.Cells[0].Value = "Milestones";
+
+            PdfGrid milestonesGrid = new PdfGrid();
+
+            milestonesGrid.Columns.Add(3);
+
+            var milestones = "";
+
+            foreach (var mil in project.Milestones)
+            {
+                string milDeliverables = "";
+
+                foreach (var del in mil.Deliverables)
+                {
+                    milDeliverables += "(" + del.Title + "])";
+                }
+                milestones += mil.Activity + " [ " + mil.DueDate.ToString() + " ] " + milDeliverables + "\n";
+            }
+            milestonesRow.Cells[1].Value = milestones;
+
+            //seventh row
+            var risksRow = pdfGrid.Rows.Add();
+            risksRow.Cells[0].Value = "Risks";
+
+            PdfGrid risksGrid = new PdfGrid();
+
+            risksGrid.Columns.Add(3);
+
+            risksGrid.Headers.Add(1);
+            risksGrid.Headers[0].Cells[0].Value = "Desctiption";
+            risksGrid.Headers[0].Cells[1].Value = "Category";
+            risksGrid.Headers[0].Cells[2].Value = "Mitigation";
+
+            foreach (var risk in project.Risks)
+            {
+                var riskRow = risksGrid.Rows.Add();
+                riskRow.Cells[0].Value = risk.RiskCategory.Title;
+                _ = risk.Description == null ? riskRow.Cells[1].Value = "" : riskRow.Cells[1].Value = risk.Description;
+                _ = risk.Mitigation == null ? riskRow.Cells[2].Value = "" : riskRow.Cells[2].Value = risk.Mitigation;
+            }
+
+            risksRow.Cells[1].Value = risksGrid;
+            //risksRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
 
             pdfGrid.Draw(page, new PointF(0f, 100f));
 
