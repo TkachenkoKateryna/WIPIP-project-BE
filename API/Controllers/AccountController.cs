@@ -182,11 +182,12 @@ namespace API.Controllers
         {
             return new UserResponse
             {
-                UserName = user.UserName,
+                Name = user.UserName,
                 ImageLink = user.ImageLink,
                 Token = _jwtService.CreateToken(user),
                 Email = user.Email,
                 Role = roleName,
+                Id = user.Id
             };
         }
 
