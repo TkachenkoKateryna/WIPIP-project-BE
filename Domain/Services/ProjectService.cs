@@ -125,11 +125,12 @@ namespace Domain.Services
             }
 
             projectEntity = _mapper.Map<Project>(projectRequest);
+            projectEntity.Status = ProjectStatus.Draft;
 
-            _projectRepository.Create(projectEntity);
+            var id = _projectRepository.CreateWithVal(projectEntity);
             _uow.Save();
 
-            return _mapper.Map<ProjectResponse>(projectEntity);
+            return _mapper.Map<ProjectResponse>(_projectRepository.Find(p => p.Id == id, _projIncludes).FirstOrDefault());
         }
 
         public ProjectResponse UpdateProject(ProjectRequest projectRequest, string projectId)

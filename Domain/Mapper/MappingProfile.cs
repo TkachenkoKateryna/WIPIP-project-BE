@@ -79,7 +79,7 @@ namespace Domain.Mapper
 
             CreateMap<RiskRequest, Risk>()
                 .ForMember(m => m.Consequence, opt => opt.MapFrom(r => r.Consequence));
-          
+
 
             CreateMap<User, ManagerResponse>()
                 .ForMember(p => p.Id, opt => opt.MapFrom(p => p.Id))
@@ -87,7 +87,8 @@ namespace Domain.Mapper
 
             CreateMap<Project, ProjectsResponse>()
                 .ForPath(p => p.Manager.Id, opt => opt.MapFrom(p => p.ManagerId))
-                .ForPath(p => p.Manager.Name, opt => opt.MapFrom(p => p.Manager.UserName));
+                .ForPath(p => p.Manager.Name, opt => opt.MapFrom(p => p.Manager.UserName))
+                .ForPath(p => p.Manager.Role, opt => opt.MapFrom(p => p.Manager.Role));
 
             CreateMap<Project, ProjectResponse>();
             CreateMap<ProjectRequest, Project>()

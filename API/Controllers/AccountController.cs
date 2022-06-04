@@ -74,7 +74,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost(Strings.LoginRoute)]
-        public async Task<ActionResult<UserResponse>> Login(LoginRequest loginRequest)
+        public async Task<ActionResult<string>> Login(LoginRequest loginRequest)
         {
             var users = _userManager.Users.ToList();
 
@@ -86,8 +86,7 @@ namespace API.Controllers
 
             if (result.Succeeded)
             {
-                var role = await _roleManager.FindByIdAsync(user.RoleId);
-                return CreateUserObject(user, role.Name);
+                return _jwtService.CreateToken(user);
             }
 
             return Unauthorized();
@@ -95,7 +94,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost(Strings.RegisterRoute)]
-        public async Task<ActionResult<UserResponse>> Register(RegisterRequest registerRequest)
+        public async Task<ActionResult<string>> Register(RegisterRequest registerRequest)
         {
             if (await _userManager.Users.AnyAsync(x => x.Email.Equals(registerRequest.Email)))
             {
@@ -129,9 +128,7 @@ namespace API.Controllers
 
             if (!passGen.Succeeded) return BadRequest("Problem registering user");
 
-            var role = await _roleManager.FindByIdAsync(user.RoleId);
-
-            return CreateUserObject(user, role.Name);
+            return _jwtService.CreateToken(user);
         }
 
         [AllowAnonymous]

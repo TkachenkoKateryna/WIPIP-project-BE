@@ -1,5 +1,4 @@
-﻿using Domain.Models.Entities;
-using Domain.Models.Entities.Identity;
+﻿using Domain.Models.Entities.Identity;
 
 namespace Domain.Interfaces.Services.Util
 {
