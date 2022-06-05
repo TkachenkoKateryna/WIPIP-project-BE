@@ -45,91 +45,48 @@ namespace API.Controllers
             return Ok(stakeholders);
         }
 
-        [HttpGet(Strings.ProjectStakeholderRoute)]
-        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders([FromQuery] string projectId)
+        [HttpPut(Strings.StakeholderRoute + "{stakeholderId}")]
+        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stakeholderId)
         {
-            _logger.LogInfo($"Fetching stakeholders that are not assigned to project with id {projectId}");
+            var stResp = _stakeholderService.UpdateStakeholder(stRequest, stakeholderId);
 
-            var stakeholders = _stakeholderService.GetStakeholders(projectId);
+            return Ok(stResp);
+        }
 
-            _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
+        [HttpDelete(Strings.StakeholderRoute + "{stakeholderId}")]
+        public IActionResult DeleteStakeholder(string stakeholderId)
+        {
+            _stakeholderService.DeleteStakeholder(stakeholderId);
 
-            return Ok(stakeholders);
+            return Ok();
         }
 
         [HttpPost(Strings.StakeholderRoute)]
         public ActionResult<StakeholderResponse> AddStakeholder(StakeholderRequest stRequest)
         {
-            try
-            {
-                var stResp = _stakeholderService.AddStakeholder(stRequest);
-                return Ok(stResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var stResp = _stakeholderService.AddStakeholder(stRequest);
+
+            return Ok(stResp);
         }
 
-        [HttpDelete(Strings.ProjectStakeholderRoute)]
-        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(StakeholderProjectRequest stRequest)
+        [HttpDelete("projects/{projectId}/stakeholders/{stakeholderId}")]
+        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(string projectId, string stakeholderId)
         {
-            try
-            {
-                _stakeholderService.RemoveStakeholderFromProject(stRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId);
+
+            return Ok();
         }
 
-        [HttpPost(Strings.ProjectStakeholderRoute)]
-        public ActionResult<StakeholderResponse> AddStakeholderToProject(StakeholderProjectRequest stRequest)
+        [HttpPut("projects/{projectId}/stakeholders/{stakeholderId}")]
+        public ActionResult<StakeholderResponse> AddStakeholderToProject(string projectId, string stakeholderId)
         {
-            try
-            {
-                var stResp = _stakeholderService.AddStakeholderToProject(stRequest);
-                return Ok(stResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var stResp = _stakeholderService.AddStakeholderToProject(projectId, stakeholderId);
+
+            return Ok(stResp);
         }
 
-
-        [HttpPut(Strings.StakeholderRoute + "{stId}")]
-        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stId)
-        {
-            try
-            {
-                var stResp = _stakeholderService.UpdateStakeholder(stRequest, stId);
-                return Ok(stResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpDelete(Strings.StakeholderRoute)]
-        public IActionResult DeleteStakeholder(StakeholderProjectRequest stRequest)
-        {
-            try
-            {
-                _stakeholderService.DeleteStakeholder(stRequest);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet(Strings.StakeholderRoute + "dowbloadExcel")]
-        public FileResult Excel([FromQuery] string projectId, [FromQuery] string projectTitle)
+        [HttpGet(Strings.StakeholderFileRoute)]
+        public FileResult GetFile([FromQuery] string projectId, [FromQuery] string projectTitle)
         {
             return File(
                 _excelService.GenerateStakeholderRegisterXml(projectId, projectTitle),

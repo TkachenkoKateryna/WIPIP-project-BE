@@ -11,8 +11,8 @@ namespace Domain.Interfaces.Services
         RiskResponse AddRisk(RiskRequest riskRequest);
         RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
         void DeleteRisk(string riskId);
-        void RemoveRiskFromProject(RiskProjectRequest projectRiskRequest);
-        RiskResponse AssignRiskToProject(RiskProjectRequest projectRiskRequest);
+        RiskResponse RemoveRiskFromProject(string projectId, string riskId);
+        RiskResponse AssignRiskToProject(string projectId, string riskId);
         IEnumerable<RiskCategoryResponse> GetRiskCategories();
         IEnumerable<RiskResponse> GenerateRisks(string projectId);
     }

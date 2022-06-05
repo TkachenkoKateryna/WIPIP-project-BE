@@ -65,19 +65,5 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpGet("teamMembers")]
-        public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)
-        {
-            try
-            {
-                var empResp = _employeeService.GeneratePossibleTeamOptions(projectId);
-                return Ok(empResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.InnerException);
-            }
-        }
     }
 }

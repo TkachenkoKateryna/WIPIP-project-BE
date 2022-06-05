@@ -4,5 +4,6 @@
     {
         public string CandidateId { get; set; }
         public string EmployeeId { get; set; }
+        public bool ToRemove { get; set; }
     }
 }

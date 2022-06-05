@@ -23,16 +23,12 @@ namespace Domain.Services
         private readonly IRepository<ProjectStakeholder> _projStakeholderRepository;
         private readonly IRepository<ProjectRisk> _projRiskRepository;
         private readonly IRepository<ProjectCandidate> _projCandidateRepository;
-        private readonly IPDFService _pdfService;
-        private readonly UserManager<User> _userManager;
         private readonly Func<IQueryable<Project>, IIncludableQueryable<Project, object>> _projIncludes;
         private readonly Func<IQueryable<ProjectStakeholder>, IIncludableQueryable<ProjectStakeholder, object>> _projStakIncludes;
         private readonly Func<IQueryable<ProjectRisk>, IIncludableQueryable<ProjectRisk, object>> _projRiskIncludes;
         private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _projCandInclude;
 
-        public ProjectService(IUnitOfWork uow, IMapper mapper, IPDFService pdfService, UserManager<User> userManager
-
-        )
+        public ProjectService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
             _projectRepository = _uow.GetRepository<Project>();
@@ -40,8 +36,6 @@ namespace Domain.Services
             _projCandidateRepository = _uow.GetRepository<ProjectCandidate>();
             _projStakeholderRepository = _uow.GetRepository<ProjectStakeholder>();
             _mapper = mapper;
-            _pdfService = pdfService;
-            _userManager = userManager;
             _projIncludes = project => project
                 .Include(p => p.Objectives)
                 .Include(p => p.Assumptions)

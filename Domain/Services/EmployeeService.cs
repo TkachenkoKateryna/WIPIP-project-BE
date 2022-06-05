@@ -17,22 +17,17 @@ namespace Domain.Services
         private readonly IRepository<Employee> _employeeRepository;
         private readonly IRepository<ProjectCandidate> _candidateRepository;
         private readonly IRepository<EmployeeSkill> _employeeSkillRepository;
-        private readonly IFileStorageService _fileStorageService;
         private readonly IMapper _mapper;
         private readonly Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> _employeeIncludes;
         private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _candidateIncludes;
 
-        private readonly string containerName = "wipipresources";
-
         public EmployeeService(IUnitOfWork uow,
-            IMapper mapper,
-            IFileStorageService fileStorageService)
+            IMapper mapper)
         {
             _uow = uow;
             _employeeRepository = _uow.GetRepository<Employee>();
             _candidateRepository = _uow.GetRepository<ProjectCandidate>();
             _employeeSkillRepository = _uow.GetRepository<EmployeeSkill>();
-            _fileStorageService = fileStorageService;
             _mapper = mapper;
             _employeeIncludes = employees => employees
                 .Include(e => e.EmployeeSkills).ThenInclude(es => es.Skill);
@@ -120,29 +115,6 @@ namespace Domain.Services
 
             _employeeRepository.SoftDelete(Guid.Parse(empId));
             _uow.Save();
-        }
-
-        public IEnumerable<EmployeeResponse> GeneratePossibleTeamOptions(string projectId)
-        {
-            var candidates = _candidateRepository
-                .Find(c => c.ProjectId == Guid.Parse(projectId), _candidateIncludes)
-                .ToList();
-
-            var teamMembers = new List<Guid>();
-
-            foreach (var candidate in candidates)
-            {
-                var members = _employeeSkillRepository.Find(empSk =>
-                    (empSk.SkillId == candidate.SkillId) &&
-                    (empSk.Proficiency == candidate.Proficiency) &&
-                    (empSk.Primary == true))
-                    .Select(emp => emp.EmployeeId);
-
-                teamMembers.AddRange(members);
-            }
-
-            return _employeeRepository.Find(emp => teamMembers.Contains(emp.Id), _employeeIncludes)
-                .Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity));
         }
 
         private void RemoveEmployeeSkill(string empId)

@@ -34,43 +34,32 @@ namespace API.Controllers
         [HttpPut(Strings.CandidateRoute + "{candidateId}")]
         public ActionResult<CandidateResponse> UpdateCandidate(CandidateRequest candidateRequest, string candidateId)
         {
-            try
-            {
-                var candidateResp = _candidateService.UpdateCandidate(candidateRequest, candidateId);
-                return Ok(candidateResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+            var candidateResp = _candidateService.UpdateCandidate(candidateRequest, candidateId);
 
-        [HttpPut(Strings.CandidateRoute)]
-        public ActionResult<CandidateResponse> UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest)
-        {
-            try
-            {
-                var candidateResp = _candidateService.UpdateEmployeeToCandidate(candRequest);
-                return Ok(candidateResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(candidateResp);
         }
 
         [HttpDelete(Strings.CandidateRoute + "{candidateId}")]
         public IActionResult DeleteCandidate(string candidateId)
         {
-            try
-            {
-                _candidateService.DeleteCandidate(candidateId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _candidateService.DeleteCandidate(candidateId);
+            return Ok();
+        }
+
+        [HttpGet(Strings.CandidateEmployeeRoute)]
+        public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)
+        {
+            var empResp = _candidateService.GetEmployeesForCandidates(projectId);
+
+            return Ok(empResp);
+        }
+
+        [HttpPost(Strings.CandidateEmployeeRoute)]
+        public ActionResult<CandidateResponse> UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest)
+        {
+            var candidateResp = _candidateService.UpdateEmployeeToCandidate(candRequest);
+
+            return Ok(candidateResp);
         }
     }
 }

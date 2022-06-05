@@ -14,6 +14,6 @@ namespace Domain.Models.Dtos.Identity
 
         [Required]
         public string Username { get; set; }
-        public Roles Role { get; set; }
+        public string Role { get; set; }
     }
 }

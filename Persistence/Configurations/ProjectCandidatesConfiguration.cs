@@ -14,6 +14,12 @@ namespace Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ProjectCandidate> builder)
         {
+            builder.Property(b => b.FTE).IsRequired();
+            builder.Property(b => b.EnglishLevel).IsRequired();
+            builder.Property(b => b.InternalRate).IsRequired();
+            builder.Property(b => b.ExternalRate).IsRequired();
+
+
             builder.HasOne(pc => pc.Employee)
                 .WithMany(e => e.Candidates)
                 .HasForeignKey(pc => pc.EmployeeId)

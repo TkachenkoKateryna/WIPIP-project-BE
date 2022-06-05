@@ -15,9 +15,9 @@ namespace Domain.Services.Util
         public Stream GenerateProjectCharter(ProjectResponse project)
         {
 
-            PdfDocument document = new PdfDocument();
+            PdfDocument document = new();
 
-            document.PageSettings.Orientation = PdfPageOrientation.Landscape;
+            document.PageSettings.Orientation = PdfPageOrientation.Portrait;
             document.PageSettings.Margins.All = 50;
             PdfPage page = document.Pages.Add();
 
@@ -26,28 +26,9 @@ namespace Domain.Services.Util
             PdfBrush solidBrush = new PdfSolidBrush(new PdfColor(126, 151, 173));
             #region Title
             PdfFont font = new PdfStandardFont(PdfFontFamily.TimesRoman, 18, PdfFontStyle.Bold);
-            PdfStringFormat format = new PdfStringFormat();
+            PdfStringFormat format = new();
             format.Alignment = PdfTextAlignment.Center;
-            graphics.DrawString("Project Charter", font, PdfBrushes.Black, new RectangleF(200, 0, 300, 250), format);
-            #endregion
-
-            #region Summary
-            PdfLightTable pdfLightTable = new PdfLightTable();
-            //Initialize DataTable to assign as DataSource to the light table.
-            DataTable table = new DataTable();
-            //Include columns to the DataTable.
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-            table.Columns.Add();
-
-            //Include rows to the DataTable.
-            table.Rows.Add(new string[] { "Project Title", project.Title, "Date", DateTime.UtcNow.Date.ToString("dd/mm/yyyy") });
-            table.Rows.Add(new string[] { "Projet Manager", project.Manager.Name, "Project Sponsor", GetSponsorName(project) });
-            // Assign data source.
-            pdfLightTable.DataSource = table;
-            // Draw PdfLightTable.
-            pdfLightTable.Draw(page, new PointF(0, 50));
+            graphics.DrawString("Project Charter", font, PdfBrushes.Black, new RectangleF(100, 0, 300, 250), format);
             #endregion
 
             PdfGrid pdfGrid = new PdfGrid();
@@ -55,7 +36,22 @@ namespace Domain.Services.Util
             pdfGrid.Columns.Add(2);
             pdfGrid.Columns[0].Width = 75f;
 
-            //first row
+            //Title row
+            var titleRow = pdfGrid.Rows.Add();
+            titleRow.Cells[0].Value = "Title";
+            titleRow.Cells[1].Value = project.Title;
+
+            //Description row
+            var descriptionRow = pdfGrid.Rows.Add();
+            descriptionRow.Cells[0].Value = "Description";
+            descriptionRow.Cells[1].Value = project.Description;
+
+            //Budget row
+            var budgetRow = pdfGrid.Rows.Add();
+            budgetRow.Cells[0].Value = "Resources";
+            budgetRow.Cells[1].Value = "Approximate monthly budget: " + project.MonthlyIncome.ToString();
+
+            //objectives row
             var objectivesRow = pdfGrid.Rows.Add();
             objectivesRow.Cells[0].Value = "Objectives";
 
@@ -174,7 +170,7 @@ namespace Domain.Services.Util
             var risksRow = pdfGrid.Rows.Add();
             risksRow.Cells[0].Value = "Risks";
 
-            PdfGrid risksGrid = new PdfGrid();
+            PdfGrid risksGrid = new();
 
             risksGrid.Columns.Add(3);
 
@@ -192,9 +188,33 @@ namespace Domain.Services.Util
             }
 
             risksRow.Cells[1].Value = risksGrid;
-            //risksRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+            risksRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
 
-            pdfGrid.Draw(page, new PointF(0f, 100f));
+            //third row
+            var approvalRow = pdfGrid.Rows.Add();
+            approvalRow.Cells[0].Value = "Approval";
+
+            PdfGrid approvalGrid = new PdfGrid();
+
+            approvalGrid.Columns.Add(2);
+
+            approvalGrid.Headers.Add(1);
+            approvalGrid.Headers[0].Cells[0].Value = "Title and name";
+            approvalGrid.Headers[0].Cells[1].Value = "Date";
+
+            var row = approvalGrid.Rows.Add();
+
+
+            row.Cells[0].Value = "Sponsor: " + GetSponsorName(project) + "\n" +
+                "signature: _______________" + "\n" +
+                "Manager: " + project.Manager.Name +
+                "\n" + "signature: _______________";
+            row.Cells[1].Value = DateTime.UtcNow.Date.ToString("dd/mm/yyyy");
+
+            approvalRow.Cells[1].Value = approvalGrid;
+            approvalRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+
+            pdfGrid.Draw(page, new PointF(0f, 40f));
 
             //Save the PDF document to stream
             MemoryStream stream = new();

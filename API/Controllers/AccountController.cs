@@ -9,6 +9,8 @@ using Domain.Models.Entities.Identity;
 using Domain.Interfaces.Services.Util;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Constants;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Exceptions;
 
 namespace API.Controllers
 {
@@ -28,6 +30,38 @@ namespace API.Controllers
             _signInManager = signInManager;
             _jwtService = jwtService;
             _roleManager = roleManager;
+        }
+
+        [Authorize]
+        [HttpPut(Strings.UserRoute + "{userId}")]
+        public async Task<ActionResult<UserResponse>> UpdateUser(UserRequest userRequest, string userId)
+        {
+            var user = await _userManager.FindByEmailAsync(userRequest.Email);
+
+            if (user is null) return BadRequest("User not found");
+
+            if (_userManager.Users.Any(user => user.Email == userRequest.Email & user.Id != userId))
+            {
+                throw new AlreadyExistsException<User>("user with such email already exists");
+            }
+
+            user.Email = userRequest.Email;
+            user.UserName = userRequest.Name;
+            user.ImageLink = userRequest.ImageLink;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                var updatedUser = await _userManager.FindByEmailAsync(userRequest.Email);
+                var role = await _roleManager.FindByIdAsync(user.RoleId);
+
+                return Ok(CreateUserObject(updatedUser, role.Name));
+            }
+            else
+            {
+                return BadRequest("Error while changing the password");
+            }
         }
 
         [Authorize]
@@ -113,13 +147,13 @@ namespace API.Controllers
 
             switch (registerRequest.Role)
             {
-                case Roles.Admin:
+                case "Admin":
                     user.RoleId = await GetRoleId(Strings.AdminRole);
                     break;
-                case Roles.Lead:
+                case "Lead":
                     user.RoleId = await GetRoleId(Strings.LeadRole);
                     break;
-                case Roles.Manager:
+                case "Manager":
                     user.RoleId = await GetRoleId(Strings.ManagerRole);
                     break;
             }
@@ -150,11 +184,11 @@ namespace API.Controllers
         [HttpPost(Strings.ChangePasswordRoute)]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest changePassword)
         {
-            User user = await _userManager.FindByEmailAsync(changePassword.Email);
+            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
             if (user is null) return BadRequest("User not found");
 
-            if (!CheckPassword(changePassword.NewPassword, changePassword.OldPassword))
+            if (!CheckPassword(changePassword.NewPassword, changePassword.ConfirmPassword))
             {
                 return BadRequest("Passwords are not equal");
             }
@@ -164,7 +198,7 @@ namespace API.Controllers
 
             if (result.Succeeded)
             {
-                var updatedUser = await _userManager.FindByEmailAsync(changePassword.Email);
+                var updatedUser = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
                 var role = await _roleManager.FindByIdAsync(user.RoleId);
 
                 return Ok(CreateUserObject(updatedUser, role.Name));

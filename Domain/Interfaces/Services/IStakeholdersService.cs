@@ -9,10 +9,10 @@ namespace Domain.Interfaces.Services
         IEnumerable<StakeholderResponse> GetStakeholders();
         IEnumerable<StakeholderResponse> GetStakeholders(string projectId);
         StakeholderResponse AddStakeholder(StakeholderRequest stRequest);
-        StakeholderResponse AddStakeholderToProject(StakeholderProjectRequest projStakeholderRequest);
-        void RemoveStakeholderFromProject(StakeholderProjectRequest projStakeholderRequest);
         StakeholderResponse UpdateStakeholder(StakeholderRequest stRequest, string stId);
-        void DeleteStakeholder(StakeholderProjectRequest stRequest);
+        void DeleteStakeholder(string stakeholderId);
 
+        StakeholderResponse AddStakeholderToProject(string projectId, string stakeholderId);
+        StakeholderResponse RemoveStakeholderFromProject(string projectId, string stakeholderId);
     }
 }

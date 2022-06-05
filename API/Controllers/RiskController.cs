@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
 using Domain.Models.Dtos.Request;
+using Domain.Models.Constants;
 
 namespace API.Controllers
 {
@@ -89,13 +90,13 @@ namespace API.Controllers
         }
 
 
-        [HttpDelete("projectrisks")]
-        public IActionResult RemoveRiskFromProject(RiskProjectRequest riskProject)
+        [HttpDelete("projects/{projectId}/risks/{riskId}")]
+        public ActionResult<RiskResponse> RemoveRiskFromProject(string projectId, string riskId)
         {
             try
             {
-                _riskService.RemoveRiskFromProject(riskProject);
-                return Ok();
+                var risk = _riskService.RemoveRiskFromProject(projectId, riskId);
+                return Ok(risk);
             }
             catch (Exception ex)
             {
@@ -103,18 +104,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("projectrisks")]
-        public IActionResult AssignRiskToProject(RiskProjectRequest riskProject)
+        [HttpPut("projects/{projectId}/risks/{riskId}")]
+        public ActionResult<RiskResponse> AssignRiskToProject(string projectId, string riskId)
         {
-            try
-            {
-                _riskService.AssignRiskToProject(riskProject);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var risk = _riskService.AssignRiskToProject(projectId, riskId);
+
+            return Ok(risk);
         }
 
         [HttpGet("risks/dowbloadExcel")]

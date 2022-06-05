@@ -53,7 +53,8 @@ namespace Domain.Mapper
 
             CreateMap<Employee, CandidateEmployeeResponse>();
             CreateMap<ProjectCandidate, CandidateResponse>();
-            CreateMap<CandidateRequest, ProjectCandidate>();
+            CreateMap<CandidateRequest, ProjectCandidate>()
+                .ForMember(c => c.EmployeeId, opt => opt.UseDestinationValue());
 
             CreateMap<RiskCategory, RiskCategoryResponse>()
               .ForMember(m => m.Id, opt => opt.MapFrom(r => r.Id))

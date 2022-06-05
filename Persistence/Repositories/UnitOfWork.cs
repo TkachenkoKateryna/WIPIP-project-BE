@@ -8,7 +8,7 @@ namespace Persistence.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DataContext _context;
-        private readonly Hashtable _repositories = new Hashtable();
+        private readonly Hashtable _repositories = new();
 
         public UnitOfWork(DataContext context)
         {

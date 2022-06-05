@@ -12,7 +12,6 @@ namespace Domain.Interfaces.Services
         EmployeeResponse AddEmployee(EmployeeRequest empRequest);
         EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, string empId);
         void DeleteEmployee(string empId);
-        IEnumerable<EmployeeResponse> GeneratePossibleTeamOptions(string projectId);
 
     }
 }
