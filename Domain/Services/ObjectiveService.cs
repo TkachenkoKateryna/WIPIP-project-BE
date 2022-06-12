@@ -47,24 +47,24 @@ namespace Domain.Services
             return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == objEntity.Id).FirstOrDefault());
         }
 
-        public ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, string objId)
+        public ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, Guid objId)
         {
-            var objEntity = _objectiveRepository.Find(ob => ob.Id.ToString() == objId)
+            var objEntity = _objectiveRepository.Find(ob => ob.Id == objId)
                  .FirstOrDefault();
             _ = objEntity ?? throw new NotFoundException<Objective>("Objective with id was not found.");
 
             objEntity = _mapper.Map<Objective>(objDto);
-            objEntity.Id = Guid.Parse(objId);
+            objEntity.Id = objId;
             _objectiveRepository.Update(objEntity);
             _uow.Save();
 
 
-            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id.ToString() == objId).FirstOrDefault());
+            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == objId).FirstOrDefault());
         }
 
         public void DeleteObjective(string objId)
         {
-            var objEntity = _objectiveRepository.FindWithDeleted(obj => obj.Id.ToString() == objId)
+            var objEntity = _objectiveRepository.Find(obj => obj.Id.ToString() == objId)
                 .FirstOrDefault();
             _ = objEntity ?? throw new NotFoundException<Objective>("Objective with id was not found.");
 

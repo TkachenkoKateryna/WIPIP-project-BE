@@ -21,16 +21,6 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<AssumptionResponse> GetAssumptions(string projectId = null)
-        {
-            var assumptions = projectId != null ?
-                _assumpRepository.Find(o => o.ProjectId == Guid.Parse(projectId)) :
-                _assumpRepository.GetAllWithDeleted();
-
-            return assumptions.Select(entity => _mapper.Map<AssumptionResponse>(entity))
-                .ToList();
-        }
-
         public AssumptionResponse AddAssumption(AssumptionRequest assumpRequest)
         {
             var assumpEntity = _assumpRepository.FindWithDeleted(assump => assump.Description == assumpRequest.Description)
@@ -67,9 +57,9 @@ namespace Domain.Services
 
         public void DeleteAssumption(string assumpId)
         {
-            var assumpEntity = _assumpRepository.FindWithDeleted(assump => assump.Id.ToString() == assumpId)
+            var assumpEntity = _assumpRepository.Find(assump => assump.Id.ToString() == assumpId)
                 .FirstOrDefault();
-            _ = assumpEntity ?? throw new NotFoundException<Objective>("Assumption with id was not found.");
+            _ = assumpEntity ?? throw new NotFoundException<Assumption>("Assumption with id was not found.");
 
             _assumpRepository.SoftDelete(Guid.Parse(assumpId));
             _uow.Save();

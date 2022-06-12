@@ -175,15 +175,6 @@ namespace Domain.Services
                 .Find(r => r.Id == Guid.Parse(riskId), _includes)
                 .FirstOrDefault());
         }
-
-        public IEnumerable<RiskCategoryResponse> GetRiskCategories()
-        {
-            return _riskCategoryRepository
-                .GetAll()
-                .Select(r => _mapper.Map<RiskCategoryResponse>(r))
-                .ToList();
-        }
-
         public IEnumerable<RiskResponse> GenerateRisks(string projectId)
         {
             var risks = new List<Risk>();
@@ -229,11 +220,11 @@ namespace Domain.Services
                 risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Resource Risks"));
             }
 
-            if (project.ProjectStakeholders.Any(c => c.Stakeholder.Payment == Payment.BigDelay ||
-            c.Stakeholder.Payment == Payment.BigDelay))
+            if (project.ProjectStakeholders.Any(c => c.Stakeholder.Payment == Payment.BigDelay || c.Stakeholder.Payment == Payment.BigDelay))
             {
                 risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Payment Risks"));
             }
+
             if (project.ProjectStakeholders.Any(c => c.Stakeholder.CommunicationChannel == null))
             {
                 risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Communication Risks"));

@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using API.Controllers.Base;
-using Domain.Models.Dtos.Identity;
 using Domain.Models.Entities.Identity;
 using Domain.Interfaces.Services.Util;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Constants;
 using Domain.Models.Dtos.Requests;
 using Domain.Models.Exceptions;
+using Domain.Models.Dtos.Identity;
 
 namespace API.Controllers
 {
@@ -36,7 +36,7 @@ namespace API.Controllers
         [HttpPut(Strings.UserRoute + "{userId}")]
         public async Task<ActionResult<UserResponse>> UpdateUser(UserRequest userRequest, string userId)
         {
-            var user = await _userManager.FindByEmailAsync(userRequest.Email);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user is null) return BadRequest("User not found");
 
@@ -46,14 +46,16 @@ namespace API.Controllers
             }
 
             user.Email = userRequest.Email;
+            user.NormalizedEmail = userRequest.Email.ToUpper();
             user.UserName = userRequest.Name;
+            user.NormalizedUserName = userRequest.Name.ToUpper();
             user.ImageLink = userRequest.ImageLink;
 
             var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
             {
-                var updatedUser = await _userManager.FindByEmailAsync(userRequest.Email);
+                var updatedUser = await _userManager.FindByIdAsync(userId);
                 var role = await _roleManager.FindByIdAsync(user.RoleId);
 
                 return Ok(CreateUserObject(updatedUser, role.Name));

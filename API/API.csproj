@@ -41,4 +41,12 @@
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\_finalProject\WIPIP\API\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\_finalProject\WIPIP\API\.editorconfig" />
+  </ItemGroup>
+
 </Project>

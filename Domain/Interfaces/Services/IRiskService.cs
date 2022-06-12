@@ -13,7 +13,6 @@ namespace Domain.Interfaces.Services
         void DeleteRisk(string riskId);
         RiskResponse RemoveRiskFromProject(string projectId, string riskId);
         RiskResponse AssignRiskToProject(string projectId, string riskId);
-        IEnumerable<RiskCategoryResponse> GetRiskCategories();
         IEnumerable<RiskResponse> GenerateRisks(string projectId);
     }
 }

@@ -40,13 +40,6 @@ namespace API.Controllers
             return Ok(_riskService.GenerateRisks(projectId));
         }
 
-        [AllowAnonymous]
-        [HttpGet("riskCategories")]
-        public ActionResult<IEnumerable<RiskCategoryResponse>> GetAllRiskCategories()
-        {
-            return Ok(_riskService.GetRiskCategories());
-        }
-
         [HttpPost("risks")]
         public ActionResult<RiskResponse> AddObjective(RiskRequest riskRequest)
         {

@@ -36,8 +36,8 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("objectives/{objId}")]
-        public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, string objId)
+        [HttpPut("objectives/{objId:Guid}")]
+        public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, Guid objId)
         {
             try
             {

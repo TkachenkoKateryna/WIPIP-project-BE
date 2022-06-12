@@ -12,9 +12,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Domain.Models.Constants;
+using Domain.Models.Filters;
 
 namespace Domain.Services
 {
+
     public class ProjectService : IProjectService
     {
         private readonly IUnitOfWork _uow;
@@ -27,6 +29,13 @@ namespace Domain.Services
         private readonly Func<IQueryable<ProjectStakeholder>, IIncludableQueryable<ProjectStakeholder, object>> _projStakIncludes;
         private readonly Func<IQueryable<ProjectRisk>, IIncludableQueryable<ProjectRisk, object>> _projRiskIncludes;
         private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _projCandInclude;
+
+        private const int DailyHours = 8;
+        private const int AvarageNumbWorkDaysMonth = 21;
+        private const int MonthExpensPerEmployee = 6;
+        private const int HundredPercent = 100;
+        private const int RoundToHundreds = 2;
+
 
         public ProjectService(IUnitOfWork uow, IMapper mapper)
         {
@@ -52,35 +61,41 @@ namespace Domain.Services
                 .Include(c => c.Employee);
         }
 
-        public IEnumerable<ProjectsResponse> GetProjects(string managerId, IEnumerable<string> roles)
+        public IEnumerable<ProjectsResponse> GetProjects(string managerId, string role, ProjectFilteringParams param = null)
         {
             List<ProjectsResponse> projects;
 
-            _ = roles ?? throw new NullReferenceException
-                (Strings.GetNullRefExcMethodParameterMessage("roles"));
-
-            var roleList = roles.ToList();
-
-            if (roleList.Contains(Strings.ManagerRole))
+            if (role is Strings.ManagerRole)
             {
                 projects = _projectRepository
                     .Find(p => p.ManagerId == managerId, _projIncludes)
                     .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
                     .ToList();
             }
-            else if (roleList.Contains(Strings.LeadRole))
-            {
-                projects = _projectRepository
-                  .GetAll(_projIncludes)
-                  .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
-                  .ToList();
-            }
             else
             {
-                projects = _projectRepository
-                    .GetAllWithDeleted(_projIncludes)
-                    .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
-                    .ToList();
+                var projectsQuery = _projectRepository.GetAllWithDeleted(_projIncludes).AsQueryable();
+
+                if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
+                {
+                    projectsQuery = projectsQuery
+                        .Where(e => e.Title.ToLower().Contains(param.SearchBy));
+                }
+
+                if (param.UsersIds == null)
+                    projects = projectsQuery.Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
+                        .ToList();
+                {
+                    projects = projectsQuery.AsEnumerable()
+                        .Where(pr => param.UsersIds.Any(id => id == pr.ManagerId))
+                        .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
+                        .ToList();
+                }
+            }
+
+            if (role is Strings.LeadRole)
+            {
+                projects = projects.Where(pr => pr.IsDeleted == false).ToList();
             }
 
             projects.ForEach(p => p.Stakeholders = _projStakeholderRepository
@@ -159,11 +174,47 @@ namespace Domain.Services
             _uow.Save();
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public ProjectResponse CalculateProjectBudget(string projectId)
         {
 
-            var project = GetProject(projectId);
-            var candidates = GetProjectCandidates(projectId);
+            var project = _projectRepository
+                .Find(p => p.Id == Guid.Parse(projectId))
+                .FirstOrDefault();
+            var candidates = _projCandidateRepository
+                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude)
+                .ToList();
 
             var income = CalculateMonthlyIncome(candidates);
             var outcome = CalculateMonthlyOutcome(candidates);
@@ -193,19 +244,20 @@ namespace Domain.Services
         }
 
 
-        private double CalculateMonthlyIncome(List<CandidateResponse> candidates)
+        private double CalculateMonthlyIncome(List<ProjectCandidate> candidates)
         {
-            return (candidates.Sum(c => c.ExternalRate * (8 * c.FTE) * 21));
+            return (candidates.Sum(c => c.ExternalRate * (DailyHours * c.FTE) * AvarageNumbWorkDaysMonth));
         }
 
-        private double CalculateMonthlyOutcome(List<CandidateResponse> candidates)
+        private double CalculateMonthlyOutcome(List<ProjectCandidate> candidates)
         {
-            return (candidates.Sum(c => (c.InternalRate * (8 * c.FTE) * 21) + (6 * 21)));
+            return (candidates.Sum(c => (c.InternalRate * (DailyHours * c.FTE) * AvarageNumbWorkDaysMonth)
+                    + (MonthExpensPerEmployee * AvarageNumbWorkDaysMonth)));
         }
 
         private double CalculateMonthlyProfit(double income, double outcome)
         {
-            return Math.Round(((income - outcome) / outcome) * 100, 2);
+            return Math.Round(((income - outcome) / outcome) * HundredPercent, RoundToHundreds);
         }
 
         private Project GetProject(string projectId)
@@ -217,11 +269,14 @@ namespace Domain.Services
 
         private List<CandidateResponse> GetProjectCandidates(string projectId)
         {
-            return _projCandidateRepository
-                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude)
-                .Select(projectEntity => _mapper.Map<CandidateResponse>(projectEntity))
+            var res = _projCandidateRepository
+                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude);
+
+            return
+                res.Select(projectEntity => _mapper.Map<CandidateResponse>(projectEntity))
                 .ToList();
         }
+
 
         private List<RiskResponse> GetProjectRisks(string projectId)
         {

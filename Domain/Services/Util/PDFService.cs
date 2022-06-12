@@ -36,22 +36,18 @@ namespace Domain.Services.Util
             pdfGrid.Columns.Add(2);
             pdfGrid.Columns[0].Width = 75f;
 
-            //Title row
             var titleRow = pdfGrid.Rows.Add();
             titleRow.Cells[0].Value = "Title";
             titleRow.Cells[1].Value = project.Title;
 
-            //Description row
             var descriptionRow = pdfGrid.Rows.Add();
             descriptionRow.Cells[0].Value = "Description";
             descriptionRow.Cells[1].Value = project.Description;
 
-            //Budget row
             var budgetRow = pdfGrid.Rows.Add();
             budgetRow.Cells[0].Value = "Resources";
             budgetRow.Cells[1].Value = "Approximate monthly budget: " + project.MonthlyIncome.ToString();
 
-            //objectives row
             var objectivesRow = pdfGrid.Rows.Add();
             objectivesRow.Cells[0].Value = "Objectives";
 
@@ -64,7 +60,6 @@ namespace Domain.Services.Util
             objectivesRow.Cells[1].Value = objectives;
 
 
-            //second row
             var assumptionsRow = pdfGrid.Rows.Add();
             assumptionsRow.Cells[0].Value = "Assumptions";
 
@@ -175,15 +170,15 @@ namespace Domain.Services.Util
             risksGrid.Columns.Add(3);
 
             risksGrid.Headers.Add(1);
-            risksGrid.Headers[0].Cells[0].Value = "Desctiption";
-            risksGrid.Headers[0].Cells[1].Value = "Category";
+            risksGrid.Headers[0].Cells[0].Value = "Category";
+            risksGrid.Headers[0].Cells[1].Value = "Title";
             risksGrid.Headers[0].Cells[2].Value = "Mitigation";
 
             foreach (var risk in project.Risks)
             {
                 var riskRow = risksGrid.Rows.Add();
                 riskRow.Cells[0].Value = risk.RiskCategory.Title;
-                _ = risk.Description == null ? riskRow.Cells[1].Value = "" : riskRow.Cells[1].Value = risk.Description;
+                _ = risk.Title == null ? riskRow.Cells[1].Value = "" : riskRow.Cells[1].Value = risk.Title;
                 _ = risk.Mitigation == null ? riskRow.Cells[2].Value = "" : riskRow.Cells[2].Value = risk.Mitigation;
             }
 
@@ -209,7 +204,7 @@ namespace Domain.Services.Util
                 "signature: _______________" + "\n" +
                 "Manager: " + project.Manager.Name +
                 "\n" + "signature: _______________";
-            row.Cells[1].Value = DateTime.UtcNow.Date.ToString("dd/mm/yyyy");
+            row.Cells[1].Value = DateTime.UtcNow.ToString("dddd, dd MMMM yyyy");
 
             approvalRow.Cells[1].Value = approvalGrid;
             approvalRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);

@@ -96,6 +96,11 @@ namespace Domain.Services
             _projStakeholdersRepository.Delete(projectStak);
             _uow.Save();
 
+            var res = _stakeholderRepository
+                .Find(st => st.Id.ToString() == stakeholderId)
+                .Select(st => _mapper.Map<StakeholderResponse>(st))
+                .FirstOrDefault();
+
             return _stakeholderRepository
                 .Find(st => st.Id.ToString() == stakeholderId)
                 .Select(st => _mapper.Map<StakeholderResponse>(st))
@@ -115,7 +120,8 @@ namespace Domain.Services
             _stakeholderRepository.Update(stEntity);
             _uow.Save();
 
-            return _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id.ToString() == stId).FirstOrDefault());
+            var res = _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id.ToString() == stId, _includesSt).FirstOrDefault());
+            return _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id.ToString() == stId, _includesSt).FirstOrDefault());
         }
 
 

@@ -6,6 +6,7 @@ using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Stakeholder;
 using Domain.Models.Entities.Identity;
 using Domain.Models.Dtos.Response;
+using Domain.Models.Dtos.Request;
 
 namespace Domain.Mapper
 {
@@ -34,6 +35,9 @@ namespace Domain.Mapper
                 .ForMember(m => m.Notes, opt => opt.MapFrom(m => m.Stakeholder.Notes))
                 .ForMember(m => m.Payment, opt => opt.MapFrom(m => m.Stakeholder.Payment))
                 .ForMember(m => m.Class, opt => opt.MapFrom(m => m.Stakeholder.Class))
+                .ForMember(m => m.Interest, opt => opt.MapFrom(m => m.Stakeholder.Interest))
+                .ForMember(m => m.Influence, opt => opt.MapFrom(m => m.Stakeholder.Influence))
+                .ForMember(m => m.ImageLink, opt => opt.MapFrom(m => m.Stakeholder.ImageLink))
                 .ForMember(m => m.IsDeleted, opt => opt.MapFrom(m => m.Stakeholder.IsDeleted));
             CreateMap<Stakeholder, StakeholderResponse>();
             CreateMap<ProjectStakeholder, ProjectStakeholderResponse>()
@@ -42,6 +46,7 @@ namespace Domain.Mapper
             CreateMap<StakeholderRequest, Stakeholder>();
 
             CreateMap<Skill, SkillResponse>();
+            CreateMap<SkillRequest, Skill>();
 
             CreateMap<EmployeeSkill, EmployeeSkillResponse>()
                 .ForMember(m => m.Title, opt => opt.MapFrom(m => m.Skill.Title));
@@ -59,6 +64,9 @@ namespace Domain.Mapper
             CreateMap<RiskCategory, RiskCategoryResponse>()
               .ForMember(m => m.Id, opt => opt.MapFrom(r => r.Id))
               .ForMember(m => m.Title, opt => opt.MapFrom(r => r.Title));
+
+            CreateMap<RiskCategoryRequest, RiskCategory>();
+
             CreateMap<ProjectRisk, ProjectRiskResponse>();
             CreateMap<ProjectRisk, RiskResponse>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(m => m.RiskId))

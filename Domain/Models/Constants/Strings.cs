@@ -12,7 +12,6 @@ namespace Domain.Models.Constants
         public const string AdminRole = "Admin";
 
         public const string StakeholderRoute = "stakeholders/";
-        public const string StakeholderFileRoute = "stakeholders/file";
 
 
         public const string EmployeeRoute = "employees/";

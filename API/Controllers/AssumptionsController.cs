@@ -16,14 +16,8 @@ namespace API.Controllers
             _assumpService = assumpService;
         }
 
-        [HttpGet("assumptions")]
-        public ActionResult<IEnumerable<AssumptionResponse>> GetAllAssumptions([FromQuery] string projId = null)
-        {
-            return Ok(_assumpService.GetAssumptions(projId));
-        }
-
         [HttpPost("assumptions")]
-        public ActionResult<AssumptionResponse> AddObjective(AssumptionRequest assumpRequest)
+        public ActionResult<AssumptionResponse> AddAssumption(AssumptionRequest assumpRequest)
         {
             try
             {

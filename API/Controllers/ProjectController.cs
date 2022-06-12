@@ -6,72 +6,66 @@ using Domain.Models.Dtos.Responses;
 using Domain.Models.Entities.Identity;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Domain.Models.Filters;
 
 namespace API.Controllers
 {
-    public class ProjectController : BaseApiController
+    [ApiController]
+    [Route("api/projects")]
+    public class ProjectController : ControllerBase
     {
         readonly IProjectService _projService;
         readonly IPDFService _pdfService;
         private readonly UserManager<User> _userManager;
-
-        public ProjectController(
-            IProjectService projService,
-            IPDFService pdfService,
-            UserManager<User> userManager)
+        private readonly RoleManager<Role> _roleManager;
+        public ProjectController(IProjectService projService, IPDFService pdfService, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _projService = projService;
             _pdfService = pdfService;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-        [AllowAnonymous]
-        [HttpGet("projects")]
-        public async Task<ActionResult<IEnumerable<ProjectsResponse>>> GetProjectsByUser()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProjectsResponse>>> GetProjectsByUser([FromQuery] ProjectFilteringParams param)
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
-            var roles = await _userManager.GetRolesAsync(user);
+            var role = await _roleManager.FindByIdAsync(user.RoleId);
 
-            return Ok(_projService.GetProjects(user.Id, roles));
+            return Ok(_projService.GetProjects(user.Id, role.Name, param));
         }
 
-        [AllowAnonymous]
-        [HttpGet("projects/{projId}")]
-        public ActionResult<ProjectResponse> GetProjectById(string projId)
+        [HttpGet("{projectId}")]
+        public ActionResult<ProjectResponse> GetProjectById(string projectId)
         {
-            return Ok(_projService.GetProjectById(projId));
+            return Ok(_projService.GetProjectById(projectId));
         }
 
-        [AllowAnonymous]
-        [HttpPost("projects")]
+        [HttpPost]
         public ActionResult<ProjectResponse> AddProject(ProjectRequest projectRequest)
         {
             return Ok(_projService.AddProject(projectRequest));
         }
 
-        [AllowAnonymous]
-        [HttpPut("projects/{projectId}")]
+        [HttpPut("{projectId}")]
         public ActionResult<ProjectResponse> UpdateProject(ProjectRequest projectRequest, string projectId)
         {
             return Ok(_projService.UpdateProject(projectRequest, projectId));
         }
 
-        [AllowAnonymous]
-        [HttpDelete("projects/{projectId}")]
+        [HttpDelete("projectId")]
         public ActionResult<ProjectResponse> DeleteProject(string projectId)
         {
             _projService.DeleteProject(projectId);
             return Ok();
         }
 
-        [AllowAnonymous]
-        [HttpGet("projectCharter/{projId}")]
-        public FileResult GenerateProjectCharter(string projId)
+        [HttpGet("{projectId}/file")]
+        public FileResult GenerateProjectCharter(string projectId)
         {
-            var project = _projService.GetProjectById(projId);
+            var project = _projService.GetProjectById(projectId);
             var fileStream = _pdfService.GenerateProjectCharter(project);
 
             //Defining the ContentType for pdf file.
@@ -82,18 +76,16 @@ namespace API.Controllers
             return File(fileStream, contentType, fileName);
         }
 
-        [AllowAnonymous]
-        [HttpGet("calculateBudget/{projId}")]
-        public ActionResult<ProjectResponse> CalculateProjectBudget(string projId)
+        [HttpGet("{projectId}/budget")]
+        public ActionResult<ProjectResponse> CalculateProjectBudget(string projectId)
         {
-            return Ok(_projService.CalculateProjectBudget(projId));
+            return Ok(_projService.CalculateProjectBudget(projectId));
         }
 
-        [AllowAnonymous]
-        [HttpPut("changeStatus/{projId}")]
-        public IActionResult SetProjectStatus(string projId, [FromQuery] ProjectStatus status)
+        [HttpPut("{projectId}/status")]
+        public IActionResult SetProjectStatus(string projectId, [FromQuery] ProjectStatus status)
         {
-            _projService.SetProjectStatus(projId, status);
+            _projService.SetProjectStatus(projectId, status);
             return Ok();
         }
     }

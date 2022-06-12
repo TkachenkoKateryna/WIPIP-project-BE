@@ -12,8 +12,9 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-
-    public class StakeholdersController : BaseApiController
+    [ApiController]
+    [Route("api/stakeholders")]
+    public class StakeholdersController : ControllerBase
     {
         private readonly IStakeholdersService _stakeholderService;
         private readonly UserManager<User> _userManager;
@@ -33,8 +34,8 @@ namespace API.Controllers
             _excelService = excelService;
         }
 
-        [HttpGet(Strings.StakeholderRoute)]
-        public async Task<ActionResult<IEnumerable<StakeholderResponse>>> GetStakeholders()
+        [HttpGet]
+        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders()
         {
             _logger.LogInfo("Fetching stakeholders");
 
@@ -45,23 +46,7 @@ namespace API.Controllers
             return Ok(stakeholders);
         }
 
-        [HttpPut(Strings.StakeholderRoute + "{stakeholderId}")]
-        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stakeholderId)
-        {
-            var stResp = _stakeholderService.UpdateStakeholder(stRequest, stakeholderId);
-
-            return Ok(stResp);
-        }
-
-        [HttpDelete(Strings.StakeholderRoute + "{stakeholderId}")]
-        public IActionResult DeleteStakeholder(string stakeholderId)
-        {
-            _stakeholderService.DeleteStakeholder(stakeholderId);
-
-            return Ok();
-        }
-
-        [HttpPost(Strings.StakeholderRoute)]
+        [HttpPost]
         public ActionResult<StakeholderResponse> AddStakeholder(StakeholderRequest stRequest)
         {
             var stResp = _stakeholderService.AddStakeholder(stRequest);
@@ -69,23 +54,39 @@ namespace API.Controllers
             return Ok(stResp);
         }
 
-        [HttpDelete("projects/{projectId}/stakeholders/{stakeholderId}")]
-        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(string projectId, string stakeholderId)
+        [HttpPut("{stakeholderId}")]
+        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stakeholderId)
+        {
+            var stResp = _stakeholderService.UpdateStakeholder(stRequest, stakeholderId);
+
+            return Ok(stResp);
+        }
+
+        [HttpDelete("{stakeholderId}")]
+        public IActionResult DeleteStakeholder(string stakeholderId)
+        {
+            _stakeholderService.DeleteStakeholder(stakeholderId);
+
+            return Ok();
+        }
+
+        [HttpDelete("{stakeholderId}")]
+        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject([FromQuery] string projectId, string stakeholderId)
         {
             _stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId);
 
             return Ok();
         }
 
-        [HttpPut("projects/{projectId}/stakeholders/{stakeholderId}")]
-        public ActionResult<StakeholderResponse> AddStakeholderToProject(string projectId, string stakeholderId)
+        [HttpPut("{stakeholderId}")]
+        public ActionResult<StakeholderResponse> AddStakeholderToProject([FromQuery] string projectId, string stakeholderId)
         {
             var stResp = _stakeholderService.AddStakeholderToProject(projectId, stakeholderId);
 
             return Ok(stResp);
         }
 
-        [HttpGet(Strings.StakeholderFileRoute)]
+        [HttpGet("file")]
         public FileResult GetFile([FromQuery] string projectId, [FromQuery] string projectTitle)
         {
             return File(

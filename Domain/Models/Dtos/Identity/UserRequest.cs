@@ -1,7 +1,6 @@
 ﻿using Domain.Models.Constants;
-using Microsoft.AspNetCore.Http;
 
-namespace Domain.Models.Dtos.Requests
+namespace Domain.Models.Dtos.Identity
 {
     public class UserRequest
     {

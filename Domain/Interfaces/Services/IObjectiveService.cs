@@ -7,7 +7,7 @@ namespace Domain.Interfaces.Services
     {
         IEnumerable<ObjectiveResponse> GetAllObjectives();
         ObjectiveResponse AddObjective(ObjectiveRequest objDto);
-        ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, string objId);
+        ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, Guid objId);
         void DeleteObjective(string objId);
     }
 }

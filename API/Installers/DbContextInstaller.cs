@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Installers
 {
-    public class DbContextInstaller 
+    public class DbContextInstaller
     {
         //public void InstallServices(IServiceCollection services, IConfiguration configuration)
         //{
