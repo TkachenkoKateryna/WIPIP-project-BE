@@ -4,6 +4,7 @@ namespace Domain.Models.Logger
 {
     public class ErrorDetails
     {
+        public bool Base { get; set; }
         public int StatusCode { get; set; }
         public string Message { get; set; }
 

@@ -30,6 +30,12 @@ namespace API.Middleware
         }
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            var error = new ErrorDetails()
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = exception.Message
+            };
+
             if (exception is NotFoundException<BaseEntity>)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;

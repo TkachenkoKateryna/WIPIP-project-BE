@@ -65,37 +65,35 @@ namespace Domain.Services
         {
             List<ProjectsResponse> projects;
 
+            var projectsQuery = _projectRepository.GetAll(_projIncludes).AsQueryable();
+
+            if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
+            {
+                projectsQuery = projectsQuery
+                    .Where(e => e.Title.ToLower().Contains(param.SearchBy));
+            }
+
             if (role is Strings.ManagerRole)
             {
-                projects = _projectRepository
-                    .Find(p => p.ManagerId == managerId, _projIncludes)
+                projects = projectsQuery
+                    .Where(p => p.ManagerId == managerId && p.IsDeleted == false)
                     .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
                     .ToList();
             }
             else
             {
-                var projectsQuery = _projectRepository.GetAllWithDeleted(_projIncludes).AsQueryable();
-
-                if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
-                {
-                    projectsQuery = projectsQuery
-                        .Where(e => e.Title.ToLower().Contains(param.SearchBy));
-                }
-
                 if (param.UsersIds == null)
+                {
                     projects = projectsQuery.Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
                         .ToList();
+                }
+                else
                 {
-                    projects = projectsQuery.AsEnumerable()
+                    projects = projectsQuery
                         .Where(pr => param.UsersIds.Any(id => id == pr.ManagerId))
                         .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
                         .ToList();
                 }
-            }
-
-            if (role is Strings.LeadRole)
-            {
-                projects = projects.Where(pr => pr.IsDeleted == false).ToList();
             }
 
             projects.ForEach(p => p.Stakeholders = _projStakeholderRepository
