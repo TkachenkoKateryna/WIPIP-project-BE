@@ -175,37 +175,6 @@ namespace Domain.Services
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public ProjectResponse CalculateProjectBudget(string projectId)
         {
 

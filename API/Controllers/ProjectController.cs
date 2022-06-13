@@ -55,7 +55,7 @@ namespace API.Controllers
             return Ok(_projService.UpdateProject(projectRequest, projectId));
         }
 
-        [HttpDelete("projectId")]
+        [HttpDelete("{projectId}")]
         public ActionResult<ProjectResponse> DeleteProject(string projectId)
         {
             _projService.DeleteProject(projectId);
@@ -68,9 +68,7 @@ namespace API.Controllers
             var project = _projService.GetProjectById(projectId);
             var fileStream = _pdfService.GenerateProjectCharter(project);
 
-            //Defining the ContentType for pdf file.
             string contentType = "application/pdf";
-            //Define the file name.
             string fileName = "Output.pdf";
 
             return File(fileStream, contentType, fileName);

@@ -70,16 +70,16 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpDelete("{stakeholderId}")]
-        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject([FromQuery] string projectId, string stakeholderId)
+        [HttpDelete("{stakeholderId}/projects/{projectId}")]
+        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(string projectId, string stakeholderId)
         {
             _stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId);
 
             return Ok();
         }
 
-        [HttpPut("{stakeholderId}")]
-        public ActionResult<StakeholderResponse> AddStakeholderToProject([FromQuery] string projectId, string stakeholderId)
+        [HttpPut("{stakeholderId}/projects/{projectId}")]
+        public ActionResult<StakeholderResponse> AddStakeholderToProject(string projectId, string stakeholderId)
         {
             var stResp = _stakeholderService.AddStakeholderToProject(projectId, stakeholderId);
 

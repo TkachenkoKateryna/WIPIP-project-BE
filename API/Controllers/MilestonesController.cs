@@ -7,24 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [AllowAnonymous]
-    public class MilestonesController : BaseApiController
+    [ApiController]
+    [Route("api/milestones")]
+    public class MilestonesController : ControllerBase
     {
         readonly IMilestoneService _milService;
 
-        public MilestonesController(
-            IMilestoneService milService)
+        public MilestonesController(IMilestoneService milService)
         {
             _milService = milService;
         }
 
-        [HttpGet("milestones")]
+        [HttpGet]
         public ActionResult<IEnumerable<MilestoneResponse>> GetAllMilestones()
         {
             return Ok(_milService.GetAllMilestones());
         }
 
-        [HttpPost("milestones")]
+        [HttpPost]
         public ActionResult<MilestoneResponse> AddMilestone(MilestoneRequest milRequest)
         {
             try
@@ -38,12 +38,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("milestones/{milId}")]
-        public ActionResult<MilestoneResponse> UpdateMilestone(MilestoneRequest milRequest, string milId)
+        [HttpPut("{milestoneId}")]
+        public ActionResult<MilestoneResponse> UpdateMilestone(MilestoneRequest milRequest, string milestoneId)
         {
             try
             {
-                var milResp = _milService.UpdateMilestone(milRequest, milId);
+                var milResp = _milService.UpdateMilestone(milRequest, milestoneId);
                 return Ok(milResp);
             }
             catch (Exception ex)
@@ -52,12 +52,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("milestones/{milId}")]
-        public IActionResult DeleteMilestone(string milId)
+        [HttpDelete("{milestoneId}")]
+        public IActionResult DeleteMilestone(string milestoneId)
         {
             try
             {
-                _milService.DeleteMilestone(milId);
+                _milService.DeleteMilestone(milestoneId);
                 return Ok();
             }
             catch (Exception ex)

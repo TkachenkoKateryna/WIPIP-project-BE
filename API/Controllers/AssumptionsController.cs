@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class AssumptionsController : BaseApiController
+    [ApiController]
+    [Route("api/assumptions")]
+    public class AssumptionsController : ControllerBase
     {
         readonly IAssumptionsService _assumpService;
 
@@ -16,7 +18,7 @@ namespace API.Controllers
             _assumpService = assumpService;
         }
 
-        [HttpPost("assumptions")]
+        [HttpPost]
         public ActionResult<AssumptionResponse> AddAssumption(AssumptionRequest assumpRequest)
         {
             try
@@ -30,7 +32,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("assumptions/{assumpId}")]
+        [HttpPut("{assumpId}")]
         public ActionResult<AssumptionResponse> UpdateAssumption(AssumptionRequest assumpRequest, string assumpId)
         {
             try
@@ -44,7 +46,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("assumptions/{assumpId}")]
+        [HttpDelete("{assumpId}")]
         public IActionResult DeleteAssumption(string assumpId)
         {
             try

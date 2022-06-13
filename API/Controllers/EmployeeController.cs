@@ -1,6 +1,4 @@
-﻿using API.Controllers.Base;
-using Domain.Models.Constants;
-using Domain.Models.Filters;
+﻿using Domain.Models.Filters;
 using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
@@ -8,23 +6,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class EmployeeController : BaseApiController
+    [ApiController]
+    [Route("api/employees")]
+    public class EmployeeController : ControllerBase
     {
         readonly IEmployeeService _employeeService;
 
-        public EmployeeController(
-            IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
         }
 
-        [HttpGet(Strings.EmployeeRoute)]
+        [HttpGet]
         public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees([FromQuery] EmployeeFilteringParams param)
         {
             return Ok(_employeeService.GetAllEmployees(param));
         }
 
-        [HttpPost(Strings.EmployeeRoute)]
+        [HttpPost]
         public ActionResult<EmployeeResponse> AddEmployee(EmployeeRequest empRequest)
         {
             try
@@ -38,12 +37,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut(Strings.EmployeeRoute + "{empId}")]
-        public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string empId)
+        [HttpPut("{employeeId}")]
+        public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string employeeId)
         {
             try
             {
-                var empResp = _employeeService.UpdateEmployee(empRequest, empId);
+                var empResp = _employeeService.UpdateEmployee(empRequest, employeeId);
                 return Ok(empResp);
             }
             catch (Exception ex)
@@ -52,12 +51,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete(Strings.EmployeeRoute + "{empId}")]
-        public IActionResult DeleteEmployee(string empId)
+        [HttpDelete("{employeeId}")]
+        public IActionResult DeleteEmployee(string employeeId)
         {
             try
             {
-                _employeeService.DeleteEmployee(empId);
+                _employeeService.DeleteEmployee(employeeId);
                 return Ok();
             }
             catch (Exception ex)

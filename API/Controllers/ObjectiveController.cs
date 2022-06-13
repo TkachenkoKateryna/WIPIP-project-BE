@@ -6,23 +6,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class ObjectiveController : BaseApiController
+    [ApiController]
+    [Route("api/objectives")]
+    public class ObjectiveController : ControllerBase
     {
         readonly IObjectiveService _objService;
 
-        public ObjectiveController(
-            IObjectiveService objService)
+        public ObjectiveController(IObjectiveService objService)
         {
             _objService = objService;
         }
 
-        [HttpGet("objectives")]
+        [HttpGet]
         public ActionResult<IEnumerable<ObjectiveResponse>> GetAllObjectives()
         {
             return Ok(_objService.GetAllObjectives());
         }
 
-        [HttpPost("objectives")]
+        [HttpPost]
         public ActionResult<ObjectiveResponse> AddObjective(ObjectiveRequest objRequest)
         {
             try
@@ -36,12 +37,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("objectives/{objId:Guid}")]
-        public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, Guid objId)
+        [HttpPut("{objectiveId:Guid}")]
+        public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, Guid objectiveId)
         {
             try
             {
-                var objResp = _objService.UpdateObjective(objRequest, objId);
+                var objResp = _objService.UpdateObjective(objRequest, objectiveId);
                 return Ok(objResp);
             }
             catch (Exception ex)
@@ -50,12 +51,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("objectives/{objId}")]
-        public IActionResult DeleteObjective(string objId)
+        [HttpDelete("{objectiveId}")]
+        public IActionResult DeleteObjective(string objectiveId)
         {
             try
             {
-                _objService.DeleteObjective(objId);
+                _objService.DeleteObjective(objectiveId);
                 return Ok();
             }
             catch (Exception ex)

@@ -14,7 +14,7 @@ namespace API.Controllers
             _azureStorageService = azureStorageService;
         }
 
-        [HttpPost("imageUpload")]
+        [HttpPost("images/upload")]
         public IActionResult UploadImage(IFormFile file)
         {
             try

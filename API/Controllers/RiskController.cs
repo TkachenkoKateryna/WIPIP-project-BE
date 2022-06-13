@@ -15,7 +15,9 @@ using Domain.Models.Constants;
 
 namespace API.Controllers
 {
-    public class RiskController : BaseApiController
+    [ApiController]
+    [Route("api/risks")]
+    public class RiskController : ControllerBase
     {
         private readonly IRiskService _riskService;
         private readonly IExcelService _excelService;
@@ -28,19 +30,19 @@ namespace API.Controllers
             _excelService = excelService;
         }
 
-        [HttpGet("risks")]
+        [HttpGet]
         public ActionResult<IEnumerable<RiskResponse>> GetAllRisks()
         {
             return Ok(_riskService.GetAllRisks());
         }
 
-        [HttpGet("generateRisks")]
+        [HttpGet("generate")]
         public ActionResult<IEnumerable<RiskResponse>> GenerateRisks([FromQuery] string projectId)
         {
             return Ok(_riskService.GenerateRisks(projectId));
         }
 
-        [HttpPost("risks")]
+        [HttpPost]
         public ActionResult<RiskResponse> AddObjective(RiskRequest riskRequest)
         {
             try
@@ -54,7 +56,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("risks/{riskId}")]
+        [HttpPut("{riskId}")]
         public ActionResult<RiskResponse> UpdateRisk(RiskRequest riskRequest, string riskId)
         {
             try
@@ -68,7 +70,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("risks/{riskId}")]
+        [HttpDelete("{riskId}")]
         public IActionResult DeleteRisk(string riskId)
         {
             try
@@ -83,7 +85,7 @@ namespace API.Controllers
         }
 
 
-        [HttpDelete("projects/{projectId}/risks/{riskId}")]
+        [HttpDelete("{riskId}/projects/{projectId}")]
         public ActionResult<RiskResponse> RemoveRiskFromProject(string projectId, string riskId)
         {
             try
@@ -97,7 +99,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("projects/{projectId}/risks/{riskId}")]
+        [HttpPut("{riskId}/projects/{projectId}")]
         public ActionResult<RiskResponse> AssignRiskToProject(string projectId, string riskId)
         {
             var risk = _riskService.AssignRiskToProject(projectId, riskId);
@@ -105,7 +107,7 @@ namespace API.Controllers
             return Ok(risk);
         }
 
-        [HttpGet("risks/dowbloadExcel")]
+        [HttpGet("file")]
         public FileResult Excel([FromQuery] string projectId)
         {
             return File(

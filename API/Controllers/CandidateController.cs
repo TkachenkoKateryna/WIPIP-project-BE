@@ -1,14 +1,14 @@
-﻿using API.Controllers.Base;
-using Domain.Models.Constants;
+﻿using Domain.Interfaces.Services;
+using Domain.Models.Dtos.Request;
 using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
-using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-using Domain.Models.Dtos.Request;
 
 namespace API.Controllers
 {
-    public class CandidateController : BaseApiController
+    [ApiController]
+    [Route("candidates")]
+    public class CandidateController : ControllerBase
     {
         readonly ICandidateService _candidateService;
 
@@ -17,7 +17,7 @@ namespace API.Controllers
             _candidateService = candidateService;
         }
 
-        [HttpPost(Strings.CandidateRoute)]
+        [HttpPost]
         public ActionResult<CandidateResponse> AddCandidate(CandidateRequest candidateRequest)
         {
             try
@@ -31,7 +31,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut(Strings.CandidateRoute + "{candidateId}")]
+        [HttpPut("{candidateId}")]
         public ActionResult<CandidateResponse> UpdateCandidate(CandidateRequest candidateRequest, string candidateId)
         {
             var candidateResp = _candidateService.UpdateCandidate(candidateRequest, candidateId);
@@ -39,14 +39,14 @@ namespace API.Controllers
             return Ok(candidateResp);
         }
 
-        [HttpDelete(Strings.CandidateRoute + "{candidateId}")]
+        [HttpDelete("{candidateId}")]
         public IActionResult DeleteCandidate(string candidateId)
         {
             _candidateService.DeleteCandidate(candidateId);
             return Ok();
         }
 
-        [HttpGet(Strings.CandidateEmployeeRoute)]
+        [HttpGet("employees")]
         public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)
         {
             var empResp = _candidateService.GetEmployeesForCandidates(projectId);
@@ -54,7 +54,7 @@ namespace API.Controllers
             return Ok(empResp);
         }
 
-        [HttpPost(Strings.CandidateEmployeeRoute)]
+        [HttpPost("employees")]
         public ActionResult<CandidateResponse> UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest)
         {
             var candidateResp = _candidateService.UpdateEmployeeToCandidate(candRequest);
