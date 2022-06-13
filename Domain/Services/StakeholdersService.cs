@@ -56,7 +56,7 @@ namespace Domain.Services
                     .ToList();
 
             stakeholders.ForEach(st => st.Projects = _projStakeholdersRepository
-                .Find(stp => stp.StakeholderId == Guid.Parse(st.Id))
+                .Find(stp => stp.StakeholderId == Guid.Parse(st.Id), _includesStp)
                 .Select(stp => _mapper.Map<ProjectStakeholderResponse>(stp))
                 .ToList());
 

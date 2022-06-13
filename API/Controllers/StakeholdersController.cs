@@ -36,7 +36,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders(StakeholderFiteringParam param = null)
+        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders([FromQuery] StakeholderFiteringParam param = null)
         {
             _logger.LogInfo("Fetching stakeholders");
 
@@ -74,9 +74,8 @@ namespace API.Controllers
         [HttpDelete("{stakeholderId}/projects/{projectId}")]
         public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(string projectId, string stakeholderId)
         {
-            _stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId);
 
-            return Ok();
+            return Ok(_stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId));
         }
 
         [HttpPut("{stakeholderId}/projects/{projectId}")]
