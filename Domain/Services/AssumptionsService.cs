@@ -23,7 +23,7 @@ namespace Domain.Services
 
         public AssumptionResponse AddAssumption(AssumptionRequest assumpRequest)
         {
-            var assumpEntity = _assumpRepository.FindWithDeleted(assump => assump.Description == assumpRequest.Description)
+            var assumpEntity = _assumpRepository.Find(assump => assump.Description == assumpRequest.Description)
                 .FirstOrDefault();
 
             if (assumpEntity != null)

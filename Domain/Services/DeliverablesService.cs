@@ -31,7 +31,7 @@ namespace Domain.Services
 
         public DeliverableResponse AddDeliverable(DeliverableRequest delRequest)
         {
-            var delEntity = _delivRepository.FindWithDeleted(del => del.Title == delRequest.Title)
+            var delEntity = _delivRepository.Find(del => del.Title == delRequest.Title)
                 .FirstOrDefault();
 
             if (delEntity != null)
@@ -65,7 +65,7 @@ namespace Domain.Services
 
         public void DeleteDeliverable(string delId)
         {
-            var delEntity = _delivRepository.FindWithDeleted(del => del.Id.ToString() == delId)
+            var delEntity = _delivRepository.Find(del => del.Id.ToString() == delId)
                 .FirstOrDefault();
             _ = delEntity ?? throw new NotFoundException<Objective>("Deliverable with id was not found.");
 

@@ -1,4 +1,6 @@
 ﻿
+using Domain.Models.Constants;
+
 namespace Domain.Models.Dtos.Responses
 {
     public class ProjectResponse
@@ -10,6 +12,7 @@ namespace Domain.Models.Dtos.Responses
         public double MonthlyIncome { get; set; }
         public double MonthlyOutcome { get; set; }
         public double MonthlyProfit { get; set; }
+        public ProjectStatus Status { get; set; }
         public ManagerResponse Manager { get; set; }
 
         public List<AssumptionResponse> Assumptions { get; set; } = new List<AssumptionResponse>();

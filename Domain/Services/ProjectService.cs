@@ -73,6 +73,12 @@ namespace Domain.Services
                     .Where(e => e.Title.ToLower().Contains(param.SearchBy));
             }
 
+            if (param.Statuses != null)
+            {
+                projectsQuery = projectsQuery
+                    .Where(pr => param.Statuses.Any(status => status == (int)pr.Status));
+            }
+
             if (role is Strings.ManagerRole)
             {
                 projects = projectsQuery

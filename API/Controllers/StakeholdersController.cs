@@ -6,6 +6,7 @@ using Domain.Models.Constants;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Dtos.Stakeholder;
 using Domain.Models.Entities.Identity;
+using Domain.Models.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -35,11 +36,11 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders()
+        public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders(StakeholderFiteringParam param = null)
         {
             _logger.LogInfo("Fetching stakeholders");
 
-            var stakeholders = _stakeholderService.GetStakeholders();
+            var stakeholders = _stakeholderService.GetStakeholders(param);
 
             _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
 

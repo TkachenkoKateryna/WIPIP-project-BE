@@ -9,6 +9,7 @@ using Domain.Models.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Domain.Models.Constants;
+using Domain.Models.Filters;
 
 namespace Domain.Services
 {
@@ -37,21 +38,36 @@ namespace Domain.Services
                 .ThenInclude(s => s.Project);
         }
 
-        public IEnumerable<StakeholderResponse> GetStakeholders()
+        public IEnumerable<StakeholderResponse> GetStakeholders(StakeholderFiteringParam param = null)
         {
             List<StakeholderResponse> stakeholders;
 
-            stakeholders = _stakeholderRepository
-                .GetAll(_includesSt)
-                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                .ToList();
+            var stakeholdersQuery = _stakeholderRepository.GetAll(_includesSt).AsQueryable();
+
+            if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
+            {
+                stakeholdersQuery = stakeholdersQuery
+                    .Where(st => st.Name.ToLower().Contains(param.SearchBy)
+                            || st.Email.ToLower().Contains(param.SearchBy)
+                            || st.Notes.ToLower().Contains(param.SearchBy));
+            }
+
+            stakeholders = stakeholdersQuery.Select(stakEntity => _mapper.Map<StakeholderResponse>(stakEntity))
+                    .ToList();
 
             stakeholders.ForEach(st => st.Projects = _projStakeholdersRepository
                 .Find(stp => stp.StakeholderId == Guid.Parse(st.Id))
                 .Select(stp => _mapper.Map<ProjectStakeholderResponse>(stp))
                 .ToList());
 
-            return stakeholders;
+            if (param.ProjectIds == null)
+            {
+                return stakeholders;
+            }
+            else
+            {
+                return stakeholders.Where(pr => param.ProjectIds.Any(id => pr.Projects.Any(pr => pr.Id == id))).ToList();
+            }
         }
 
         public IEnumerable<StakeholderResponse> GetStakeholders(string projectId)

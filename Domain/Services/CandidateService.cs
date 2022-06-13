@@ -66,7 +66,7 @@ namespace Domain.Services
         public void DeleteCandidate(string candidateId)
         {
             var candidateEntity = _candidateRepository
-                .FindWithDeleted(mil => mil.Id.ToString() == candidateId)
+                .Find(mil => mil.Id.ToString() == candidateId)
                 .FirstOrDefault();
 
             _ = candidateEntity ?? throw new NotFoundException<ProjectCandidate>
@@ -112,7 +112,8 @@ namespace Domain.Services
             }
 
             var candEntityWithEmployee = _candidateRepository
-                .Find(cand => cand.EmployeeId == Guid.Parse(candidateRequest.EmployeeId) && cand.ProjectId == Guid.Parse(candidateRequest.EmployeeId))
+                .Find(cand => cand.EmployeeId == Guid.Parse(candidateRequest.EmployeeId)
+                && cand.ProjectId == Guid.Parse(candidateRequest.EmployeeId))
                 .FirstOrDefault();
 
             if (!candidateRequest.ToRemove)
