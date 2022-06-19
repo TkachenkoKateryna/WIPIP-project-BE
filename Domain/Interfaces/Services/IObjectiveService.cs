@@ -5,9 +5,8 @@ namespace Domain.Interfaces.Services
 {
     public interface IObjectiveService
     {
-        IEnumerable<ObjectiveResponse> GetAllObjectives();
-        ObjectiveResponse AddObjective(ObjectiveRequest objDto);
-        ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, Guid objId);
-        void DeleteObjective(string objId);
+        ObjectiveResponse AddObjective(ObjectiveRequest obRequest);
+        ObjectiveResponse UpdateObjective(ObjectiveRequest obRequest, Guid obId);
+        void DeleteObjective(Guid obId);
     }
 }

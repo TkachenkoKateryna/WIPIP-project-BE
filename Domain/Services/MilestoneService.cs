@@ -28,85 +28,67 @@ namespace Domain.Services
             _includes = milestone => milestone.Include(m => m.Deliverables);
         }
 
-        public IEnumerable<MilestoneResponse> GetAllMilestones()
+        public MilestoneResponse AddMilestone(MilestoneRequest mRequest)
         {
-            return _milRepository.GetAllWithDeleted(_includes)
-                .Select(milEntity => _mapper.Map<MilestoneResponse>(milEntity))
-                .ToList();
-        }
+            var mEntity = _milRepository.Find(m => m.Activity == mRequest.Activity).FirstOrDefault();
 
-        public MilestoneResponse AddMilestone(MilestoneRequest milRequest)
-        {
-            var milEntity = _milRepository
-                .FindWithDeleted(mil => mil.Activity == milRequest.Activity)
-                .FirstOrDefault();
-
-            if (milEntity != null)
+            if (mEntity != null)
             {
-                throw new AlreadyExistsException<Milestone>
-                    ($"Milestone with such activity {milRequest.Activity} already exists.");
+                throw new AlreadyExistsException("Milestone with such activity exists");
             }
 
-            milEntity = _mapper.Map<Milestone>(milRequest);
-            var id = _milRepository.CreateWithVal(milEntity);
+            mEntity = _mapper.Map<Milestone>(mRequest);
+            var id = _milRepository.CreateWithVal(mEntity);
             _uow.Save();
 
-            foreach (var del in milRequest.DeliverablesId.Select(delId =>
-                         _delivRepository.Find(d => d.Id == Guid.Parse(delId))
-                         .FirstOrDefault())
-                         .Where(del => del != null))
+            foreach (var d in mRequest.DeliverablesId.Select(dId => _delivRepository.Find(d => d.Id == dId))
+                         .FirstOrDefault().Where(d => d != null))
             {
-                del.MilestoneId = id;
-                _delivRepository.Update(del);
+                d.MilestoneId = id;
+                _delivRepository.Update(d);
             }
             _uow.Save();
 
-            return _mapper.Map<MilestoneResponse>(_milRepository.Find(ob => ob.Id == milEntity.Id, _includes).FirstOrDefault());
+            return _mapper.Map<MilestoneResponse>(_milRepository.Find(m => m.Id == id, _includes).FirstOrDefault());
         }
 
-        public MilestoneResponse UpdateMilestone(MilestoneRequest milRequest, string milId)
+        public MilestoneResponse UpdateMilestone(MilestoneRequest mRequest, Guid mId)
         {
-            var milEntity = _milRepository.Find(mil =>
-                    mil.Id == Guid.Parse(milId), _includes)
-                .FirstOrDefault();
+            var mEntity = _milRepository.Find(m => m.Id == mId, _includes).FirstOrDefault();
 
-            _ = milEntity ?? throw new NotFoundException<Objective>("Milestone with id was not found.");
+            _ = mEntity ?? throw new NotFoundException("Milestone was not found.");
 
-            foreach (var del in milEntity.Deliverables.ToList()
-                         .Where(del => milRequest.DeliverablesId
-                             .All(id => id != del.Id.ToString())))
+            foreach (var d in mEntity.Deliverables.ToList().Where(del => mRequest.DeliverablesId.All(id => id != del.Id)))
             {
-                del.MilestoneId = null;
-                _delivRepository.Update(del);
+                d.MilestoneId = null;
+                _delivRepository.Update(d);
                 _uow.Save();
             }
 
-            milEntity = _mapper.Map<Milestone>(milRequest);
-            milEntity.Id = Guid.Parse(milId);
+            mEntity = _mapper.Map<Milestone>(mRequest);
+            mEntity.Id = mId;
 
-            foreach (var del in
-                     from delId in milRequest.DeliverablesId
-                     where milEntity.Deliverables.All(del => del.Id != Guid.Parse(delId))
-                     select _delivRepository.Find(del => del.Id == Guid.Parse(delId))
-                         .FirstOrDefault())
+            foreach (var d in
+                     from dId in mRequest.DeliverablesId
+                     where mEntity.Deliverables.All(d => d.Id != dId)
+                     select _delivRepository.Find(d => d.Id == dId).FirstOrDefault())
             {
-                del.MilestoneId = Guid.Parse(milId);
-                _delivRepository.Update(del);
+                d.MilestoneId = mId;
+                _delivRepository.Update(d);
             }
 
-            _milRepository.Update(milEntity);
+            _milRepository.Update(mEntity);
             _uow.Save();
 
-            return _mapper.Map<MilestoneResponse>(_milRepository.Find(ob => ob.Id == milEntity.Id, _includes).FirstOrDefault());
+            return _mapper.Map<MilestoneResponse>(_milRepository.Find(m => m.Id == mId, _includes).FirstOrDefault());
         }
 
-        public void DeleteMilestone(string milId)
+        public void DeleteMilestone(Guid mId)
         {
-            var milEntity = _milRepository.FindWithDeleted(mil => mil.Id.ToString() == milId)
-                .FirstOrDefault();
-            _ = milEntity ?? throw new NotFoundException<Objective>("Milestone with id was not found.");
+            var mEntity = _milRepository.FindWithDeleted(m => m.Id == mId).FirstOrDefault();
+            _ = mEntity ?? throw new NotFoundException("Milestone was not found.");
 
-            _milRepository.SoftDelete(Guid.Parse(milId));
+            _milRepository.SoftDelete(mId);
             _uow.Save();
         }
     }

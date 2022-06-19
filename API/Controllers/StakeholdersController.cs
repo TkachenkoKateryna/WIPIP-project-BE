@@ -1,15 +1,9 @@
-﻿using API.Controllers.Base;
-using Domain.Interfaces.Services;
+﻿using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
-using Domain.Interfaces.Util;
-using Domain.Models.Constants;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Dtos.Stakeholder;
-using Domain.Models.Entities.Identity;
 using Domain.Models.Filters;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -18,81 +12,58 @@ namespace API.Controllers
     public class StakeholdersController : ControllerBase
     {
         private readonly IStakeholdersService _stakeholderService;
-        private readonly UserManager<User> _userManager;
-        private readonly ILoggerManager _logger;
         private readonly IExcelService _excelService;
 
-
-        public StakeholdersController(
-            IStakeholdersService stakeholderService,
-            UserManager<User> userManager,
-            ILoggerManager logger,
-            IExcelService excelService)
+        public StakeholdersController(IStakeholdersService stakeholderService, IExcelService excelService)
         {
             _stakeholderService = stakeholderService;
-            _userManager = userManager;
-            _logger = logger;
             _excelService = excelService;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<StakeholderResponse>> GetStakeholders([FromQuery] StakeholderFiteringParam param = null)
         {
-            _logger.LogInfo("Fetching stakeholders");
+            return Ok(_stakeholderService.GetStakeholders(param));
+        }
 
-            var stakeholders = _stakeholderService.GetStakeholders(param);
-
-            _logger.LogInfo($"Returning {stakeholders.Count()} stakeholders.");
-
-            return Ok(stakeholders);
+        [HttpGet("file")]
+        public FileResult GetFile([FromQuery] Guid projectId, [FromQuery] string projectTitle)
+        {
+            return File(_excelService.GenerateStakeholderRegisterXml(projectId, projectTitle),
+                "application/xml",
+                "stakeholders.xlsx");
         }
 
         [HttpPost]
         public ActionResult<StakeholderResponse> AddStakeholder(StakeholderRequest stRequest)
         {
-            var stResp = _stakeholderService.AddStakeholder(stRequest);
-
-            return Ok(stResp);
+            return Ok(_stakeholderService.AddStakeholder(stRequest));
         }
 
-        [HttpPut("{stakeholderId}")]
-        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, string stakeholderId)
+        [HttpPut("{stakeholderId:Guid}")]
+        public ActionResult<StakeholderResponse> UpdateStakeholder(StakeholderRequest stRequest, Guid stakeholderId)
         {
-            var stResp = _stakeholderService.UpdateStakeholder(stRequest, stakeholderId);
-
-            return Ok(stResp);
+            return Ok(_stakeholderService.UpdateStakeholder(stRequest, stakeholderId));
         }
 
-        [HttpDelete("{stakeholderId}")]
-        public IActionResult DeleteStakeholder(string stakeholderId)
+        [HttpPut("{stakeholderId:Guid}/projects/{projectId}")]
+        public ActionResult<StakeholderResponse> AddStakeholderToProject(Guid projectId, Guid stakeholderId)
+        {
+            return Ok(_stakeholderService.AddStakeholderToProject(projectId, stakeholderId));
+        }
+
+        [HttpDelete("{stakeholderId:Guid}")]
+        public IActionResult DeleteStakeholder(Guid stakeholderId)
         {
             _stakeholderService.DeleteStakeholder(stakeholderId);
 
             return Ok();
         }
 
-        [HttpDelete("{stakeholderId}/projects/{projectId}")]
-        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(string projectId, string stakeholderId)
+        [HttpDelete("{stakeholderId:Guid}/projects/{projectId:Guid}")]
+        public ActionResult<StakeholderResponse> RemoveStakeholderFromProject(Guid projectId, Guid stakeholderId)
         {
-
             return Ok(_stakeholderService.RemoveStakeholderFromProject(projectId, stakeholderId));
-        }
-
-        [HttpPut("{stakeholderId}/projects/{projectId}")]
-        public ActionResult<StakeholderResponse> AddStakeholderToProject(string projectId, string stakeholderId)
-        {
-            var stResp = _stakeholderService.AddStakeholderToProject(projectId, stakeholderId);
-
-            return Ok(stResp);
-        }
-
-        [HttpGet("file")]
-        public FileResult GetFile([FromQuery] string projectId, [FromQuery] string projectTitle)
-        {
-            return File(
-                _excelService.GenerateStakeholderRegisterXml(projectId, projectTitle),
-                "application/xml",
-                "stakeholders.xlsx");
         }
     }
 }

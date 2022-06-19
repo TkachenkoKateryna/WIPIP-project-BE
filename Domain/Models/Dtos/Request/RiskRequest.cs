@@ -10,7 +10,7 @@ namespace Domain.Models.Dtos.Requests
         public Likelihood Likelihood { get; set; }
         public Impact Impact { get; set; }
         public string Mitigation { get; set; }
-        public string RiskCategoryId { get; set; }
-        public string ProjectId { get; set; }
+        public Guid RiskCategoryId { get; set; }
+        public Guid? ProjectId { get; set; }
     }
 }

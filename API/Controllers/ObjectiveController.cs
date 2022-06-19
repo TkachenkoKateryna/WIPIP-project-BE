@@ -1,5 +1,4 @@
-﻿using API.Controllers.Base;
-using Domain.Models.Dtos.Requests;
+﻿using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -17,52 +16,24 @@ namespace API.Controllers
             _objService = objService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<ObjectiveResponse>> GetAllObjectives()
-        {
-            return Ok(_objService.GetAllObjectives());
-        }
-
         [HttpPost]
         public ActionResult<ObjectiveResponse> AddObjective(ObjectiveRequest objRequest)
         {
-            try
-            {
-                var objResp = _objService.AddObjective(objRequest);
-                return Ok(objResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_objService.AddObjective(objRequest));
         }
 
         [HttpPut("{objectiveId:Guid}")]
         public ActionResult<ObjectiveResponse> UpdateObjective(ObjectiveRequest objRequest, Guid objectiveId)
         {
-            try
-            {
-                var objResp = _objService.UpdateObjective(objRequest, objectiveId);
-                return Ok(objResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_objService.UpdateObjective(objRequest, objectiveId));
         }
 
-        [HttpDelete("{objectiveId}")]
-        public IActionResult DeleteObjective(string objectiveId)
+        [HttpDelete("{objectiveId:Guid}")]
+        public IActionResult DeleteObjective(Guid objectiveId)
         {
-            try
-            {
-                _objService.DeleteObjective(objectiveId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _objService.DeleteObjective(objectiveId);
+
+            return Ok();
         }
     }
 }

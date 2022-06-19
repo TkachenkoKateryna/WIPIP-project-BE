@@ -1,9 +1,7 @@
-﻿using API.Controllers.Base;
-using Domain.Models.Dtos.Responses;
-using Domain.Interfaces.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Interfaces.Services;
 using Domain.Models.Dtos.Request;
-using Domain.Models.Dtos.Requests;
+using Domain.Models.Dtos.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
@@ -30,13 +28,13 @@ namespace API.Controllers
             return Ok(_skillService.AddSkill(skillRequest));
         }
 
-        [HttpPut("{skillId}")]
+        [HttpPut("{skillId:Guid}")]
         public ActionResult<RiskResponse> UpdateSkill(SkillRequest skillRequest, Guid skillId)
         {
             return Ok(_skillService.UpdateSkill(skillRequest, skillId));
         }
 
-        [HttpDelete("{skillId}")]
+        [HttpDelete("{skillId:Guid}")]
         public IActionResult DeleteSkill(Guid skillId)
         {
             _skillService.DeleteSkill(skillId);

@@ -1,5 +1,5 @@
-﻿using Domain.Interfaces;
-using System.Reflection;
+﻿using System.Reflection;
+using Domain.Interfaces.Util;
 
 namespace API.Extensions
 {

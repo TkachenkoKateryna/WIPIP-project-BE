@@ -1,5 +1,4 @@
 ﻿namespace Domain.Models.Constants
-
 {
     public enum ProjectStatus
     {

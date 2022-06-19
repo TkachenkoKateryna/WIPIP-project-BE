@@ -3,6 +3,6 @@
     public class StakeholderFiteringParam
     {
         public string SearchBy { get; set; } = "";
-        public string[] ProjectIds { get; set; }
+        public Guid[] ProjectIds { get; set; }
     }
 }

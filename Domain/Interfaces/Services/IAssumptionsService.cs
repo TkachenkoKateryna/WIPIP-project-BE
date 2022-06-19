@@ -6,8 +6,8 @@ namespace Domain.Interfaces.Services
     public interface IAssumptionsService
     {
         AssumptionResponse AddAssumption(AssumptionRequest assumpRequest);
-        AssumptionResponse UpdateAssumption(AssumptionRequest assumpRequest, string assumpId);
-        void DeleteAssumption(string assumpId);
+        AssumptionResponse UpdateAssumption(AssumptionRequest assumpRequest, Guid assumpId);
+        void DeleteAssumption(Guid assumpId);
 
     }
 }

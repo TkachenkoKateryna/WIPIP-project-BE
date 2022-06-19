@@ -3,7 +3,6 @@ using Domain.Models.Logger;
 using Domain.Interfaces.Util;
 using Domain.Models.Exceptions;
 using Domain.Models.Entities.Base;
-using System;
 
 namespace API.Middleware
 {
@@ -30,31 +29,34 @@ namespace API.Middleware
         }
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var error = new ErrorDetails()
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = exception.Message
-            };
+            var error = new ErrorDetails();
 
-            if (exception is NotFoundException<BaseEntity>)
+            switch (exception) 
             {
-                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                case NotFoundException:
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    error.Message = exception.Message;
+                    break;
+                case AlreadyExistsException:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    error.Field = (string)exception.Data["field"];
+                    error.Message = exception.Message;
+                    break;
+                case UnauthorizedAccessException:
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    error.Message = exception.Message;
+                    break;
+                case Exception:
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    error.Message = "Sorry, something went wrong";
+                    break;
             }
-            if (exception is UnauthorizedAccessException)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            }
-            if (exception is Exception)
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
+
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            await context.Response.WriteAsync(new ErrorDetails()
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = exception.Message
-            }.ToString());
+
+            error.StatusCode = context.Response.StatusCode;
+
+            await context.Response.WriteAsync(error.ToString());
         }
     }
 }

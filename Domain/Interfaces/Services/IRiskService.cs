@@ -1,18 +1,17 @@
-﻿using Domain.Models.Dtos.Request;
-using Domain.Models.Dtos.Requests;
+﻿using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 
 namespace Domain.Interfaces.Services
 {
     public interface IRiskService
     {
-        IEnumerable<RiskResponse> GetAllRisks();
-        IEnumerable<RiskResponse> GetRisksByProject(string projectId);
-        RiskResponse AddRisk(RiskRequest riskRequest);
-        RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId);
-        void DeleteRisk(string riskId);
-        RiskResponse RemoveRiskFromProject(string projectId, string riskId);
-        RiskResponse AssignRiskToProject(string projectId, string riskId);
-        IEnumerable<RiskResponse> GenerateRisks(string projectId);
+        IEnumerable<RiskResponse> GetRisks();
+        IEnumerable<RiskResponse> GetRisksByProject(Guid prId);
+        RiskResponse AddRisk(RiskRequest rRequest);
+        RiskResponse AssignRiskToProject(Guid prId, Guid rId);
+        RiskResponse UpdateRisk(RiskRequest rRequest, Guid rId);
+        void DeleteRisk(Guid riskId);
+        RiskResponse RemoveRiskFromProject(Guid prId, Guid rId);
+        IEnumerable<RiskResponse> GenerateRisks(Guid prId);
     }
 }

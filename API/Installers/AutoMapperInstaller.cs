@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Domain.Interfaces;
+using Domain.Interfaces.Util;
 using Domain.Mapper;
 
 namespace API.Installers

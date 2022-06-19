@@ -1,12 +1,12 @@
-﻿using API.Controllers.Base;
-using Domain.Interfaces.Services;
+﻿using Domain.Interfaces.Services.Util;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class FilesController : BaseApiController
+    [ApiController]
+    [Route("api")]
+    public class FilesController : ControllerBase
     {
-
         private readonly IFileStorageService _azureStorageService;
 
         public FilesController(IFileStorageService azureStorageService)
@@ -17,15 +17,7 @@ namespace API.Controllers
         [HttpPost("images/upload")]
         public IActionResult UploadImage(IFormFile file)
         {
-            try
-            {
-                return Ok(_azureStorageService.UploadImage(file));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_azureStorageService.UploadImage(file));
         }
-
     }
 }

@@ -20,49 +20,27 @@ namespace API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<EmployeeResponse>> GetAllEmployees([FromQuery] EmployeeFilteringParams param)
         {
-            return Ok(_employeeService.GetAllEmployees(param));
+            return Ok(_employeeService.GetEmployees(param));
         }
 
         [HttpPost]
         public ActionResult<EmployeeResponse> AddEmployee(EmployeeRequest empRequest)
         {
-            try
-            {
-                var empResp = _employeeService.AddEmployee(empRequest);
-                return Ok(empResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_employeeService.AddEmployee(empRequest));
         }
 
-        [HttpPut("{employeeId}")]
-        public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, string employeeId)
+        [HttpPut("{employeeId:Guid}")]
+        public ActionResult<EmployeeResponse> UpdateEmployee(EmployeeRequest empRequest, Guid employeeId)
         {
-            try
-            {
-                var empResp = _employeeService.UpdateEmployee(empRequest, employeeId);
-                return Ok(empResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_employeeService.UpdateEmployee(empRequest, employeeId));
         }
 
-        [HttpDelete("{employeeId}")]
-        public IActionResult DeleteEmployee(string employeeId)
+        [HttpDelete("{employeeId:Guid}")]
+        public IActionResult DeleteEmployee(Guid employeeId)
         {
-            try
-            {
-                _employeeService.DeleteEmployee(employeeId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _employeeService.DeleteEmployee(employeeId);
+
+            return Ok();
         }
     }
 }

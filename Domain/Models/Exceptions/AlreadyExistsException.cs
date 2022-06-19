@@ -1,9 +1,19 @@
-﻿namespace Domain.Models.Exceptions
+﻿using System.Collections;
+
+namespace Domain.Models.Exceptions
 {
-    public class AlreadyExistsException<T> : Exception
+    public class AlreadyExistsException : Exception
     {
-        public AlreadyExistsException(string message) : base(message)
+        private IDictionary data;
+        public override IDictionary Data
         {
+            get { return data; }
+        }
+
+        public AlreadyExistsException(string message, string fieldName = null) : base(message)
+        {
+            data = new Dictionary<string, string>();
+            this.data.Add("field", fieldName);
         }
     }
 }

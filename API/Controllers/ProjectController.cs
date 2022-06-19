@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using API.Controllers.Base;
 using Domain.Models.Constants;
 using Domain.Models.Dtos.Project;
 using Domain.Models.Dtos.Responses;
@@ -20,7 +19,11 @@ namespace API.Controllers
         readonly IPDFService _pdfService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public ProjectController(IProjectService projService, IPDFService pdfService, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public ProjectController(
+            IProjectService projService,
+            IPDFService pdfService,
+            UserManager<User> userManager,
+            RoleManager<Role> roleManager)
         {
             _projService = projService;
             _pdfService = pdfService;
@@ -31,39 +34,26 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectsResponse>>> GetProjectsByUser([FromQuery] ProjectFilteringParams param)
         {
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var role = await _roleManager.FindByIdAsync(user.RoleId);
 
             return Ok(_projService.GetProjects(user.Id, role.Name, param));
         }
 
-        [HttpGet("{projectId}")]
-        public ActionResult<ProjectResponse> GetProjectById(string projectId)
+        [HttpGet("{projectId:Guid}")]
+        public ActionResult<ProjectResponse> GetProjectById(Guid projectId)
         {
             return Ok(_projService.GetProjectById(projectId));
         }
 
-        [HttpPost]
-        public ActionResult<ProjectResponse> AddProject(ProjectRequest projectRequest)
+        [HttpGet("{projectId:Guid}/budget")]
+        public ActionResult<ProjectResponse> CalculateProjectBudget(Guid projectId)
         {
-            return Ok(_projService.AddProject(projectRequest));
+            return Ok(_projService.CalculateProjectBudget(projectId));
         }
 
-        [HttpPut("{projectId}")]
-        public ActionResult<ProjectResponse> UpdateProject(ProjectRequest projectRequest, string projectId)
-        {
-            return Ok(_projService.UpdateProject(projectRequest, projectId));
-        }
-
-        [HttpDelete("{projectId}")]
-        public ActionResult<ProjectResponse> DeleteProject(string projectId)
-        {
-            _projService.DeleteProject(projectId);
-            return Ok();
-        }
-
-        [HttpGet("{projectId}/file")]
-        public FileResult GenerateProjectCharter(string projectId)
+        [HttpGet("{projectId:Guid}/file")]
+        public FileResult GenerateProjectCharter(Guid projectId)
         {
             var project = _projService.GetProjectById(projectId);
             var fileStream = _pdfService.GenerateProjectCharter(project);
@@ -74,17 +64,32 @@ namespace API.Controllers
             return File(fileStream, contentType, fileName);
         }
 
-        [HttpGet("{projectId}/budget")]
-        public ActionResult<ProjectResponse> CalculateProjectBudget(string projectId)
+        [HttpPost]
+        public ActionResult<ProjectResponse> AddProject(ProjectRequest projectRequest)
         {
-            return Ok(_projService.CalculateProjectBudget(projectId));
+            return Ok(_projService.AddProject(projectRequest));
         }
 
-        [HttpPut("{projectId}/status")]
-        public IActionResult SetProjectStatus(string projectId, [FromQuery] ProjectStatus status)
+        [HttpPut("{projectId:Guid}")]
+        public ActionResult<ProjectResponse> UpdateProject(ProjectRequest projectRequest, Guid projectId)
+        {
+            return Ok(_projService.UpdateProject(projectRequest, projectId));
+        }
+
+        [HttpPut("{projectId:Guid}/status")]
+        public IActionResult SetProjectStatus(Guid projectId, [FromQuery] ProjectStatus status)
         {
             _projService.SetProjectStatus(projectId, status);
             return Ok();
         }
+
+        [HttpDelete("{projectId:Guid}")]
+        public ActionResult<ProjectResponse> DeleteProject(Guid projectId)
+        {
+            _projService.DeleteProject(projectId);
+
+            return Ok();
+        }
+
     }
 }

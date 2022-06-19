@@ -89,7 +89,7 @@ namespace Tests.Services
             var assumptionService = new AssumptionsService(mockUnitOfWork.Object, MapperFactory.GetMapper());
 
             // Act
-            var result = assumptionService.UpdateAssumption(new AssumptionRequest(), "25a5ece8-8166-4a28-9252-00e6c619e423");
+            var result = assumptionService.UpdateAssumption(new AssumptionRequest(), Guid.Parse("25a5ece8-8166-4a28-9252-00e6c619e423"));
 
             // Assert
             var assumptionResponse =
@@ -133,7 +133,7 @@ namespace Tests.Services
             var assumptionService = new AssumptionsService(mockUnitOfWork.Object, MapperFactory.GetMapper());
 
             // Act
-            assumptionService.DeleteAssumption("25a5ece8-8166-4a28-9252-00e6c619e423");
+            assumptionService.DeleteAssumption(Guid.Parse("25a5ece8-8166-4a28-9252-00e6c619e423"));
 
             // Assert
             var result = assumptions.First().IsDeleted;

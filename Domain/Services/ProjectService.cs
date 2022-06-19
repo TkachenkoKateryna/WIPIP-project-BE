@@ -69,22 +69,18 @@ namespace Domain.Services
 
             if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
             {
-                projectsQuery = projectsQuery
-                    .Where(e => e.Title.ToLower().Contains(param.SearchBy));
+                projectsQuery = projectsQuery.Where(e => e.Title.ToLower().Contains(param.SearchBy));
             }
 
             if (param.Statuses != null)
             {
-                projectsQuery = projectsQuery
-                    .Where(pr => param.Statuses.Any(status => status == (int)pr.Status));
+                projectsQuery = projectsQuery.Where(pr => param.Statuses.Any(status => status == (int)pr.Status));
             }
 
             if (role is Strings.ManagerRole)
             {
-                projects = projectsQuery
-                    .Where(p => p.ManagerId == managerId && p.IsDeleted == false)
-                    .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity))
-                    .ToList();
+                projects = projectsQuery.Where(p => p.ManagerId == managerId && p.IsDeleted == false)
+                    .Select(projEntity => _mapper.Map<ProjectsResponse>(projEntity)).ToList();
             }
             else
             {
@@ -109,20 +105,16 @@ namespace Domain.Services
             return projects;
         }
 
-        public ProjectResponse GetProjectById(string projectId)
+        public ProjectResponse GetProjectById(Guid prId)
         {
-            var project = _projectRepository
-                .Find(p => p.Id == Guid.Parse(projectId), _projIncludes)
-                .Select(empEntity => _mapper.Map<ProjectResponse>(empEntity))
-                .FirstOrDefault();
+            var prResponse = _projectRepository.Find(p => p.Id == prId, _projIncludes)
+                .Select(pEntity => _mapper.Map<ProjectResponse>(pEntity)).FirstOrDefault();
 
-            project.Stakeholders = GetProjectStakeholders(projectId);
+            prResponse.Stakeholders = GetProjectStakeholders(prId);
+            prResponse.Risks = GetProjectRisks(prId);
+            prResponse.Candidates = GetProjectCandidates(prId);
 
-            project.Risks = GetProjectRisks(projectId);
-
-            project.Candidates = GetProjectCandidates(projectId);
-
-            return project;
+            return prResponse;
         }
 
         public ProjectResponse AddProject(ProjectRequest projectRequest)
@@ -133,7 +125,7 @@ namespace Domain.Services
 
             if (projectEntity != null)
             {
-                throw new AlreadyExistsException<Milestone>
+                throw new AlreadyExistsException
                     ($"Project with such title {projectRequest.Title} already exists.");
             }
 
@@ -146,47 +138,40 @@ namespace Domain.Services
             return _mapper.Map<ProjectResponse>(_projectRepository.Find(p => p.Id == id, _projIncludes).FirstOrDefault());
         }
 
-        public ProjectResponse UpdateProject(ProjectRequest projectRequest, string projectId)
+        public ProjectResponse UpdateProject(ProjectRequest prRequest, Guid prId)
         {
-            var projectEntity = _projectRepository
-                .Find(project => project.Id == Guid.Parse(projectId), _projIncludes)
+            var prEntity = _projectRepository.Find(pr => pr.Id == prId, _projIncludes)
                 .FirstOrDefault();
 
-            _ = projectEntity ?? throw new NotFoundException<Project>
-                ($"Project with id {projectId} was not found.");
+            _ = prEntity ?? throw new NotFoundException("Project was not found");
 
-            projectEntity.Title = projectRequest.Title;
-            projectEntity.Description = projectRequest.Description;
-            projectEntity.ManagerId = projectRequest.ManagerId;
+            prEntity.Title = prRequest.Title;
+            prEntity.Description = prRequest.Description;
+            prEntity.ManagerId = prRequest.ManagerId;
 
-            _projectRepository.Update(projectEntity);
+            _projectRepository.Update(prEntity);
             _uow.Save();
 
-            return GetProjectById(projectId);
+            return GetProjectById(prId);
 
         }
 
-        public void DeleteProject(string projectId)
+        public void DeleteProject(Guid prId)
         {
-            var projEntity = _projectRepository
-                .FindWithDeleted(proj => proj.Id.ToString() == projectId)
-                .FirstOrDefault();
-            _ = projEntity ?? throw new NotFoundException<Project>
-                ($"Project with id {projectId} was not found.");
+            var prEntity = _projectRepository.Find(pr => pr.Id == prId).FirstOrDefault();
 
-            _projectRepository.SoftDelete(Guid.Parse(projectId));
+            _ = prEntity ?? throw new NotFoundException("Project was not found");
+
+            _projectRepository.SoftDelete(prId);
             _uow.Save();
         }
 
 
-        public ProjectResponse CalculateProjectBudget(string projectId)
+        public ProjectResponse CalculateProjectBudget(Guid prId)
         {
 
-            var project = _projectRepository
-                .Find(p => p.Id == Guid.Parse(projectId))
-                .FirstOrDefault();
-            var candidates = _projCandidateRepository
-                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude)
+            var project = _projectRepository.Find(p => p.Id == prId).FirstOrDefault();
+            var candidates = _projCandidateRepository.Find(pc => pc.ProjectId == prId, _projCandInclude)
                 .ToList();
 
             var income = CalculateMonthlyIncome(candidates);
@@ -200,71 +185,53 @@ namespace Domain.Services
             _projectRepository.Update(project);
             _uow.Save();
 
-            return GetProjectById(projectId);
+            return GetProjectById(prId);
         }
 
-        public void SetProjectStatus(string projectId, ProjectStatus status)
+        public void SetProjectStatus(Guid prId, ProjectStatus status)
         {
-            var projectEntity = _projectRepository
-                .Find(p => p.Id == Guid.Parse(projectId))
-                .FirstOrDefault();
+            var prEntity = _projectRepository.Find(p => p.Id == prId).FirstOrDefault();
 
-            _ = projectEntity ?? throw new NotFoundException<Project>($"Project with id {projectId} was not found.");
+            _ = prEntity ?? throw new NotFoundException("Project was not found");
 
-            projectEntity.Status = status;
-            _projectRepository.Update(projectEntity);
+            prEntity.Status = status;
+            _projectRepository.Update(prEntity);
             _uow.Save();
         }
 
 
-        private double CalculateMonthlyIncome(List<ProjectCandidate> candidates)
+        private static double CalculateMonthlyIncome(List<ProjectCandidate> candidates)
         {
             return (candidates.Sum(c => c.ExternalRate * (DailyHours * c.FTE) * AvarageNumbWorkDaysMonth));
         }
 
-        private double CalculateMonthlyOutcome(List<ProjectCandidate> candidates)
+        private static double CalculateMonthlyOutcome(List<ProjectCandidate> candidates)
         {
             return (candidates.Sum(c => (c.InternalRate * (DailyHours * c.FTE) * AvarageNumbWorkDaysMonth)
                     + (MonthExpensPerEmployee * AvarageNumbWorkDaysMonth)));
         }
 
-        private double CalculateMonthlyProfit(double income, double outcome)
+        private static double CalculateMonthlyProfit(double income, double outcome)
         {
             return Math.Round(((income - outcome) / outcome) * HundredPercent, RoundToHundreds);
         }
 
-        private Project GetProject(string projectId)
+        private List<CandidateResponse> GetProjectCandidates(Guid prId)
         {
-            return _projectRepository
-                .Find(p => p.Id == Guid.Parse(projectId))
-                .FirstOrDefault();
+            return _projCandidateRepository.Find(pc => pc.ProjectId == prId, _projCandInclude)
+                .Select(prEntity => _mapper.Map<CandidateResponse>(prEntity)).ToList();
         }
 
-        private List<CandidateResponse> GetProjectCandidates(string projectId)
+        private List<RiskResponse> GetProjectRisks(Guid prId)
         {
-            var res = _projCandidateRepository
-                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude);
-
-            return
-                res.Select(projectEntity => _mapper.Map<CandidateResponse>(projectEntity))
-                .ToList();
+            return _projRiskRepository.Find(r => r.ProjectId == prId, _projRiskIncludes)
+                .Select(empEntity => _mapper.Map<RiskResponse>(empEntity)).ToList();
         }
 
-
-        private List<RiskResponse> GetProjectRisks(string projectId)
+        private List<StakeholderResponse> GetProjectStakeholders(Guid prId)
         {
-            return _projRiskRepository
-                .Find(r => r.ProjectId == Guid.Parse(projectId), _projRiskIncludes)
-                .Select(empEntity => _mapper.Map<RiskResponse>(empEntity))
-                .ToList();
-        }
-
-        private List<StakeholderResponse> GetProjectStakeholders(string projectId)
-        {
-            return _projStakeholderRepository
-                .Find(p => p.ProjectId == Guid.Parse(projectId), _projStakIncludes)
-                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                .ToList();
+            return _projStakeholderRepository.Find(pr => pr.ProjectId == prId, _projStakIncludes)
+                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity)).ToList();
         }
     }
 }

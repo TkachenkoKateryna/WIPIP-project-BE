@@ -1,14 +1,13 @@
-﻿using Domain.Models.Exceptions;
-using AutoMapper;
+﻿using AutoMapper;
+using Domain.Interfaces.Repositories;
+using Domain.Interfaces.Services;
+using Domain.Models.Constants;
 using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Entities;
-using Domain.Interfaces.Repositories;
-using Domain.Interfaces.Services;
+using Domain.Models.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Domain.Models.Constants;
-using Domain.Models.Dtos.Request;
 
 namespace Domain.Services
 {
@@ -52,192 +51,166 @@ namespace Domain.Services
                 .Include(c => c.Employee);
         }
 
-        public IEnumerable<RiskResponse> GetAllRisks()
+        public IEnumerable<RiskResponse> GetRisks()
         {
-            return _riskRepository
-                .GetAllWithDeleted(_includes)
-                .Select(entity => _mapper.Map<RiskResponse>(entity))
+            return _riskRepository.GetAll(_includes).Select(rEntity => _mapper.Map<RiskResponse>(rEntity))
                 .ToList();
         }
 
-        public IEnumerable<RiskResponse> GetRisksByProject(string projectId)
+        public IEnumerable<RiskResponse> GetRisksByProject(Guid prId)
         {
-            return _projRiskRepository
-                .Find(risk => risk.ProjectId == Guid.Parse(projectId), _projRiskIncludes)
-                .Select(entity => _mapper.Map<RiskResponse>(entity))
-                .ToList();
+            return _projRiskRepository.Find(r => r.ProjectId == prId, _projRiskIncludes)
+                .Select(rEntity => _mapper.Map<RiskResponse>(rEntity)).ToList();
         }
 
-        public RiskResponse AddRisk(RiskRequest riskRequest)
+        public RiskResponse AddRisk(RiskRequest rRequest)
         {
-            var riskEntity = _riskRepository
-                .FindWithDeleted(r => r.Title == riskRequest.Title)
-                .FirstOrDefault();
+            var rEntity = _riskRepository.FindWithDeleted(r => r.Title == rRequest.Title).FirstOrDefault();
 
-            if (riskEntity != null)
+            if (rEntity != null)
             {
-                throw new AlreadyExistsException<Objective>(
-                    $"Risk with such {riskRequest.Title} already exists.");
+                throw new AlreadyExistsException("Risk with such title already exists", "title");
             }
 
-            riskEntity = _mapper.Map<Risk>(riskRequest);
+            rEntity = _mapper.Map<Risk>(rRequest);
 
-            var id = _riskRepository.CreateWithVal(riskEntity);
+            var rId = _riskRepository.CreateWithVal(rEntity);
 
-            if (riskRequest.ProjectId != null)
+            if (rRequest.ProjectId != null)
             {
                 _projRiskRepository.Create(new ProjectRisk()
                 {
-                    ProjectId = Guid.Parse(riskRequest.ProjectId),
-                    RiskId = riskEntity.Id
+                    ProjectId = rRequest.ProjectId.Value,
+                    RiskId = rId
                 });
-
             }
             _uow.Save();
 
-            return _mapper.Map<RiskResponse>(_riskRepository
-                .Find(risk => risk.Id == id, _includes)
+            return _mapper.Map<RiskResponse>(_riskRepository.Find(risk => risk.Id == rId, _includes)
                 .FirstOrDefault());
             ;
         }
 
-        public RiskResponse UpdateRisk(RiskRequest riskRequest, string riskId)
+        public RiskResponse UpdateRisk(RiskRequest rRequest, Guid rId)
         {
-            var riskEntity = _riskRepository
-                .Find(risk => risk.Id.ToString() == riskId)
-                .FirstOrDefault();
-            _ = riskEntity ?? throw new NotFoundException<Risk>(
-                $"Risk with id {riskId} was not found.");
+            var rEntity = _riskRepository.Find(r => r.Id == rId).FirstOrDefault();
 
-            riskEntity = _mapper.Map<Risk>(riskRequest);
-            riskEntity.Id = Guid.Parse(riskId);
-            _riskRepository.Update(riskEntity);
+            _ = rEntity ?? throw new NotFoundException("Risk was not found");
+
+            rEntity = _mapper.Map<Risk>(rRequest);
+            rEntity.Id = rId;
+            _riskRepository.Update(rEntity);
             _uow.Save();
 
-            var res = _mapper.Map<RiskResponse>(_riskRepository
-                .Find(ob => ob.Id.ToString() == riskId, _includes)
-                .FirstOrDefault());
-
-            return res;
-        }
-
-        public void DeleteRisk(string riskId)
-        {
-            var riskEntity = _riskRepository
-                .FindWithDeleted(risk => risk.Id.ToString() == riskId)
-                .FirstOrDefault();
-            _ = riskEntity ?? throw new NotFoundException<Risk>(
-                $"Risk with id {riskId} was not found.");
-
-            _riskRepository.SoftDelete(Guid.Parse(riskId));
-
-            _uow.Save();
-        }
-
-        public RiskResponse RemoveRiskFromProject(string projectId, string riskId)
-        {
-            var projectRiskEntity = _projRiskRepository
-                .Find(r => r.RiskId == Guid.Parse(riskId) && r.ProjectId == Guid.Parse(projectId))
-                .FirstOrDefault();
-
-            _ = projectRiskEntity ?? throw new NotFoundException<Risk>(
-                $"Risk with id {riskId} was not found.");
-
-            _projRiskRepository.Delete(projectRiskEntity);
-            _uow.Save();
-
-            return _mapper.Map<RiskResponse>(_riskRepository
-                .Find(r => r.Id == Guid.Parse(riskId), _includes)
+            return _mapper.Map<RiskResponse>(_riskRepository.Find(r => r.Id == rId, _includes)
                 .FirstOrDefault());
         }
 
-        public RiskResponse AssignRiskToProject(string projectId, string riskId)
+        public void DeleteRisk(Guid rId)
         {
-            var projectRiskEntity = _projRiskRepository
-                .Find(r => r.RiskId == Guid.Parse(riskId) && r.ProjectId == Guid.Parse(projectId))
+            var rEntity = _riskRepository.FindWithDeleted(r => r.Id == rId).FirstOrDefault();
+
+            _ = rEntity ?? throw new NotFoundException("Risk was not found");
+
+            _riskRepository.SoftDelete(rId);
+            _uow.Save();
+        }
+
+        public RiskResponse RemoveRiskFromProject(Guid prId, Guid rId)
+        {
+            var prREntity = _projRiskRepository.Find(r => r.RiskId == rId && r.ProjectId == prId)
                 .FirstOrDefault();
 
-            if (projectRiskEntity != null)
+            _ = prREntity ?? throw new NotFoundException($"Risk was not found");
+
+            _projRiskRepository.Delete(prREntity);
+            _uow.Save();
+
+            return _mapper.Map<RiskResponse>(_riskRepository.Find(r => r.Id == rId, _includes)
+                .FirstOrDefault());
+        }
+
+        public RiskResponse AssignRiskToProject(Guid prId, Guid rId)
+        {
+            var prREntity = _projRiskRepository.Find(r => r.RiskId == rId && r.ProjectId == prId)
+                .FirstOrDefault();
+
+            if (prREntity != null)
             {
-                throw new AlreadyExistsException<ProjectRisk>("Such project risk already exists");
+                throw new AlreadyExistsException("Such project risk already exists");
             }
 
-            projectRiskEntity = new ProjectRisk()
+            prREntity = new ProjectRisk()
             {
-                ProjectId = Guid.Parse(projectId),
-                RiskId = Guid.Parse(riskId)
+                ProjectId = prId,
+                RiskId = rId
             };
 
-            var id = _projRiskRepository.CreateWithVal(projectRiskEntity);
+            var id = _projRiskRepository.CreateWithVal(prREntity);
             _uow.Save();
 
-            return _mapper.Map<RiskResponse>(_riskRepository
-                .Find(r => r.Id == Guid.Parse(riskId), _includes)
+            return _mapper.Map<RiskResponse>(_riskRepository.Find(r => r.Id == rId, _includes)
                 .FirstOrDefault());
         }
-        public IEnumerable<RiskResponse> GenerateRisks(string projectId)
+        public IEnumerable<RiskResponse> GenerateRisks(Guid prId)
         {
             var risks = new List<Risk>();
 
-            var project = _uow.GetRepository<Project>()
-                .Find(p => p.Id == Guid.Parse(projectId), _projIncludes)
+            var project = _uow.GetRepository<Project>().Find(p => p.Id == prId, _projIncludes)
                 .FirstOrDefault();
 
             project.Candidates = _uow.GetRepository<ProjectCandidate>()
-                .Find(pc => pc.ProjectId == Guid.Parse(projectId), _projCandInclude)
+                .Find(pc => pc.ProjectId == prId, _projCandInclude)
                 .ToList();
 
             project.ProjectStakeholders = _uow.GetRepository<ProjectStakeholder>()
-                 .Find(p => p.ProjectId == Guid.Parse(projectId), _projStakIncludes)
-                 .ToList();
+                .Find(p => p.ProjectId == prId, _projStakIncludes)
+                .ToList();
 
             if (project == null)
             {
-                throw new NotFoundException<Project>($"Project with id {projectId} wasn't found");
+                throw new NotFoundException("Project was not found");
             }
 
-            var riskIds = _projRiskRepository
-                .Find(risk => risk.ProjectId == Guid.Parse(projectId), _projRiskIncludes)
-                .Select(risk => risk.RiskId)
-                .ToList();
+            var riskIds = _projRiskRepository.Find(r => r.ProjectId == prId, _projRiskIncludes)
+                .Select(risk => risk.RiskId).ToList();
 
-            var risksResponse = _riskRepository
-                .Find(risk => !riskIds.Any(r => r == risk.Id), _includes)
+            var risksResponse = _riskRepository.Find(risk => !riskIds.Any(r => r == risk.Id), _includes)
                 .ToList();
 
             if (!project.Assumptions.Any())
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Assumptions Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.AssumptionCategory));
             }
 
             if (!project.Objectives.Any())
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Project goals Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.ProjectGoalsCategory));
             }
 
             if (project.Candidates.Any(c => c.EmployeeId == null))
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Resource Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.ResourceCategory));
             }
 
             if (project.ProjectStakeholders.Any(c => c.Stakeholder.Payment == Payment.BigDelay || c.Stakeholder.Payment == Payment.BigDelay))
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Payment Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.PaymentCategory));
             }
 
             if (project.ProjectStakeholders.Any(c => c.Stakeholder.CommunicationChannel == null))
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Communication Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.CommunicationCategory));
             }
 
             if (project.Deliverables.Any())
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Scope Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.ScopeCategory));
             }
 
             if (project.MonthlyProfit < (double)44)
             {
-                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == "Budget Risks"));
+                risks.AddRange(risksResponse.Where(risk => risk.RiskCategory.Title == Strings.BudgetCategory));
             }
 
             return risks.Select(r => _mapper.Map<RiskResponse>(r));

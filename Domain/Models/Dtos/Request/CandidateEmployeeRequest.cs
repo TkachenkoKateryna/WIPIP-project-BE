@@ -2,8 +2,8 @@
 {
     public class CandidateEmployeeRequest
     {
-        public string CandidateId { get; set; }
-        public string EmployeeId { get; set; }
+        public Guid CandidateId { get; set; }
+        public Guid EmployeeId { get; set; }
         public bool ToRemove { get; set; }
     }
 }

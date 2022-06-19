@@ -1,18 +1,18 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Interfaces.Util;
 using Persistence.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Installers
 {
-    public class DbContextInstaller
+    public class DbContextInstaller : IInstaller
     {
-        //public void InstallServices(IServiceCollection services, IConfiguration configuration)
-        //{
-        //    string connectionsString = configuration.GetConnectionString("DbWIPIP");
+        public void InstallServices(IServiceCollection services, IConfiguration configuration)
+        {
+            string connectionsString = configuration.GetConnectionString("DbWIPIP");
 
-        //    services.AddDbContext<DataContext>(options =>
-        //        options.UseSqlServer(connectionsString)
-        //            .EnableSensitiveDataLogging());
-        //}
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(connectionsString)
+                    .EnableSensitiveDataLogging());
+        }
     }
 }

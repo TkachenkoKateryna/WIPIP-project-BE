@@ -5,7 +5,6 @@ using Syncfusion.Pdf.Graphics;
 using Syncfusion.Pdf.Grid;
 using Domain.Interfaces.Services.Util;
 using System.Data;
-using Syncfusion.Pdf.Tables;
 using Microsoft.OpenApi.Extensions;
 
 namespace Domain.Services.Util
@@ -14,16 +13,15 @@ namespace Domain.Services.Util
     {
         public Stream GenerateProjectCharter(ProjectResponse project)
         {
-
             PdfDocument document = new();
 
             document.PageSettings.Orientation = PdfPageOrientation.Portrait;
             document.PageSettings.Margins.All = 50;
+
             PdfPage page = document.Pages.Add();
 
             PdfGraphics graphics = page.Graphics;
 
-            PdfBrush solidBrush = new PdfSolidBrush(new PdfColor(126, 151, 173));
             #region Title
             PdfFont font = new PdfStandardFont(PdfFontFamily.TimesRoman, 18, PdfFontStyle.Bold);
             PdfStringFormat format = new();
@@ -36,6 +34,7 @@ namespace Domain.Services.Util
             pdfGrid.Columns.Add(2);
             pdfGrid.Columns[0].Width = 75f;
 
+            #region General Rows
             var titleRow = pdfGrid.Rows.Add();
             titleRow.Cells[0].Value = "Title";
             titleRow.Cells[1].Value = project.Title;
@@ -47,19 +46,21 @@ namespace Domain.Services.Util
             var budgetRow = pdfGrid.Rows.Add();
             budgetRow.Cells[0].Value = "Resources";
             budgetRow.Cells[1].Value = "Approximate monthly budget: " + project.MonthlyIncome.ToString();
+            #endregion
 
+            #region Objectives
             var objectivesRow = pdfGrid.Rows.Add();
             objectivesRow.Cells[0].Value = "Objectives";
 
             var objectives = "";
             foreach (var obj in project.Objectives)
             {
-
                 objectives += obj.Description + " [ " + obj.Title + " ] " + " [ " + obj.Priority + " ] " + "\n";
             }
             objectivesRow.Cells[1].Value = objectives;
+            #endregion
 
-
+            #region Assumptions
             var assumptionsRow = pdfGrid.Rows.Add();
             assumptionsRow.Cells[0].Value = "Assumptions";
 
@@ -69,8 +70,9 @@ namespace Domain.Services.Util
                 assumptions += assump.Description + "\n";
             }
             assumptionsRow.Cells[1].Value = assumptions;
+            #endregion
 
-            //third row
+            #region Candidates
             var candidatesRow = pdfGrid.Rows.Add();
             candidatesRow.Cells[0].Value = "Candidates";
 
@@ -97,8 +99,9 @@ namespace Domain.Services.Util
 
             candidatesRow.Cells[1].Value = candidatesGrid;
             candidatesRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+            #endregion
 
-            //forth row
+            #region Stakeholders
             var stakeholdersRow = pdfGrid.Rows.Add();
             stakeholdersRow.Cells[0].Value = "Stakeholders";
 
@@ -124,7 +127,9 @@ namespace Domain.Services.Util
             }
             stakeholdersRow.Cells[1].Value = stakeholdersGrid;
             stakeholdersRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
-            //fifth row
+            #endregion
+
+            #region Deliverables
             var deliverablesRow = pdfGrid.Rows.Add();
             deliverablesRow.Cells[0].Value = "Deliverables";
 
@@ -138,8 +143,9 @@ namespace Domain.Services.Util
             }
 
             deliverablesRow.Cells[1].Value = deliverables;
+            #endregion
 
-            //sixth row
+            #region Milestones
             var milestonesRow = pdfGrid.Rows.Add();
             milestonesRow.Cells[0].Value = "Milestones";
 
@@ -148,7 +154,6 @@ namespace Domain.Services.Util
             milestonesGrid.Columns.Add(3);
 
             var milestones = "";
-
             foreach (var mil in project.Milestones)
             {
                 string milDeliverables = "";
@@ -160,8 +165,9 @@ namespace Domain.Services.Util
                 milestones += mil.Activity + " [ " + mil.DueDate.ToString() + " ] " + milDeliverables + "\n";
             }
             milestonesRow.Cells[1].Value = milestones;
+            #endregion
 
-            //seventh row
+            #region Risks
             var risksRow = pdfGrid.Rows.Add();
             risksRow.Cells[0].Value = "Risks";
 
@@ -185,7 +191,9 @@ namespace Domain.Services.Util
             risksRow.Cells[1].Value = risksGrid;
             risksRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
 
-            //third row
+            #endregion
+
+            #region Approval
             var approvalRow = pdfGrid.Rows.Add();
             approvalRow.Cells[0].Value = "Approval";
 
@@ -199,7 +207,6 @@ namespace Domain.Services.Util
 
             var row = approvalGrid.Rows.Add();
 
-
             row.Cells[0].Value = "Sponsor: " + GetSponsorName(project) + "\n" +
                 "signature: _______________" + "\n" +
                 "Manager: " + project.Manager.Name +
@@ -208,15 +215,13 @@ namespace Domain.Services.Util
 
             approvalRow.Cells[1].Value = approvalGrid;
             approvalRow.Cells[1].Style.CellPadding = new PdfPaddings(5, 5, 5, 5);
+            #endregion
 
             pdfGrid.Draw(page, new PointF(0f, 40f));
 
-            //Save the PDF document to stream
             MemoryStream stream = new();
             document.Save(stream);
-            //If the position is not set to '0' then the PDF will be empty.
             stream.Position = 0;
-            //Close the document.
             document.Close(true);
 
             return stream;
@@ -228,14 +233,7 @@ namespace Domain.Services.Util
                 .Where(st => st.Role == Models.Constants.StakeholderRole.Sponsor)
                 .FirstOrDefault();
 
-            if (sponsor != null)
-            {
-                return sponsor.Name;
-            }
-            else
-            {
-                return "";
-            }
+            return sponsor == null ? null : sponsor.Name;
         }
     }
 }

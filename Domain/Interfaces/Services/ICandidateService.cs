@@ -6,10 +6,10 @@ namespace Domain.Interfaces.Services
 {
     public interface ICandidateService
     {
+        IEnumerable<EmployeeResponse> GetEmployeesForCandidates(Guid projectId);
         CandidateResponse AddCandidate(CandidateRequest candRequest);
-        CandidateResponse UpdateCandidate(CandidateRequest candRequest, string candId);
+        CandidateResponse UpdateCandidate(CandidateRequest candRequest, Guid candId);
         CandidateResponse UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest);
-        void DeleteCandidate(string candId);
-        IEnumerable<EmployeeResponse> GetEmployeesForCandidates(string projectId);
+        void DeleteCandidate(Guid candId);
     }
 }

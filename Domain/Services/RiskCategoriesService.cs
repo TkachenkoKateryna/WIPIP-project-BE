@@ -23,54 +23,52 @@ namespace Domain.Services
 
         public IEnumerable<RiskCategoryResponse> GetRiskCategories()
         {
-            return _riskCategoryRepository.GetAll()
-                .Select(r => _mapper.Map<RiskCategoryResponse>(r))
+            return _riskCategoryRepository.GetAll().Select(rc => _mapper.Map<RiskCategoryResponse>(rc))
                 .ToList();
         }
 
-        public RiskCategoryResponse AddRiskCategory(RiskCategoryRequest riskCategoryRequest)
+        public RiskCategoryResponse AddRiskCategory(RiskCategoryRequest rcRequest)
         {
 
-            var riskCategortEntity = _riskCategoryRepository
-                .Find(riskCategory => riskCategory.Title == riskCategoryRequest.Title)
-                .FirstOrDefault();
+            var rcEntity = _riskCategoryRepository.Find(rc => rc.Title == rcRequest.Title).FirstOrDefault();
 
-            if (riskCategortEntity != null)
+            if (rcEntity != null)
             {
-                throw new AlreadyExistsException<RiskCategory>("Assumption with such description already exists.");
+                throw new AlreadyExistsException("Risk category with such title already exists", "title");
             }
 
-            riskCategortEntity = _mapper.Map<RiskCategory>(riskCategoryRequest);
+            rcEntity = _mapper.Map<RiskCategory>(rcRequest);
 
-            var id = _riskCategoryRepository.CreateWithVal(riskCategortEntity);
+            var rcId = _riskCategoryRepository.CreateWithVal(rcEntity);
             _uow.Save();
 
-            return _mapper.Map<RiskCategoryResponse>(_riskCategoryRepository.Find(skill => skill.Id == id).FirstOrDefault());
+            return _mapper.Map<RiskCategoryResponse>(_riskCategoryRepository.Find(rc => rc.Id == rcId)
+                .FirstOrDefault());
         }
 
-        public RiskCategoryResponse UpdateRiskCategory(RiskCategoryRequest skillRequest, Guid riskCategoryId)
+        public RiskCategoryResponse UpdateRiskCategory(RiskCategoryRequest rcRequest, Guid rcId)
         {
-            var riskCategortEntity = _riskCategoryRepository.Find(riskCategory => riskCategory.Id == riskCategoryId)
-                .FirstOrDefault();
-            _ = riskCategortEntity ?? throw new NotFoundException<Skill>("Assumption with id was not found.");
+            var rcEntity = _riskCategoryRepository.Find(rc => rc.Id == rcId).FirstOrDefault();
 
-            riskCategortEntity = _mapper.Map<RiskCategory>(skillRequest);
-            riskCategortEntity.Id = riskCategoryId;
+            _ = rcEntity ?? throw new NotFoundException("Risk category was not found");
 
-            _riskCategoryRepository.Update(riskCategortEntity);
+            rcEntity = _mapper.Map<RiskCategory>(rcRequest);
+
+            rcEntity.Id = rcId;
+            _riskCategoryRepository.Update(rcEntity);
             _uow.Save();
 
-
-            return _mapper.Map<RiskCategoryResponse>(_riskCategoryRepository.Find(riskCategory => riskCategory.Id == riskCategoryId).FirstOrDefault());
+            return _mapper.Map<RiskCategoryResponse>(_riskCategoryRepository.Find(rc => rc.Id == rcId)
+                .FirstOrDefault());
         }
 
-        public void DeleteRiskCategory(Guid riskCategoryId)
+        public void DeleteRiskCategory(Guid rcId)
         {
-            var riskCategoryEntity = _riskCategoryRepository.Find(riskCategory => riskCategory.Id == riskCategoryId)
-                .FirstOrDefault();
-            _ = riskCategoryEntity ?? throw new NotFoundException<RiskCategory>("Assumption with id was not found.");
+            var riskCategoryEntity = _riskCategoryRepository.Find(rc => rc.Id == rcId).FirstOrDefault();
 
-            _riskCategoryRepository.SoftDelete(riskCategoryId);
+            _ = riskCategoryEntity ?? throw new NotFoundException("Risk category was not found");
+
+            _riskCategoryRepository.SoftDelete(rcId);
             _uow.Save();
         }
     }

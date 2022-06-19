@@ -3,7 +3,7 @@ namespace Domain.Interfaces.Services.Util
 {
     public interface IExcelService
     {
-        byte[] GenerateRiskRegisterXml(string projectId);
-        byte[] GenerateStakeholderRegisterXml(string projectId, string projectName);
+        byte[] GenerateRiskRegisterXml(Guid projectId);
+        byte[] GenerateStakeholderRegisterXml(Guid projectId, string projectName);
     }
 }

@@ -2,7 +2,7 @@
 {
     public class StakeholderProjectRequest
     {
-        public string StakeholderId { get; set; }
-        public string ProjectId { get; set; }
+        public Guid StakeholderId { get; set; }
+        public Guid ProjectId { get; set; }
     }
 }

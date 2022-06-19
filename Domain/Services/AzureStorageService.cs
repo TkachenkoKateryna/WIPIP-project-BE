@@ -1,5 +1,4 @@
-﻿using Domain.Models.Exceptions;
-using Domain.Interfaces.Services;
+﻿using Domain.Interfaces.Services.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -17,25 +16,6 @@ namespace Domain.Services
         {
             connectionString = configuration.GetConnectionString("AzureStorageConnection");
         }
-        public void DelteFile(string fileRoute, string containerName)
-        {
-            if (fileRoute != null)
-            {
-                var account = CloudStorageAccount.Parse(connectionString);
-                var client = account.CreateCloudBlobClient();
-                var container = client.GetContainerReference(containerName);
-
-                var blobName = Path.GetFileName(fileRoute);
-                var blob = container.GetBlobReference(blobName);
-                blob.DeleteIfExistsAsync();
-            }
-        }
-
-        public string EditFile(byte[] content, string extension, string containerName, string fileRoute, string contentType)
-        {
-            DelteFile(fileRoute, containerName);
-            return SaveFile(content, extension, containerName, contentType);
-        }
 
         public string UploadImage(IFormFile image)
         {
@@ -51,7 +31,7 @@ namespace Domain.Services
             }
             else
             {
-                throw new Exception("Image doesn't exist");
+                throw new ArgumentNullException("Image doesn't exist");
             }
 
             return result;
@@ -70,6 +50,7 @@ namespace Domain.Services
             var fileName = $"{Guid.NewGuid()}{extension}";
             var blob = container.GetBlockBlobReference(fileName);
             blob.UploadFromByteArray(content, 0, content.Length);
+
             return blob.Uri.ToString();
         }
     }

@@ -4,6 +4,7 @@ using Domain.Models.Dtos.Responses;
 using Domain.Services.Util;
 using FluentAssertions;
 using Moq;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -32,14 +33,14 @@ namespace Tests.Services
             };
 
             var riskService = new Mock<IRiskService>();
-            riskService.Setup(r => r.GetRisksByProject(It.IsAny<string>()))
+            riskService.Setup(r => r.GetRisksByProject(It.IsAny<Guid>()))
                 .Returns(projectRisks);
             var stakeholderService = new Mock<IStakeholdersService>();
 
             var excelService = new ExcelService(riskService.Object, stakeholderService.Object);
 
             // Act
-            var result = excelService.GenerateRiskRegisterXml("25a5ece8-8166-4a28-9252-00e6c619e423");
+            var result = excelService.GenerateRiskRegisterXml(Guid.Parse("25a5ece8-8166-4a28-9252-00e6c619e423"));
 
             result.Should().BeOfType<byte[]>();
         }
@@ -64,14 +65,14 @@ namespace Tests.Services
             };
 
             var stakeholderService = new Mock<IStakeholdersService>();
-            stakeholderService.Setup(r => r.GetStakeholders(It.IsAny<string>()))
+            stakeholderService.Setup(r => r.GetStakeholders(It.IsAny<Guid>()))
                 .Returns(projectStakeholders);
             var riskService = new Mock<IRiskService>();
 
             var excelService = new ExcelService(riskService.Object, stakeholderService.Object);
 
             // Act
-            var result = excelService.GenerateStakeholderRegisterXml("25a5ece8-8166-4a28-9252-00e6c619e423", "Project Name");
+            var result = excelService.GenerateStakeholderRegisterXml(Guid.Parse("25a5ece8-8166-4a28-9252-00e6c619e423"), "Project Name");
 
             result.Should().BeOfType<byte[]>();
         }

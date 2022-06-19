@@ -2,7 +2,7 @@
 {
     public class RiskProjectRequest
     {
-        public string RiskId { get; set; }
-        public string ProjectId { get; set; }
+        public Guid RiskId { get; set; }
+        public Guid ProjectId { get; set; }
     }
 }

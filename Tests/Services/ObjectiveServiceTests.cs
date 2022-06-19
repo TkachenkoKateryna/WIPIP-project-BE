@@ -135,7 +135,7 @@ namespace Tests.Services
             var objectivesService = new ObjectiveService(mockUnitOfWork.Object, MapperFactory.GetMapper());
 
             // Act
-            objectivesService.DeleteObjective("25a5ece8-8166-4a28-9252-00e6c619e423");
+            objectivesService.DeleteObjective(Guid.Parse("25a5ece8-8166-4a28-9252-00e6c619e423"));
 
             // Assert
             var result = objectives.First().IsDeleted;

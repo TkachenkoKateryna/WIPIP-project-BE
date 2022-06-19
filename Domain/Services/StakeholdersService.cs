@@ -6,10 +6,9 @@ using Domain.Models.Dtos.Responses;
 using Domain.Models.Dtos.Stakeholder;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
+using Domain.Models.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Domain.Models.Constants;
-using Domain.Models.Filters;
 
 namespace Domain.Services
 {
@@ -56,7 +55,7 @@ namespace Domain.Services
                     .ToList();
 
             stakeholders.ForEach(st => st.Projects = _projStakeholdersRepository
-                .Find(stp => stp.StakeholderId == Guid.Parse(st.Id), _includesStp)
+                .Find(stp => stp.StakeholderId.ToString() == st.Id, _includesStp)
                 .Select(stp => _mapper.Map<ProjectStakeholderResponse>(stp))
                 .ToList());
 
@@ -66,27 +65,23 @@ namespace Domain.Services
             }
             else
             {
-                return stakeholders.Where(pr => param.ProjectIds.Any(id => pr.Projects.Any(pr => pr.Id == id))).ToList();
+                return stakeholders.Where(pr => param.ProjectIds.Any(id => pr.Projects.Any(pr => pr.Id == id.ToString()))).ToList();
             }
         }
 
-        public IEnumerable<StakeholderResponse> GetStakeholders(string projectId)
+        public IEnumerable<StakeholderResponse> GetStakeholders(Guid prId)
         {
-            return _projStakeholdersRepository
-                .Find(prSt => prSt.ProjectId == Guid.Parse(projectId), _includesStp)
-                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity))
-                .ToList();
+            return _projStakeholdersRepository.Find(prSt => prSt.ProjectId == prId, _includesStp)
+                .Select(empEntity => _mapper.Map<StakeholderResponse>(empEntity)).ToList();
         }
 
         public StakeholderResponse AddStakeholder(StakeholderRequest stRequest)
         {
-            var stEntity = _stakeholderRepository
-                .FindWithDeleted(st => st.Email == stRequest.Email)
-                .FirstOrDefault();
+            var stEntity = _stakeholderRepository.FindWithDeleted(st => st.Email == stRequest.Email).FirstOrDefault();
 
             if (stEntity != null)
             {
-                throw new AlreadyExistsException<Stakeholder>("Stakeholder with such email already exists.");
+                throw new AlreadyExistsException("Stakeholder with such email already exists", "email");
             }
 
             stEntity = _mapper.Map<Stakeholder>(stRequest);
@@ -94,69 +89,53 @@ namespace Domain.Services
             _stakeholderRepository.Create(stEntity);
             _uow.Save();
 
-            var stakeholder = _stakeholderRepository
-                .Find(st => st.Id == stEntity.Id)
-                .FirstOrDefault();
+            var stakeholder = _stakeholderRepository.Find(st => st.Id == stEntity.Id).FirstOrDefault();
 
             return _mapper.Map<StakeholderResponse>(stakeholder);
         }
 
-        public StakeholderResponse RemoveStakeholderFromProject(string projectId, string stakeholderId)
+        public StakeholderResponse RemoveStakeholderFromProject(Guid prId, Guid stId)
         {
-            var projectStak = _projStakeholdersRepository
-                .Find(ps => ps.ProjectId == Guid.Parse(projectId)
-                && ps.StakeholderId == Guid.Parse(stakeholderId))
-                .FirstOrDefault();
-            _ = projectStak ?? throw new NotFoundException<ProjectStakeholder>("Stakeholder in project wasn't found");
+            var projectStak = _projStakeholdersRepository.Find(prSt => prSt.ProjectId == prId
+                && prSt.StakeholderId == stId).FirstOrDefault();
+
+            _ = projectStak ?? throw new NotFoundException("Stakeholder wasn't found");
 
             _projStakeholdersRepository.Delete(projectStak);
             _uow.Save();
 
-            var res = _stakeholderRepository
-                .Find(st => st.Id.ToString() == stakeholderId)
-                .Select(st => _mapper.Map<StakeholderResponse>(st))
-                .FirstOrDefault();
-
-            return _stakeholderRepository
-                .Find(st => st.Id.ToString() == stakeholderId)
-                .Select(st => _mapper.Map<StakeholderResponse>(st))
+            return _stakeholderRepository.Find(st => st.Id == stId).Select(st => _mapper.Map<StakeholderResponse>(st))
                 .FirstOrDefault();
         }
 
-        public StakeholderResponse UpdateStakeholder(StakeholderRequest stRequest, string stId)
+        public StakeholderResponse UpdateStakeholder(StakeholderRequest stRequest, Guid stId)
         {
-            var stEntity = _stakeholderRepository
-                .Find(st => st.Id.ToString() == stId)
-                .FirstOrDefault();
-            _ = stEntity ?? throw new NotFoundException<Stakeholder>("Stakeholder with id was not found.");
+            var stEntity = _stakeholderRepository.Find(st => st.Id == stId).FirstOrDefault();
 
+            _ = stEntity ?? throw new NotFoundException("Stakeholder was not found");
 
             stEntity = _mapper.Map<Stakeholder>(stRequest);
-            stEntity.Id = Guid.Parse(stId);
+
+            stEntity.Id = stId;
             _stakeholderRepository.Update(stEntity);
             _uow.Save();
 
-            var res = _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id.ToString() == stId, _includesSt).FirstOrDefault());
-            return _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id.ToString() == stId, _includesSt).FirstOrDefault());
+            return _mapper.Map<StakeholderResponse>(_stakeholderRepository.Find(st => st.Id == stId, _includesSt)
+                .FirstOrDefault());
         }
 
 
-        public void DeleteStakeholder(string stakeholderId)
+        public void DeleteStakeholder(Guid stId)
         {
-            var stEntity = _stakeholderRepository
-                .FindWithDeleted(st => st.Id.ToString() == stakeholderId)
-                .FirstOrDefault();
-            _ = stEntity ?? throw new NotFoundException<Stakeholder>("Stakeholder with id was not found.");
+            var stEntity = _stakeholderRepository.Find(st => st.Id == stId).FirstOrDefault();
 
-            _stakeholderRepository.SoftDelete(Guid.Parse(stakeholderId));
+            _ = stEntity ?? throw new NotFoundException("Stakeholder was not found");
 
-            var projSt = _projStakeholdersRepository
-                .Find(st => st.StakeholderId == Guid.Parse(stakeholderId))
-                .ToList(); ;
-            _ = projSt ?? throw new NotFoundException<ProjectStakeholder>
-                ("Such pair of stakeholder and project doesn't exist");
+            _stakeholderRepository.SoftDelete(stId);
 
-            foreach (var st in projSt)
+            var prStList = _projStakeholdersRepository.Find(st => st.StakeholderId == stId).ToList();
+
+            foreach (var st in prStList)
             {
                 _projStakeholdersRepository.SoftDelete(st.Id);
             }
@@ -164,20 +143,16 @@ namespace Domain.Services
             _uow.Save();
         }
 
-
-        public StakeholderResponse AddStakeholderToProject(string projectId, string stakeholderId)
+        public StakeholderResponse AddStakeholderToProject(Guid prId, Guid stId)
         {
-            _projStakeholdersRepository.Create(
-                new ProjectStakeholder
-                {
-                    StakeholderId = Guid.Parse(stakeholderId),
-                    ProjectId = Guid.Parse(projectId)
-                });
+            _projStakeholdersRepository.Create(new ProjectStakeholder
+            {
+                StakeholderId = stId,
+                ProjectId = prId
+            });
             _uow.Save();
 
-            return _stakeholderRepository
-                .Find(st => st.Id.ToString() == stakeholderId)
-                .Select(st => _mapper.Map<StakeholderResponse>(st))
+            return _stakeholderRepository.Find(st => st.Id == stId).Select(st => _mapper.Map<StakeholderResponse>(st))
                 .FirstOrDefault();
         }
 

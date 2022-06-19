@@ -21,8 +21,7 @@ namespace Domain.Services
         private readonly Func<IQueryable<Employee>, IIncludableQueryable<Employee, object>> _employeeIncludes;
         private readonly Func<IQueryable<ProjectCandidate>, IIncludableQueryable<ProjectCandidate, object>> _candidateIncludes;
 
-        public EmployeeService(IUnitOfWork uow,
-            IMapper mapper)
+        public EmployeeService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
             _employeeRepository = _uow.GetRepository<Employee>();
@@ -36,45 +35,42 @@ namespace Domain.Services
                 .Include(c => c.Employee);
         }
 
-        public IEnumerable<EmployeeResponse> GetAllEmployees(EmployeeFilteringParams param)
+        public IEnumerable<EmployeeResponse> GetEmployees(EmployeeFilteringParams param)
         {
-            var employees = _employeeRepository
-                .GetAll(_employeeIncludes).AsQueryable();
+            var employeesQuery = _employeeRepository.GetAll(_employeeIncludes).AsQueryable();
 
             if (!string.IsNullOrEmpty(param.SearchBy.Trim().ToLowerInvariant()))
             {
-                employees = employees
-                    .Where(e => e.Name.ToLower().Contains(param.SearchBy)
-                                || e.Email.ToLower().Contains(param.SearchBy)
-                                || e.Phone.ToLower().Contains(param.SearchBy));
+                employeesQuery = employeesQuery.Where(e =>
+                    e.Name.ToLower().Contains(param.SearchBy)
+                    || e.Email.ToLower().Contains(param.SearchBy)
+                    || e.Phone.ToLower().Contains(param.SearchBy));
             }
 
             if (param.MinEnglishLevel != null)
             {
-                employees = employees.Where(emp => emp.EnglishLevel >= param.MinEnglishLevel);
+                employeesQuery = employeesQuery.Where(emp => emp.EnglishLevel >= param.MinEnglishLevel);
             }
 
             if (param.SkillIds == null)
-                return employees.Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity))
-                    .ToList();
             {
-                var newList = employees.AsEnumerable().Where(emp => param.SkillIds.Any(sk =>
-                    emp.EmployeeSkills.Any(empSk => empSk.SkillId == Guid.Parse(sk)))).ToList();
-
-                return newList.Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity));
+                return employeesQuery.Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity)).ToList();
+            }
+            else
+            {
+                return employeesQuery.Where(emp => param.SkillIds.Any(sk => emp.EmployeeSkills.Any(empSk => empSk.SkillId == sk)))
+                    .Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity))
+                    .ToList();
             }
         }
 
         public EmployeeResponse AddEmployee(EmployeeRequest empRequest)
         {
-            var empEntity = _employeeRepository
-                .FindWithDeleted(emp => emp.Email == empRequest.Email)
-                .FirstOrDefault();
+            var empEntity = _employeeRepository.FindWithDeleted(e => e.Email == empRequest.Email).FirstOrDefault();
 
             if (empEntity != null)
             {
-                throw new AlreadyExistsException<Employee>(
-                    $"Employee with {empRequest.Email} email already exists.");
+                throw new AlreadyExistsException("Employee with such email already exists", "email");
             }
 
             empEntity = _mapper.Map<Employee>(empRequest);
@@ -85,59 +81,54 @@ namespace Domain.Services
             return _mapper.Map<EmployeeResponse>(empEntity);
         }
 
-        public EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, string empId)
+        public EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, Guid empId)
         {
-            var empEntity = _employeeRepository.Find(emp => emp.Id == Guid.Parse(empId))
-                .FirstOrDefault();
+            var empEntity = _employeeRepository.Find(e => e.Id == empId).FirstOrDefault();
 
-            _ = empEntity ?? throw new NotFoundException<Employee>($"Employee with id {empId} was not found.");
+            _ = empEntity ?? throw new NotFoundException("Employee was not found.");
 
             RemoveEmployeeSkill(empId);
 
             empEntity = _mapper.Map<Employee>(empRequest);
-            empEntity.Id = Guid.Parse(empId);
-
+            empEntity.Id = empId;
             _employeeRepository.Update(empEntity);
 
             AddEmployeeSkill(empRequest.EmployeeSkills, empId);
 
             _uow.Save();
 
-            return _mapper.Map<EmployeeResponse>(_employeeRepository
-                .Find(emp => emp.Id == empEntity.Id, _employeeIncludes).FirstOrDefault());
+            return _mapper.Map<EmployeeResponse>(_employeeRepository.Find(emp => emp.Id == empId, _employeeIncludes)
+                .FirstOrDefault());
         }
 
-        public void DeleteEmployee(string empId)
+        public void DeleteEmployee(Guid empId)
         {
-            var empEntity = _employeeRepository.FindWithDeleted(emp => emp.Id.ToString() == empId)
-                .FirstOrDefault();
-            _ = empEntity ?? throw new NotFoundException<Employee>($"Employee with id {empId} was not found.");
+            var empEntity = _employeeRepository.FindWithDeleted(e => e.Id == empId).FirstOrDefault();
 
-            _employeeRepository.SoftDelete(Guid.Parse(empId));
+            _ = empEntity ?? throw new NotFoundException("Employee was not found.");
+
+            _employeeRepository.SoftDelete(empId);
             _uow.Save();
         }
 
-        private void RemoveEmployeeSkill(string empId)
+        private void RemoveEmployeeSkill(Guid empId)
         {
-            foreach (var employeeSkill in _employeeSkillRepository.Find(sk =>
-                         sk.EmployeeId == Guid.Parse(empId)))
+            foreach (var employeeSkill in _employeeSkillRepository.Find(sk => sk.EmployeeId == empId))
             {
                 _employeeSkillRepository.Delete(employeeSkill);
             }
         }
 
-        private void AddEmployeeSkill(IEnumerable<EmployeeSkillRequest> skills, string empId)
+        private void AddEmployeeSkill(IEnumerable<EmployeeSkillRequest> skills, Guid empId)
         {
-
             foreach (var skill in skills)
             {
                 _employeeSkillRepository.Create(new EmployeeSkill()
                 {
-                    EmployeeId = Guid.Parse(empId),
-                    SkillId = Guid.Parse(skill.SkillId),
+                    EmployeeId = empId,
+                    SkillId = skill.SkillId,
                     Proficiency = skill.Proficiency,
                     Primary = skill.Primary
-
                 });
             }
         }

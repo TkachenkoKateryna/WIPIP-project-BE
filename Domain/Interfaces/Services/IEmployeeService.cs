@@ -1,17 +1,15 @@
-﻿using Domain.Models.Constants;
-using Domain.Models.Filters;
-using Domain.Models.Dtos.Requests;
+﻿using Domain.Models.Dtos.Requests;
 using Domain.Models.Dtos.Responses;
-using Microsoft.AspNetCore.Http;
+using Domain.Models.Filters;
 
 namespace Domain.Interfaces.Services
 {
     public interface IEmployeeService
     {
-        IEnumerable<EmployeeResponse> GetAllEmployees(EmployeeFilteringParams param);
+        IEnumerable<EmployeeResponse> GetEmployees(EmployeeFilteringParams param);
         EmployeeResponse AddEmployee(EmployeeRequest empRequest);
-        EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, string empId);
-        void DeleteEmployee(string empId);
+        EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, Guid empId);
+        void DeleteEmployee(Guid empId);
 
     }
 }

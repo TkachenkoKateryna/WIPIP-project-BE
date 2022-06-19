@@ -21,54 +21,45 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ObjectiveResponse> GetAllObjectives()
+        public ObjectiveResponse AddObjective(ObjectiveRequest obRequest)
         {
-            return _objectiveRepository.GetAllWithDeleted()
-                .Select(empEntity => _mapper.Map<ObjectiveResponse>(empEntity))
-                .ToList();
-        }
+            var obEntity = _objectiveRepository.FindWithDeleted(ob => ob.Title == obRequest.Title).FirstOrDefault();
 
-        public ObjectiveResponse AddObjective(ObjectiveRequest objDto)
-        {
-            var objEntity = _objectiveRepository.FindWithDeleted(ob => ob.Title == objDto.Title)
-                .FirstOrDefault();
-
-            if (objEntity != null)
+            if (obEntity != null)
             {
-                throw new AlreadyExistsException<Objective>("Objective with such title already exists.");
+                throw new AlreadyExistsException("Objective with such title already exists", "title");
             }
 
-            objEntity = _mapper.Map<Objective>(objDto);
+            obEntity = _mapper.Map<Objective>(obRequest);
 
-            _objectiveRepository.Create(objEntity);
-
+            var obId = _objectiveRepository.CreateWithVal(obEntity);
             _uow.Save();
 
-            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == objEntity.Id).FirstOrDefault());
+            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == obId).FirstOrDefault());
         }
 
-        public ObjectiveResponse UpdateObjective(ObjectiveRequest objDto, Guid objId)
+        public ObjectiveResponse UpdateObjective(ObjectiveRequest obRequest, Guid obId)
         {
-            var objEntity = _objectiveRepository.Find(ob => ob.Id == objId)
-                 .FirstOrDefault();
-            _ = objEntity ?? throw new NotFoundException<Objective>("Objective with id was not found.");
+            var obEntity = _objectiveRepository.Find(ob => ob.Id == obId).FirstOrDefault();
 
-            objEntity = _mapper.Map<Objective>(objDto);
-            objEntity.Id = objId;
-            _objectiveRepository.Update(objEntity);
+            _ = obEntity ?? throw new NotFoundException("Objective was not found");
+
+            obEntity = _mapper.Map<Objective>(obRequest);
+
+            obEntity.Id = obId;
+            _objectiveRepository.Update(obEntity);
             _uow.Save();
 
-
-            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == objId).FirstOrDefault());
+            return _mapper.Map<ObjectiveResponse>(_objectiveRepository.Find(ob => ob.Id == obId).FirstOrDefault());
         }
 
-        public void DeleteObjective(string objId)
+        public void DeleteObjective(Guid obId)
         {
-            var objEntity = _objectiveRepository.Find(obj => obj.Id.ToString() == objId)
-                .FirstOrDefault();
-            _ = objEntity ?? throw new NotFoundException<Objective>("Objective with id was not found.");
+            var obEntity = _objectiveRepository.Find(ob => ob.Id == obId).FirstOrDefault();
 
-            _objectiveRepository.SoftDelete(Guid.Parse(objId));
+            _ = obEntity ?? throw new NotFoundException("Objective was not found");
+
+            _objectiveRepository.SoftDelete(obId);
             _uow.Save();
         }
     }

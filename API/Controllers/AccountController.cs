@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using API.Controllers.Base;
 using Domain.Models.Entities.Identity;
 using Domain.Interfaces.Services.Util;
 using Domain.Models.Dtos.Responses;
@@ -11,10 +10,13 @@ using Domain.Models.Constants;
 using Domain.Models.Dtos.Requests;
 using Domain.Models.Exceptions;
 using Domain.Models.Dtos.Identity;
+using API.Extensions;
 
 namespace API.Controllers
 {
-    public class AccountController : BaseApiController
+    [ApiController]
+    [Route("api")]
+    public class AccountController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
@@ -42,11 +44,12 @@ namespace API.Controllers
 
             if (_userManager.Users.Any(user => user.Email == userRequest.Email & user.Id != userId))
             {
-                throw new AlreadyExistsException<User>("user with such email already exists");
+                throw new AlreadyExistsException("User with such email already exists");
             }
 
-            user.Email = userRequest.Email;
-            user.NormalizedEmail = userRequest.Email.ToUpper();
+            await _userManager.SetEmailAsync(user, userRequest.Email);
+            //user.Email = userRequest.Email;
+            //user.NormalizedEmail = userRequest.Email.ToUpper();
             user.UserName = userRequest.Name;
             user.NormalizedUserName = userRequest.Name.ToUpper();
             user.ImageLink = userRequest.ImageLink;
@@ -62,7 +65,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest("Error while changing the password");
+                return BadRequest("Error while updating user");
             }
         }
 
@@ -70,6 +73,7 @@ namespace API.Controllers
         [HttpGet(Strings.UserRoute)]
         public async Task<ActionResult<UserResponse>> GetCurrentUser()
         {
+
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
             var role = await _roleManager.FindByIdAsync(user.RoleId);
 
@@ -112,7 +116,7 @@ namespace API.Controllers
         [HttpPost(Strings.LoginRoute)]
         public async Task<ActionResult<string>> Login(LoginRequest loginRequest)
         {
-            var users = _userManager.Users.ToList();
+            _ = _userManager.Users.ToList();
 
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
 
@@ -134,11 +138,11 @@ namespace API.Controllers
         {
             if (await _userManager.Users.AnyAsync(x => x.Email.Equals(registerRequest.Email)))
             {
-                return BadRequest("Email taken");
+                throw new AlreadyExistsException("User with such email already exists", "email");
             }
             if (await _userManager.Users.AnyAsync(x => x.UserName.Equals(registerRequest.Email)))
             {
-                return BadRequest("Username taken");
+                throw new AlreadyExistsException("User with such user name already exists", "username");
             }
 
             var user = new User
@@ -186,7 +190,7 @@ namespace API.Controllers
         [HttpPost(Strings.ChangePasswordRoute)]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest changePassword)
         {
-            var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             if (user is null) return BadRequest("User not found");
 
@@ -200,7 +204,7 @@ namespace API.Controllers
 
             if (result.Succeeded)
             {
-                var updatedUser = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+                var updatedUser = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var role = await _roleManager.FindByIdAsync(user.RoleId);
 
                 return Ok(CreateUserObject(updatedUser, role.Name));
@@ -217,14 +221,13 @@ namespace API.Controllers
             {
                 Name = user.UserName,
                 ImageLink = user.ImageLink,
-                Token = _jwtService.CreateToken(user),
                 Email = user.Email,
                 Role = roleName,
                 Id = user.Id
             };
         }
 
-        private ManagerResponse CreateManagerObject(User user, string roleName)
+        private static ManagerResponse CreateManagerObject(User user, string roleName)
         {
             return new ManagerResponse
             {
@@ -234,7 +237,7 @@ namespace API.Controllers
             };
         }
 
-        private bool CheckPassword(string newPassword, string confirmedPassword)
+        private static bool CheckPassword(string newPassword, string confirmedPassword)
         {
             return newPassword.Equals(confirmedPassword);
         }

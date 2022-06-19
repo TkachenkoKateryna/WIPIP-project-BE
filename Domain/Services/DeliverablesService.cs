@@ -21,56 +21,51 @@ namespace Domain.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<DeliverableResponse> GetDeliverablesByProject(string projectId)
+        public IEnumerable<DeliverableResponse> GetDeliverablesByProject(Guid projectId)
         {
-            return _delivRepository.
-                Find(d => d.ProjectId == Guid.Parse(projectId))
+            return _delivRepository.Find(d => d.ProjectId == projectId)
                 .Select(delEntity => _mapper.Map<DeliverableResponse>(delEntity))
                 .ToList();
         }
 
         public DeliverableResponse AddDeliverable(DeliverableRequest delRequest)
         {
-            var delEntity = _delivRepository.Find(del => del.Title == delRequest.Title)
-                .FirstOrDefault();
+            var delEntity = _delivRepository.Find(d => d.Title == delRequest.Title).FirstOrDefault();
 
             if (delEntity != null)
             {
-                throw new AlreadyExistsException<Objective>("Deliverable with such title already exists.");
+                throw new AlreadyExistsException("Deliverable with such title already exists", "title");
             }
 
             delEntity = _mapper.Map<Deliverable>(delRequest);
 
-            _delivRepository.Create(delEntity);
-
+            var id = _delivRepository.CreateWithVal(delEntity);
             _uow.Save();
-
-            return _mapper.Map<DeliverableResponse>(_delivRepository.Find(ob => ob.Id == delEntity.Id).FirstOrDefault());
+            return _mapper.Map<DeliverableResponse>(_delivRepository.Find(ob => ob.Id == id).FirstOrDefault());
         }
 
-        public DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, string delId)
+        public DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, Guid delId)
         {
-            var delEntity = _delivRepository.Find(ob => ob.Id.ToString() == delId)
-                 .FirstOrDefault();
-            _ = delEntity ?? throw new NotFoundException<Objective>("Deliverable with id was not found.");
+            var delEntity = _delivRepository.Find(d => d.Id == delId).FirstOrDefault();
+
+            _ = delEntity ?? throw new NotFoundException("Deliverable was not found");
 
             delEntity = _mapper.Map<Deliverable>(delRequest);
-            delEntity.Id = Guid.Parse(delId);
+
+            delEntity.Id = delId;
             _delivRepository.Update(delEntity);
             _uow.Save();
 
-
-            return _mapper.Map<DeliverableResponse>(_delivRepository.Find(del => del.Id.ToString() == delId).FirstOrDefault());
+            return _mapper.Map<DeliverableResponse>(_delivRepository.Find(del => del.Id == delId).FirstOrDefault());
         }
 
-        public void DeleteDeliverable(string delId)
+        public void DeleteDeliverable(Guid delId)
         {
-            var delEntity = _delivRepository.Find(del => del.Id.ToString() == delId)
-                .FirstOrDefault();
-            _ = delEntity ?? throw new NotFoundException<Objective>("Deliverable with id was not found.");
+            var delEntity = _delivRepository.Find(d => d.Id == delId).FirstOrDefault();
+
+            _ = delEntity ?? throw new NotFoundException("Deliverable was not found");
 
             _delivRepository.Delete(delEntity);
-
             _uow.Save();
         }
     }

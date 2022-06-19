@@ -28,13 +28,13 @@ namespace API.Controllers
             return Ok(_riskCategoryService.AddRiskCategory(riskCategoryRequest));
         }
 
-        [HttpPut("{riskCategoryId}")]
+        [HttpPut("{riskCategoryId:Guid}")]
         public ActionResult<RiskResponse> UpdateRiskCategories(RiskCategoryRequest riskCategoryRequest, Guid riskCategoryId)
         {
             return Ok(_riskCategoryService.UpdateRiskCategory(riskCategoryRequest, riskCategoryId));
         }
 
-        [HttpDelete("{riskCategoryId}")]
+        [HttpDelete("{riskCategoryId:Guid}")]
         public IActionResult DeleteRiskCategories(Guid riskCategoryId)
         {
             _riskCategoryService.DeleteRiskCategory(riskCategoryId);

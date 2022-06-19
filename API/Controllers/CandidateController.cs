@@ -17,49 +17,36 @@ namespace API.Controllers
             _candidateService = candidateService;
         }
 
+        [HttpGet("employees")]
+        public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] Guid projectId)
+        {
+            return Ok(_candidateService.GetEmployeesForCandidates(projectId));
+        }
+
         [HttpPost]
         public ActionResult<CandidateResponse> AddCandidate(CandidateRequest candidateRequest)
         {
-            try
-            {
-                var candidateResp = _candidateService.AddCandidate(candidateRequest);
-                return Ok(candidateResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPut("{candidateId}")]
-        public ActionResult<CandidateResponse> UpdateCandidate(CandidateRequest candidateRequest, string candidateId)
-        {
-            var candidateResp = _candidateService.UpdateCandidate(candidateRequest, candidateId);
-
-            return Ok(candidateResp);
-        }
-
-        [HttpDelete("{candidateId}")]
-        public IActionResult DeleteCandidate(string candidateId)
-        {
-            _candidateService.DeleteCandidate(candidateId);
-            return Ok();
-        }
-
-        [HttpGet("employees")]
-        public ActionResult<EmployeeResponse> GetTeamMembers([FromQuery] string projectId)
-        {
-            var empResp = _candidateService.GetEmployeesForCandidates(projectId);
-
-            return Ok(empResp);
+            return Ok(_candidateService.AddCandidate(candidateRequest));
         }
 
         [HttpPost("employees")]
         public ActionResult<CandidateResponse> UpdateEmployeeToCandidate(CandidateEmployeeRequest candRequest)
         {
-            var candidateResp = _candidateService.UpdateEmployeeToCandidate(candRequest);
+            return Ok(_candidateService.UpdateEmployeeToCandidate(candRequest));
+        }
 
-            return Ok(candidateResp);
+        [HttpPut("{candidateId:Guid}")]
+        public ActionResult<CandidateResponse> UpdateCandidate(CandidateRequest candidateRequest, Guid candidateId)
+        {
+            return Ok(_candidateService.UpdateCandidate(candidateRequest, candidateId));
+        }
+
+        [HttpDelete("{candidateId:Guid}")]
+        public IActionResult DeleteCandidate(Guid candidateId)
+        {
+            _candidateService.DeleteCandidate(candidateId);
+
+            return Ok();
         }
     }
 }

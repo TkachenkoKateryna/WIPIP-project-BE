@@ -23,46 +23,48 @@ namespace Domain.Services
 
         public AssumptionResponse AddAssumption(AssumptionRequest assumpRequest)
         {
-            var assumpEntity = _assumpRepository.Find(assump => assump.Description == assumpRequest.Description)
+            var assumpEntity = _assumpRepository.Find(entity => entity.Description == assumpRequest.Description)
                 .FirstOrDefault();
 
             if (assumpEntity != null)
             {
-                throw new AlreadyExistsException<Assumption>("Assumption with such description already exists.");
+                throw new AlreadyExistsException("Assumption with such description already exists", "description");
             }
 
             assumpEntity = _mapper.Map<Assumption>(assumpRequest);
-
-            _assumpRepository.Create(assumpEntity);
-
+            var id = _assumpRepository.CreateWithVal(assumpEntity);
             _uow.Save();
 
-            return _mapper.Map<AssumptionResponse>(_assumpRepository.Find(assump => assump.Id == assumpEntity.Id).FirstOrDefault());
+            return GetAssumptionResponse(id);
         }
 
-        public AssumptionResponse UpdateAssumption(AssumptionRequest assumpRequest, string assumpId)
+        public AssumptionResponse UpdateAssumption(AssumptionRequest assumpRequest, Guid assumpId)
         {
-            var assumpEntity = _assumpRepository.Find(assump => assump.Id.ToString() == assumpId)
-                 .FirstOrDefault();
-            _ = assumpEntity ?? throw new NotFoundException<Objective>("Assumption with id was not found.");
+            var assumpEntity = _assumpRepository.Find(entity => entity.Id == assumpId).FirstOrDefault();
+            _ = assumpEntity ?? throw new NotFoundException("Assumption was not found");
 
             assumpEntity = _mapper.Map<Assumption>(assumpRequest);
-            assumpEntity.Id = Guid.Parse(assumpId);
+            assumpEntity.Id = assumpId;
             _assumpRepository.Update(assumpEntity);
             _uow.Save();
 
-
-            return _mapper.Map<AssumptionResponse>(_assumpRepository.Find(assump => assump.Id.ToString() == assumpId).FirstOrDefault());
+            return GetAssumptionResponse(assumpId);
         }
 
-        public void DeleteAssumption(string assumpId)
+        public void DeleteAssumption(Guid assumpId)
         {
-            var assumpEntity = _assumpRepository.Find(assump => assump.Id.ToString() == assumpId)
-                .FirstOrDefault();
-            _ = assumpEntity ?? throw new NotFoundException<Assumption>("Assumption with id was not found.");
+            var assumpEntity = _assumpRepository.Find(entity => entity.Id == assumpId).FirstOrDefault();
 
-            _assumpRepository.SoftDelete(Guid.Parse(assumpId));
+            _ = assumpEntity ?? throw new NotFoundException("Assumption was not found.");
+
+            _assumpRepository.SoftDelete(assumpId);
             _uow.Save();
+        }
+
+        private AssumptionResponse GetAssumptionResponse(Guid assumptionId)
+        {
+            return _mapper.Map<AssumptionResponse>(_assumpRepository.Find(entity => entity.Id == assumptionId)
+                .FirstOrDefault());
         }
     }
 }

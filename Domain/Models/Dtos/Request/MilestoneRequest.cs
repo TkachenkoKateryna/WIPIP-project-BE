@@ -2,9 +2,9 @@
 {
     public class MilestoneRequest
     {
-        public string ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string Activity { get; set; }
         public DateTime DueDate { get; set; }
-        public List<string> DeliverablesId { get; set; }
+        public List<Guid> DeliverablesId { get; set; }
     }
 }

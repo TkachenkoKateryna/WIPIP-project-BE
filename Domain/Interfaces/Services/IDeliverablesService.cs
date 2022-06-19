@@ -5,9 +5,9 @@ namespace Domain.Interfaces.Services
 {
     public interface IDeliverablesService
     {
-        IEnumerable<DeliverableResponse> GetDeliverablesByProject(string projectId);
+        IEnumerable<DeliverableResponse> GetDeliverablesByProject(Guid projectId);
         DeliverableResponse AddDeliverable(DeliverableRequest delRequest);
-        DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, string delId);
-        void DeleteDeliverable(string delId);
+        DeliverableResponse UpdateDeliverable(DeliverableRequest delRequest, Guid delId);
+        void DeleteDeliverable(Guid delId);
     }
 }

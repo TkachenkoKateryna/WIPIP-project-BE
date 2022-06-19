@@ -23,53 +23,50 @@ namespace Domain.Services
 
         public IEnumerable<SkillResponse> GetSkills()
         {
-            return _skillRepository.GetAll().Select(entity =>
-                    _mapper.Map<SkillResponse>(entity))
-                .ToList();
+            return _skillRepository.GetAll().Select(sk => _mapper.Map<SkillResponse>(sk)).ToList();
         }
 
-        public SkillResponse AddSkill(SkillRequest skillRequest)
+        public SkillResponse AddSkill(SkillRequest skRequest)
         {
 
-            var skillEntity = _skillRepository.Find(skill => skill.Title == skillRequest.Title)
-                .FirstOrDefault();
+            var skEntity = _skillRepository.Find(sk => sk.Title == skRequest.Title).FirstOrDefault();
 
-            if (skillEntity != null)
+            if (skEntity != null)
             {
-                throw new AlreadyExistsException<Skill>("Assumption with such description already exists.");
+                throw new AlreadyExistsException("Skill with such title already exists", "title");
             }
 
-            skillEntity = _mapper.Map<Skill>(skillRequest);
+            skEntity = _mapper.Map<Skill>(skRequest);
 
-            var id = _skillRepository.CreateWithVal(skillEntity);
+            var id = _skillRepository.CreateWithVal(skEntity);
             _uow.Save();
 
-            return _mapper.Map<SkillResponse>(_skillRepository.Find(skill => skill.Id == id).FirstOrDefault());
+            return _mapper.Map<SkillResponse>(_skillRepository.Find(sk => sk.Id == id).FirstOrDefault());
         }
 
-        public SkillResponse UpdateSkill(SkillRequest skillRequest, Guid skillId)
+        public SkillResponse UpdateSkill(SkillRequest skRequest, Guid skId)
         {
-            var skillEntity = _skillRepository.Find(skill => skill.Id == skillId)
-                .FirstOrDefault();
-            _ = skillEntity ?? throw new NotFoundException<Skill>("Assumption with id was not found.");
+            var skEntity = _skillRepository.Find(sk => sk.Id == skId).FirstOrDefault();
 
-            skillEntity = _mapper.Map<Skill>(skillRequest);
-            skillEntity.Id = skillId;
+            _ = skEntity ?? throw new NotFoundException("Skill was not found");
 
-            _skillRepository.Update(skillEntity);
+            skEntity = _mapper.Map<Skill>(skRequest);
+            skEntity.Id = skId;
+
+            _skillRepository.Update(skEntity);
             _uow.Save();
 
 
-            return _mapper.Map<SkillResponse>(_skillRepository.Find(skill => skill.Id == skillId).FirstOrDefault());
+            return _mapper.Map<SkillResponse>(_skillRepository.Find(sk => sk.Id == skId).FirstOrDefault());
         }
 
-        public void DeleteSkill(Guid skillId)
+        public void DeleteSkill(Guid skId)
         {
-            var skillEntity = _skillRepository.Find(skill => skill.Id == skillId)
-                .FirstOrDefault();
-            _ = skillEntity ?? throw new NotFoundException<Skill>("Assumption with id was not found.");
+            var skEntity = _skillRepository.Find(sk => sk.Id == skId).FirstOrDefault();
 
-            _skillRepository.SoftDelete(skillId);
+            _ = skEntity ?? throw new NotFoundException("Skill was not found");
+
+            _skillRepository.SoftDelete(skId);
             _uow.Save();
         }
     }

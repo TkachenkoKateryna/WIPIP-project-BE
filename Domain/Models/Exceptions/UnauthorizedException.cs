@@ -1,9 +1,8 @@
 ﻿namespace Domain.Models.Exceptions
 {
-    internal class UnauthorizedException<T> : Exception
+    internal class UnauthorizedException : Exception
     {
-        public UnauthorizedException(string message)
-            : base(message)
+        public UnauthorizedException(string message) : base(message)
         {
         }
     }

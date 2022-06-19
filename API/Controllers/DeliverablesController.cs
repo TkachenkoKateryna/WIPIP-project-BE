@@ -9,7 +9,7 @@ namespace API.Controllers
     [Route("api/deliverables")]
     public class DeliverablesController : ControllerBase
     {
-        readonly IDeliverablesService _delService;
+        private readonly IDeliverablesService _delService;
 
         public DeliverablesController(IDeliverablesService delService)
         {
@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<DeliverableResponse>> GetAllDeliverables([FromQuery] string projectId)
+        public ActionResult<IEnumerable<DeliverableResponse>> GetAllDeliverables([FromQuery] Guid projectId)
         {
             return Ok(_delService.GetDeliverablesByProject(projectId));
         }
@@ -25,43 +25,21 @@ namespace API.Controllers
         [HttpPost]
         public ActionResult<DeliverableResponse> AddDeliverable(DeliverableRequest delRequest)
         {
-            try
-            {
-                var delResp = _delService.AddDeliverable(delRequest);
-                return Ok(delResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_delService.AddDeliverable(delRequest));
         }
 
-        [HttpPut("{delId}")]
-        public ActionResult<DeliverableResponse> UpdateDeliverable(DeliverableRequest delRequest, string delId)
+        [HttpPut("{delId:Guid}")]
+        public ActionResult<DeliverableResponse> UpdateDeliverable(DeliverableRequest delRequest, Guid delId)
         {
-            try
-            {
-                var delResp = _delService.UpdateDeliverable(delRequest, delId);
-                return Ok(delResp);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_delService.UpdateDeliverable(delRequest, delId));
         }
 
-        [HttpDelete("{delId}")]
-        public IActionResult DeleteDeliverables(string delId)
+        [HttpDelete("{delId:Guid}")]
+        public IActionResult DeleteDeliverables(Guid delId)
         {
-            try
-            {
-                _delService.DeleteDeliverable(delId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _delService.DeleteDeliverable(delId);
+
+            return Ok();
         }
     }
 }

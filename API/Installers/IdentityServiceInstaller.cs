@@ -1,11 +1,10 @@
-﻿using Domain.Models.Entities;
-using Domain.Interfaces;
+﻿using System.Text;
+using Domain.Interfaces.Util;
+using Domain.Models.Entities.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.EF;
-using System.Text;
-using Domain.Models.Entities.Identity;
 
 namespace API.Installers
 {
@@ -13,14 +12,14 @@ namespace API.Installers
     {
         public class IdentityServiceExtensions : IInstaller
         {
-            public void InstallServices(IServiceCollection services,
-                IConfiguration config)
+            public void InstallServices(IServiceCollection services, IConfiguration config)
             {
                 services.AddIdentityCore<User>(opt =>
                 {
                     opt.Password.RequireNonAlphanumeric = false;
                     opt.Password.RequireDigit = false;
                     opt.Password.RequireUppercase = false;
+                    opt.Password.RequireLowercase = false;
                 })
                     .AddRoles<Role>()
                     .AddEntityFrameworkStores<DataContext>()
