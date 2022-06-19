@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("candidates")]
+    [Route("api/candidates")]
     public class CandidateController : ControllerBase
     {
         readonly ICandidateService _candidateService;
