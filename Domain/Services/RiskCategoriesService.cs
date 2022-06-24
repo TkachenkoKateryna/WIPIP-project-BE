@@ -5,6 +5,8 @@ using Domain.Models.Dtos.Request;
 using Domain.Models.Dtos.Responses;
 using Domain.Models.Entities;
 using Domain.Models.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Domain.Services
 {
@@ -13,12 +15,15 @@ namespace Domain.Services
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IRepository<RiskCategory> _riskCategoryRepository;
+        private readonly Func<IQueryable<RiskCategory>, IIncludableQueryable<RiskCategory, object>> _includes;
 
         public RiskCategoriesService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
             _riskCategoryRepository = _uow.GetRepository<RiskCategory>();
             _mapper = mapper;
+            _includes = risk => risk
+               .Include(s => s.Risks);
         }
 
         public IEnumerable<RiskCategoryResponse> GetRiskCategories()
@@ -64,9 +69,14 @@ namespace Domain.Services
 
         public void DeleteRiskCategory(Guid rcId)
         {
-            var riskCategoryEntity = _riskCategoryRepository.Find(rc => rc.Id == rcId).FirstOrDefault();
+            var riskCategoryEntity = _riskCategoryRepository.Find(rc => rc.Id == rcId, _includes).FirstOrDefault();
 
             _ = riskCategoryEntity ?? throw new NotFoundException("Risk category was not found");
+
+            if (riskCategoryEntity.Risks.Count != 0)
+            {
+                throw new AlreadyExistsException("Risk category has been already assigned to some risks. To delete the risk carwgory reassign it from risks.");
+            }
 
             _riskCategoryRepository.SoftDelete(rcId);
             _uow.Save();

@@ -23,7 +23,7 @@ namespace Domain.Services
 
         public AssumptionResponse AddAssumption(AssumptionRequest assumpRequest)
         {
-            var assumpEntity = _assumpRepository.Find(entity => entity.Description == assumpRequest.Description)
+            var assumpEntity = _assumpRepository.Find(a => a.Description == assumpRequest.Description && a.ProjectId == assumpRequest.ProjectId)
                 .FirstOrDefault();
 
             if (assumpEntity != null)
@@ -42,6 +42,11 @@ namespace Domain.Services
         {
             var assumpEntity = _assumpRepository.Find(entity => entity.Id == assumpId).FirstOrDefault();
             _ = assumpEntity ?? throw new NotFoundException("Assumption was not found");
+
+            if (_assumpRepository.Find(a => a.Description == assumpRequest.Description && a.ProjectId == assumpRequest.ProjectId && a.Id != assumpId).Any())
+            {
+                throw new AlreadyExistsException("Assumption with such description already exists", "description");
+            }
 
             assumpEntity = _mapper.Map<Assumption>(assumpRequest);
             assumpEntity.Id = assumpId;

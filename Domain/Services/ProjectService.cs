@@ -199,7 +199,6 @@ namespace Domain.Services
             _uow.Save();
         }
 
-
         private static double CalculateMonthlyIncome(List<ProjectCandidate> candidates)
         {
             return (candidates.Sum(c => c.ExternalRate * (DailyHours * c.FTE) * AvarageNumbWorkDaysMonth));
@@ -213,7 +212,7 @@ namespace Domain.Services
 
         private static double CalculateMonthlyProfit(double income, double outcome)
         {
-            return Math.Round(((income - outcome) / outcome) * HundredPercent, RoundToHundreds);
+            return Math.Round(((income - outcome) / income) * HundredPercent, RoundToHundreds);
         }
 
         private List<CandidateResponse> GetProjectCandidates(Guid prId)

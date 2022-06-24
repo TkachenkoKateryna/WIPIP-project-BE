@@ -1,8 +1,12 @@
 ﻿using Domain.Interfaces.Services;
 using Domain.Interfaces.Services.Util;
 using Domain.Interfaces.Util;
+using Domain.Models.Dtos.Requests;
+using Domain.Models.Validators;
 using Domain.Services;
 using Domain.Services.Util;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace API.Installers
 {
@@ -26,6 +30,8 @@ namespace API.Installers
             services.AddScoped<IExcelService, ExcelService>();
             services.AddScoped<IPDFService, PDFService>();
             services.AddSingleton<ILoggerManager, LoggerManager>();
+            services.AddFluentValidation();
+            services.AddTransient<IValidator<EmployeeRequest>, EmployeeValidator>();
         }
     }
 }

@@ -23,7 +23,8 @@ namespace Domain.Services
 
         public ObjectiveResponse AddObjective(ObjectiveRequest obRequest)
         {
-            var obEntity = _objectiveRepository.FindWithDeleted(ob => ob.Title == obRequest.Title).FirstOrDefault();
+            var obEntity = _objectiveRepository.Find(ob => ob.Title == obRequest.Title && ob.ProjectId == obRequest.ProjectId)
+                .FirstOrDefault();
 
             if (obEntity != null)
             {
@@ -43,6 +44,11 @@ namespace Domain.Services
             var obEntity = _objectiveRepository.Find(ob => ob.Id == obId).FirstOrDefault();
 
             _ = obEntity ?? throw new NotFoundException("Objective was not found");
+
+            if (_objectiveRepository.Find(ob => ob.Title == obRequest.Title && ob.Id != obId && ob.ProjectId == obRequest.ProjectId).Any()) 
+            {
+                throw new AlreadyExistsException("Objective with such title already exists", "title");
+            }
 
             obEntity = _mapper.Map<Objective>(obRequest);
 

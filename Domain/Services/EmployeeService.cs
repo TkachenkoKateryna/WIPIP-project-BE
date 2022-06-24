@@ -58,7 +58,7 @@ namespace Domain.Services
             }
             else
             {
-                return employeesQuery.Where(emp => param.SkillIds.Any(sk => emp.EmployeeSkills.Any(empSk => empSk.SkillId == sk)))
+                return employeesQuery.AsEnumerable().Where(emp => param.SkillIds.Any(sk => emp.EmployeeSkills.Any(empSk => empSk.SkillId == sk)))
                     .Select(empEntity => _mapper.Map<EmployeeResponse>(empEntity))
                     .ToList();
             }
@@ -73,12 +73,21 @@ namespace Domain.Services
                 throw new AlreadyExistsException("Employee with such email already exists", "email");
             }
 
+            if(_employeeRepository.Find(e => e.Phone == empRequest.Phone).FirstOrDefault() != null)
+            {
+                throw new AlreadyExistsException("Employee with such phone already exists", "phone");
+            }
+
             empEntity = _mapper.Map<Employee>(empRequest);
 
-            _employeeRepository.Create(empEntity);
+            var empId = _employeeRepository.CreateWithVal(empEntity);
+
+            AddEmployeeSkill(empRequest.EmployeeSkills, empId);
+
             _uow.Save();
 
-            return _mapper.Map<EmployeeResponse>(empEntity);
+            return _mapper.Map<EmployeeResponse>(_employeeRepository.Find(emp => emp.Id == empId, _employeeIncludes)
+                .FirstOrDefault());
         }
 
         public EmployeeResponse UpdateEmployee(EmployeeRequest empRequest, Guid empId)

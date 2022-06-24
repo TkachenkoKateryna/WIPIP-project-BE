@@ -96,17 +96,21 @@ namespace Domain.Services
 
             _ = candEntity ?? throw new NotFoundException("Candidate was not founds");
 
-            var candEntityWithEmployee = _candidateRepository.Find(cand => cand.EmployeeId == candidateRequest.EmployeeId
-                && cand.ProjectId == candidateRequest.EmployeeId).FirstOrDefault();
-
             if (!candidateRequest.ToRemove)
             {
+                if (_candidateRepository.Find(c => c.EmployeeId == candidateRequest.EmployeeId && c.Id != candidateRequest.CandidateId && 
+                c.ProjectId == candidateRequest.ProjectId).Any())
+                {
+                    throw new AlreadyExistsException("Candidate has been already assinged to another employee. To add to new employee you need to make candidate free from employees.");
+                }
+
                 candEntity.EmployeeId = candidateRequest.EmployeeId;
             }
             else
             {
                 candEntity.EmployeeId = null;
             }
+
             _candidateRepository.Update(candEntity);
             _uow.Save();
 

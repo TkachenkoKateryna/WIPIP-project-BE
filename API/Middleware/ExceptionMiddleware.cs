@@ -42,7 +42,12 @@ namespace API.Middleware
                     error.Field = (string)exception.Data["field"];
                     error.Message = exception.Message;
                     break;
-                case UnauthorizedAccessException:
+                case BadRequestException:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    error.Field = (string)exception.Data["field"];
+                    error.Message = exception.Message;
+                    break;
+                case UnathorizedException:
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     error.Message = exception.Message;
                     break;

@@ -38,6 +38,7 @@ namespace Domain.Mapper
                 .ForMember(m => m.Interest, opt => opt.MapFrom(m => m.Stakeholder.Interest))
                 .ForMember(m => m.Influence, opt => opt.MapFrom(m => m.Stakeholder.Influence))
                 .ForMember(m => m.ImageLink, opt => opt.MapFrom(m => m.Stakeholder.ImageLink))
+                .ForMember(m => m.CommunicationChannel, opt => opt.MapFrom(m => m.Stakeholder.CommunicationChannel))
                 .ForMember(m => m.IsDeleted, opt => opt.MapFrom(m => m.Stakeholder.IsDeleted));
             CreateMap<Stakeholder, StakeholderResponse>();
             CreateMap<ProjectStakeholder, ProjectStakeholderResponse>()

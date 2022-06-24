@@ -40,11 +40,16 @@ namespace API.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (user is null) return BadRequest("User not found");
+            if (user is null) throw new NotFoundException("User was not found");
 
             if (_userManager.Users.Any(user => user.Email == userRequest.Email & user.Id != userId))
             {
-                throw new AlreadyExistsException("User with such email already exists");
+                throw new AlreadyExistsException("User with such email already exists", "email");
+            }
+
+            if (_userManager.Users.Any(user => user.UserName == userRequest.Name & user.Id != userId))
+            {
+                throw new AlreadyExistsException("User with such username already exists", "name");
             }
 
             await _userManager.SetEmailAsync(user, userRequest.Email);
@@ -65,7 +70,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest("Error while updating user");
+                throw new BadRequestException("Error while updating user");
             }
         }
 
@@ -120,7 +125,7 @@ namespace API.Controllers
 
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
 
-            if (user == null) return Unauthorized();
+            if (user == null) throw new NotFoundException("User was not found");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, false);
 
@@ -129,7 +134,7 @@ namespace API.Controllers
                 return _jwtService.CreateToken(user);
             }
 
-            return Unauthorized();
+            throw new UnathorizedException("Error while authorization. Check username or email.");
         }
 
         [AllowAnonymous]
@@ -140,7 +145,7 @@ namespace API.Controllers
             {
                 throw new AlreadyExistsException("User with such email already exists", "email");
             }
-            if (await _userManager.Users.AnyAsync(x => x.UserName.Equals(registerRequest.Email)))
+            if (await _userManager.Users.AnyAsync(x => x.UserName.Equals(registerRequest.Username)))
             {
                 throw new AlreadyExistsException("User with such user name already exists", "username");
             }
@@ -196,7 +201,7 @@ namespace API.Controllers
 
             if (!CheckPassword(changePassword.NewPassword, changePassword.ConfirmPassword))
             {
-                return BadRequest("Passwords are not equal");
+                throw new BadRequestException("Passwords are not equal", "confirmPassword");
             }
 
             var result =
@@ -211,7 +216,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest("Error while changing the password");
+                throw new BadRequestException("Error while changing the password. Check the old passsword.");
             }
         }
 

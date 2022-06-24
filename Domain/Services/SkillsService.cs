@@ -5,6 +5,8 @@ using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models.Dtos.Request;
 using Domain.Models.Exceptions;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Services
 {
@@ -13,12 +15,15 @@ namespace Domain.Services
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IRepository<Skill> _skillRepository;
-
+        private readonly Func<IQueryable<Skill>, IIncludableQueryable<Skill, object>> _includes;
         public SkillsService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
             _skillRepository = _uow.GetRepository<Skill>();
             _mapper = mapper;
+            _includes = skill => skill
+                .Include(s => s.EmployeeSkills)
+                .Include(s => s.Candidates);
         }
 
         public IEnumerable<SkillResponse> GetSkills()
@@ -62,9 +67,14 @@ namespace Domain.Services
 
         public void DeleteSkill(Guid skId)
         {
-            var skEntity = _skillRepository.Find(sk => sk.Id == skId).FirstOrDefault();
+            var skEntity = _skillRepository.Find(sk => sk.Id == skId, _includes).FirstOrDefault();
 
             _ = skEntity ?? throw new NotFoundException("Skill was not found");
+
+            if (skEntity.Candidates.Count != 0 || skEntity.EmployeeSkills.Count != 0)
+            {
+                throw new AlreadyExistsException("Skill has been already assigned to other elements. To delete the skill reassign it from elements.");
+            }
 
             _skillRepository.SoftDelete(skId);
             _uow.Save();

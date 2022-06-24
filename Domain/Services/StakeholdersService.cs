@@ -18,17 +18,15 @@ namespace Domain.Services
         private readonly IMapper _mapper;
         private readonly IRepository<Stakeholder> _stakeholderRepository;
         private readonly IRepository<ProjectStakeholder> _projStakeholdersRepository;
-        private readonly ILoggerManager _logger;
         private readonly Func<IQueryable<ProjectStakeholder>, IIncludableQueryable<ProjectStakeholder, object>> _includesStp;
         private readonly Func<IQueryable<Stakeholder>, IIncludableQueryable<Stakeholder, object>> _includesSt;
 
-        public StakeholdersService(IUnitOfWork uow, IMapper mapper, ILoggerManager logger)
+        public StakeholdersService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
             _stakeholderRepository = _uow.GetRepository<Stakeholder>();
             _projStakeholdersRepository = _uow.GetRepository<ProjectStakeholder>();
             _mapper = mapper;
-            _logger = logger;
             _includesStp = stakeholders => stakeholders
                 .Include(s => s.Project)
                 .Include(s => s.Stakeholder);
@@ -127,18 +125,16 @@ namespace Domain.Services
 
         public void DeleteStakeholder(Guid stId)
         {
-            var stEntity = _stakeholderRepository.Find(st => st.Id == stId).FirstOrDefault();
+            var stEntity = _stakeholderRepository.Find(st => st.Id == stId, _includesSt).FirstOrDefault();
 
             _ = stEntity ?? throw new NotFoundException("Stakeholder was not found");
 
-            _stakeholderRepository.SoftDelete(stId);
-
-            var prStList = _projStakeholdersRepository.Find(st => st.StakeholderId == stId).ToList();
-
-            foreach (var st in prStList)
+            if (stEntity.ProjectStakeholders != null)
             {
-                _projStakeholdersRepository.SoftDelete(st.Id);
+                throw new AlreadyExistsException("Stakeholder has been already assigned to some projects. To delete the stakeholder reassign it from projects.");
             }
+
+            _stakeholderRepository.SoftDelete(stId);
 
             _uow.Save();
         }

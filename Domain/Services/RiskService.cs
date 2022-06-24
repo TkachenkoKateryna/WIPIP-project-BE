@@ -108,9 +108,14 @@ namespace Domain.Services
 
         public void DeleteRisk(Guid rId)
         {
-            var rEntity = _riskRepository.FindWithDeleted(r => r.Id == rId).FirstOrDefault();
+            var rEntity = _riskRepository.FindWithDeleted(r => r.Id == rId, _includes).FirstOrDefault();
 
             _ = rEntity ?? throw new NotFoundException("Risk was not found");
+
+            if (rEntity.ProjectRisks.Count != 0)
+            {
+                throw new AlreadyExistsException("Risk has been already assigned to other elements. To delete the risk reassign it from elements.");
+            }
 
             _riskRepository.SoftDelete(rId);
             _uow.Save();

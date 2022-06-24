@@ -30,11 +30,11 @@ namespace Domain.Services
 
         public MilestoneResponse AddMilestone(MilestoneRequest mRequest)
         {
-            var mEntity = _milRepository.Find(m => m.Activity == mRequest.Activity).FirstOrDefault();
+            var mEntity = _milRepository.Find(m => m.Activity == mRequest.Activity && m.ProjectId == mRequest.ProjectId).FirstOrDefault();
 
             if (mEntity != null)
             {
-                throw new AlreadyExistsException("Milestone with such activity exists");
+                throw new AlreadyExistsException("Milestone with such activity exists", "activity");
             }
 
             mEntity = _mapper.Map<Milestone>(mRequest);
@@ -57,6 +57,11 @@ namespace Domain.Services
             var mEntity = _milRepository.Find(m => m.Id == mId, _includes).FirstOrDefault();
 
             _ = mEntity ?? throw new NotFoundException("Milestone was not found.");
+
+            if (_milRepository.Find(m => m.Activity == mRequest.Activity && m.Id != mId && m.ProjectId == m.ProjectId).Any())
+            {
+                throw new AlreadyExistsException("Milestone with such title already exists", "activity");
+            }
 
             foreach (var d in mEntity.Deliverables.ToList().Where(del => mRequest.DeliverablesId.All(id => id != del.Id)))
             {

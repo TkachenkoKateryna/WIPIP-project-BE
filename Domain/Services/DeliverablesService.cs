@@ -30,7 +30,7 @@ namespace Domain.Services
 
         public DeliverableResponse AddDeliverable(DeliverableRequest delRequest)
         {
-            var delEntity = _delivRepository.Find(d => d.Title == delRequest.Title).FirstOrDefault();
+            var delEntity = _delivRepository.Find(d => d.Title == delRequest.Title && d.ProjectId == delRequest.ProjectId).FirstOrDefault();
 
             if (delEntity != null)
             {
@@ -50,6 +50,11 @@ namespace Domain.Services
 
             _ = delEntity ?? throw new NotFoundException("Deliverable was not found");
 
+            if (_delivRepository.Find(d => d.Title == delRequest.Title && d.Id != delId && d.ProjectId == delRequest.ProjectId).Any())
+            {
+                throw new AlreadyExistsException("Deliverable with such title already exists", "title");
+            }
+
             delEntity = _mapper.Map<Deliverable>(delRequest);
 
             delEntity.Id = delId;
@@ -65,7 +70,12 @@ namespace Domain.Services
 
             _ = delEntity ?? throw new NotFoundException("Deliverable was not found");
 
-            _delivRepository.Delete(delEntity);
+            if (delEntity.MilestoneId != null)
+            {
+                throw new BadRequestException("Delivary is already assigned to the milestone. To remove the delivery it should be free.");
+            }
+
+            _delivRepository.SoftDelete(delId);
             _uow.Save();
         }
     }
